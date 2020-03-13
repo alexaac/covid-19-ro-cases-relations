@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+    <head>
+
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>COVID-19 în România - Relațiile dintre cazuri</title>
+        <link rel="stylesheet" href="main.css">
+
+    </head>
+
+    <body>
+
+        <div class="wrapper">
+            <div class="slider">
+                <label for="nRadius"
+                        style="display: inline-block; width: 240px; text-align: right">
+                        Cazul numărul <span id="nRadius-value">…</span>
+                </label>
+
+                <input type="range" min="1" max="150" id="nRadius">
+            </div>
+            <div id="chart"></div>
+        </div>
+
+        <script src="//d3js.org/d3.v5.min.js"></script>
+        
+        <script src="main.js"></script>
+
+    </body>
+
+</html>

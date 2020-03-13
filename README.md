@@ -1,2 +1,6 @@
-# covid-19-ro-cases-relations
-Relations between COVID-19 cases in Romania. Data is being aggregated by geo-spatial.org
+# covid-19-ro
+
+COVID-19 Romania
+
+[Cases relations](https://alexaac.github.io/covid-19-ro-cases-relations)
+
