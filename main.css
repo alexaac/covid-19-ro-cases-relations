@@ -69,6 +69,13 @@ tooltip_div.tooltip {
     margin: 10px;
 }
 
+/* Smaller devices */
+@media (max-width: 550px) {
+    svg.chart-group {
+    height: 100%;
+  }
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 550px) {
     .wrapper {
