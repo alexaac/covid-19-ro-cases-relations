@@ -50,8 +50,10 @@ const graph = { nodes: [], links: [] };
         return "<b>Cazul " + d.properties.case_no + "</b><br />" +
             (d.properties.gender === 'Bărbat' ? "Bărbat, " : "Femeie, ") +
             (d.properties.age != null ? d.properties.age + "," : "") +
-            " din  " + d.properties.county + ".<br />" +
-            "Status: " + (d.properties.status === "Vindecat" ? "vindecat" : "spitalizat") + ".<br />" +
+            (d.properties.county != null ? (" din  " + d.properties.county) : "") + ".<br />" +
+            (d.properties.status != null
+                ? ("Status: " + (d.properties.status === "Vindecat" ? "vindecat" : "spitalizat") + ".<br />")
+                : "") +
             (d.properties.healing_date !== null ? ("Data recuperării: " + d.properties.healing_date + ".<br />") : "") +
             (d.properties.reference !== null && d.properties.reference !== "" ? ("Detalii: " + '<a href="' + d.properties.reference + '" target= "_blank">aici</a>') : "");
     };
