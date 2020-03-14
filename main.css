@@ -19,6 +19,7 @@ body {
 
 svg.chart-group {
     width: 100%;
+    height: 100%;
     max-width: 900px;
 }
 
@@ -67,13 +68,6 @@ tooltip_div.tooltip {
 .slider {
     padding: 10px;
     margin: 10px;
-}
-
-/* Smaller devices */
-@media (max-width: 550px) {
-    svg.chart-group {
-        height: 100%;
-    }
 }
 
 /* Small devices (tablets, 768px and up) */
