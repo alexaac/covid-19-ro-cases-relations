@@ -3,7 +3,7 @@
 // set the dimensions and margins of the graph
 const margin = {top: 50, right: 50, bottom: 50, left: 50},
     width = 1100 - margin.left - margin.right,
-    height = 1000 - margin.top - margin.bottom,
+    height = 960 - margin.top - margin.bottom,
     svg_width = width + margin.left + margin.right,
     svg_height = height + margin.top + margin.bottom;
 
