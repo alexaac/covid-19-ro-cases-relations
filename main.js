@@ -14,9 +14,26 @@ const graph = { nodes: [], links: [] };
     
     // Get nodes from links
     d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations").then(function(data) {
-    
+
         graph.nodes = data.data.nodes;
         graph.links = data.data.links;
+
+        const sources = data.data.nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România");
+
+        const country_nodes = sources.map( v => ({
+            name: v.properties.country_of_infection + "_" + v.properties.case_no,
+            target: v.properties.case_no,
+            country_name: v.properties.country_of_infection,
+            properties: {},
+            is_country_of_infection: 1
+        }));
+        const country_links = country_nodes.map( v => ({
+            source: v.name,
+            target: v.target
+        }));
+
+        graph.nodes.push(...country_nodes);
+        graph.links.push(...country_links);
 
         changeView();
     });
@@ -29,6 +46,10 @@ const graph = { nodes: [], links: [] };
         .style("display", "none");
 
     const highlight = (d) => {
+        if (d.is_country_of_infection) {
+            return;
+        };
+
         let left = d3.event.pageX -20;
         let top = d3.event.pageY + 20;
 
@@ -82,8 +103,12 @@ const graph = { nodes: [], links: [] };
 
     const changeView = () => {
 
-        const types = Array.from(new Set(graph.nodes.map(d => d.source)));
-        const cases = Array.from(new Set(graph.nodes.map(d => d.properties.case_no)));
+        const types = Array.from(new Set(graph.nodes
+            .filter(d => d.is_country_of_infection !== 1)
+            .map(d => d.source)));
+        const cases = Array.from(new Set(graph.nodes
+            .filter(d => d.is_country_of_infection !== 1)
+            .map(d => d.properties ? d.properties.case_no : "")));
         const color = d3.scaleOrdinal(d3.schemePaired).domain(types);
 
         // graph.nodes.shift();
@@ -95,7 +120,7 @@ const graph = { nodes: [], links: [] };
                 let name = JSON.parse(JSON.stringify(d)).name;
                 return name;
             }))
-            .force("charge", d3.forceManyBody().strength(-200))
+            .force("charge", d3.forceManyBody().strength(-120))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius(function(d) {
                 return d.radius
@@ -166,7 +191,11 @@ const graph = { nodes: [], links: [] };
             .attr("stroke", "white")
             .attr("stroke-width", 1.5)
             .attr("r", 8)
-            .attr("fill", function(d) {return d.parent ? color(d.parent.properties.county) : color(d.properties.county); })
+            .attr("fill", function(d) {
+                return (d.is_country_of_infection)
+                    ? "black"
+                    : (d.parent ? color(d.parent.properties.county) : color(d.properties.county)); 
+            })
             .attr("stroke", function(d) { return d.properties.status === "Vindecat" ? 'green' : '#333'; })
             .on("mouseenter", d => highlight(d));
             // .on("mouseleave", (d) => { unHighlight(); });
@@ -174,7 +203,9 @@ const graph = { nodes: [], links: [] };
         node.append("text")
                 .attr("x", 8)
                 .attr("y", "0.31em")
-                .text(d => { return "#" + d.name + ((d.properties.country_of_infection != null  && d.properties.country_of_infection != "România") ? (" <- " + d.properties.country_of_infection) : ""); })
+                .text(d => {
+                    return d.is_country_of_infection ? d.country_name : ("#" + d.name);
+                })
                 .clone(true).lower()
                 .attr("fill", "none")
                 .attr("stroke", "white")
