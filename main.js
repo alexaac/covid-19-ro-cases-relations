@@ -71,7 +71,7 @@ const graph = { nodes: [], links: [] };
         return "<b>Cazul " + d.properties.case_no + "</b><br />" +
             (d.properties.gender === 'Bărbat' ? "Bărbat, " : "Femeie, ") +
             (d.properties.age != null && d.properties.age != 0 ? d.properties.age + "," : "") +
-            (d.properties.county != null ? (" din  " + d.properties.county) : "") + ".<br />" +
+            (d.properties.county != null && d.properties.county != "" ? (" din  " + d.properties.county) : "") + ".<br />" +
             (d.properties.status != null
                 ? ("Status: " + (d.properties.status === "Vindecat" ? "vindecat" : "spitalizat") + ".<br />")
                 : "") +
