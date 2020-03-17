@@ -3,7 +3,7 @@
 // set the dimensions and margins of the graph
 const margin = {top: 50, right: 50, bottom: 50, left: 50},
     width = 1100 - margin.left - margin.right,
-    height = 960 - margin.top - margin.bottom,
+    height = 1100 - margin.top - margin.bottom,
     svg_width = width + margin.left + margin.right,
     svg_height = height + margin.top + margin.bottom;
 
@@ -120,7 +120,9 @@ const graph = { nodes: [], links: [] };
                 let name = JSON.parse(JSON.stringify(d)).name;
                 return name;
             }))
-            .force("charge", d3.forceManyBody().strength(-120))
+            .force("charge", d3.forceManyBody()
+                                .strength(-100)
+                                .distanceMax(1100))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius(function(d) {
                 return d.radius
