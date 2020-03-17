@@ -9,11 +9,110 @@ const margin = {top: 50, right: 50, bottom: 50, left: 50},
 
 const graph = { nodes: [], links: [] };
 
+// use a tooltip to show node info
+const tooltip_div = d3.select("body")
+   .append("tooltip_div")
+   .attr("class", "tooltip")
+   .style("opacity", 0)
+   .style("display", "none");
+
+const highlight = (d) => {
+   if (d.is_country_of_infection) {
+       return;
+   };
+
+   let left = d3.event.pageX -20;
+   let top = d3.event.pageY + 20;
+
+   if (window.innerWidth - left < 150){
+     left = d3.event.pageX - 40;
+   }
+
+   tooltip_div.transition()
+       .duration(200)
+       .style("opacity", .9);
+
+   tooltip_div.html(tooltipHTML(d))
+       .style("left", left + 'px')
+       .style("top", top + 'px')
+       .style("display", null);
+};
+
+const tooltipHTML = (d) => {
+   return "<b>Cazul " + d.properties.case_no + "</b><br />" +
+       (d.properties.gender === 'Bărbat' ? "Bărbat" : "Femeie") +
+       (d.properties.age != null && d.properties.age != 0 ? (", " + d.properties.age) : "") +
+       (d.properties.county != null && d.properties.county != "" ? (", din  " + d.properties.county) : "") + ".<br />" +
+       (d.properties.status != null
+           ? ("Status: " + (d.properties.status === "Vindecat" ? "vindecat" : "spitalizat") + ".<br />")
+           : "") +
+       (d.properties.healing_date !== null ? ("Data recuperării: " + d.properties.healing_date + ".<br />") : "") +
+       (d.properties.reference !== null && d.properties.reference !== "" ? ("Detalii: " + '<a href="' + d.properties.reference + '" target= "_blank">aici</a>') : "");
+};
+
+const unHighlight = () => {
+   tooltip_div.transition()
+       .duration(200)
+       .style("opacity", 0);
+};
+
+// simulation drag
+const drag = simulation => {
+    const dragstarted = d => {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    const dragged = d => {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+    }
+
+    const dragended = d => {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+
+    return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+};
+
+// simulation link
+const linkArc = d => {
+    const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+    return `
+      M${d.source.x},${d.source.y}
+      A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+    `;
+};
+
+// updateR the slider
+const updateRadius = (nRadius) => {
+
+    // adjust the text on the range slider
+    d3.select("#nRadius-value").text(nRadius);
+    d3.select("#nRadius").property("value", nRadius);
+
+    // highlight case
+    d3.selectAll("circle")
+        .attr("stroke-width", "1.5px")
+        .attr("r", 8)
+        .attr("fill-opacity", 1);
+    d3.selectAll(".CO-" + nRadius)
+        .attr("r", 15)
+        .attr("stroke-width", "10px")
+        .attr("fill-opacity", 0.1);
+}
+
 // Get the data
 (() => {
     
     // Get nodes from links
-    d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations").then(function(data) {
+    d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations").then( data => {
 
         graph.nodes = data.data.nodes;
         graph.links = data.data.links;
@@ -37,53 +136,6 @@ const graph = { nodes: [], links: [] };
 
         changeView();
     });
-
-    // use a tooltip to show info per county, simultaneous in all charts
-    const tooltip_div = d3.select("body")
-        .append("tooltip_div") 
-        .attr("class", "tooltip")       
-        .style("opacity", 0)
-        .style("display", "none");
-
-    const highlight = (d) => {
-        if (d.is_country_of_infection) {
-            return;
-        };
-
-        let left = d3.event.pageX -20;
-        let top = d3.event.pageY + 20;
-
-        if (window.innerWidth - left < 150){
-          left = d3.event.pageX - 40;
-        }
-
-        tooltip_div.transition()    
-            .duration(200)    
-            .style("opacity", .9);
-
-        tooltip_div.html(tooltipHTML(d))
-            .style("left", left + 'px')
-            .style("top", top + 'px')
-            .style("display", null);
-    };
-
-    const tooltipHTML = (d) => {
-        return "<b>Cazul " + d.properties.case_no + "</b><br />" +
-            (d.properties.gender === 'Bărbat' ? "Bărbat" : "Femeie") +
-            (d.properties.age != null && d.properties.age != 0 ? (", " + d.properties.age) : "") +
-            (d.properties.county != null && d.properties.county != "" ? (", din  " + d.properties.county) : "") + ".<br />" +
-            (d.properties.status != null
-                ? ("Status: " + (d.properties.status === "Vindecat" ? "vindecat" : "spitalizat") + ".<br />")
-                : "") +
-            (d.properties.healing_date !== null ? ("Data recuperării: " + d.properties.healing_date + ".<br />") : "") +
-            (d.properties.reference !== null && d.properties.reference !== "" ? ("Detalii: " + '<a href="' + d.properties.reference + '" target= "_blank">aici</a>') : "");
-    };
-
-    const unHighlight = () => {
-        tooltip_div.transition()
-            .duration(200)
-            .style("opacity", 0);
-    };
 
     // append the svg object to the chart div
     // appends a 'group' element to 'svg'
@@ -124,7 +176,7 @@ const graph = { nodes: [], links: [] };
                                 .strength(-100)
                                 .distanceMax(1100))
             .force("center", d3.forceCenter(width / 2, height / 2))
-            .force('collision', d3.forceCollide().radius(function(d) {
+            .force('collision', d3.forceCollide().radius( d => {
                 return d.radius
             }))
             .force("x", d3.forceX())
@@ -155,31 +207,6 @@ const graph = { nodes: [], links: [] };
                     .attr("stroke", d => "#999")
                     .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
 
-        const drag = simulation => {
-
-            function dragstarted(d) {
-                if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-            }
-            
-            function dragged(d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
-            }
-            
-            function dragended(d) {
-                if (!d3.event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
-            
-            return d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended);
-        };
-
         const node = svg.append("g")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
@@ -193,12 +220,12 @@ const graph = { nodes: [], links: [] };
             .attr("stroke", "white")
             .attr("stroke-width", 1.5)
             .attr("r", 8)
-            .attr("fill", function(d) {
+            .attr("fill", d => {
                 return (d.is_country_of_infection)
                     ? "black"
                     : (d.parent ? color(d.parent.properties.county) : color(d.properties.county)); 
             })
-            .attr("stroke", function(d) { return d.properties.status === "Vindecat" ? 'green' : '#333'; })
+            .attr("stroke", d => { return d.properties.status === "Vindecat" ? 'green' : '#333'; })
             .on("mouseenter", d => highlight(d));
             // .on("mouseleave", (d) => { unHighlight(); });
             
@@ -224,29 +251,11 @@ const graph = { nodes: [], links: [] };
 
         // when the input range changes highlight the circle
         d3.select("#nRadius").on("input", function() {
-            update(+this.value);
+            updateRadius(+this.value);
         });
 
         // Select first case
-        update(1);
-
-        // update the elements
-        function update(nRadius) {
-
-            // adjust the text on the range slider
-            d3.select("#nRadius-value").text(nRadius);
-            d3.select("#nRadius").property("value", nRadius);
-
-            // highlight case
-            d3.selectAll("circle")
-                .attr("stroke-width", "1.5px")
-                .attr("r", 8)
-                .attr("fill-opacity", 1);
-            d3.selectAll(".CO-" + nRadius)
-                .attr("r", 15)
-                .attr("stroke-width", "10px")
-                .attr("fill-opacity", 0.1);
-        }
+        updateRadius(1);
 
         /******************************** Title ********************************/
         // svg.append("text")
@@ -256,14 +265,6 @@ const graph = { nodes: [], links: [] };
         //     .style("font-size", "16px")
         //     .style("text-decoration", "underline")
         //     .text("Relația cazurilor confirmate");
-
-        function linkArc(d) {
-            const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
-            return `
-              M${d.source.x},${d.source.y}
-              A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
-            `;
-        };
 
     };
 
