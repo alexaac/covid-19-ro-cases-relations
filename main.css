@@ -12,6 +12,12 @@ body {
     padding: 0px;
 }
 
+:root {
+    --main-confirmate:#63ace7 ;
+    --main-recuperari: #00ffff;
+    --main-decese: #b2beb5;
+}
+
 .wrapper {
     margin: 0 20;
     max-width: 1200px;

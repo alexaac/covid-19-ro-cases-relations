@@ -7,8 +7,6 @@ const margin = {top: 50, right: 50, bottom: 50, left: 50},
     svg_width = width + margin.left + margin.right,
     svg_height = height + margin.top + margin.bottom;
 
-const graph = { nodes: [], links: [] };
-
 // use a tooltip to show node info
 const tooltip_div = d3.select("body")
    .append("tooltip_div")
@@ -90,70 +88,59 @@ const linkArc = d => {
     `;
 };
 
-// updateR the slider
-const updateRadius = (nRadius) => {
-
-    // adjust the text on the range slider
-    d3.select("#nRadius-value").text(nRadius);
-    d3.select("#nRadius").property("value", nRadius);
-
-    // highlight case
-    d3.selectAll("circle")
-        .attr("stroke-width", "1.5px")
-        .attr("r", 8)
-        .attr("fill-opacity", 1);
-    d3.selectAll(".CO-" + nRadius)
-        .attr("r", 15)
-        .attr("stroke-width", "10px")
-        .attr("fill-opacity", 0.1);
-}
-
-// Get the data
 (() => {
-    
-    // Get nodes from links
+
+    // d3.json("cases_relations.json").then( data => { // dummy data
     d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations").then( data => {
 
-        graph.nodes = data.data.nodes;
-        graph.links = data.data.links;
+        const graph = { nodes: [], links: [] };
+        const graph1 = { nodes: [], links: [] };
 
-        const sources = data.data.nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România");
+        const nodes = data.data.nodes;
+        const links = data.data.links;
 
-        const country_nodes = sources.map( v => ({
-            name: v.properties.country_of_infection + "_" + v.properties.case_no,
-            target: v.properties.case_no,
-            country_name: v.properties.country_of_infection,
-            properties: {},
-            is_country_of_infection: 1
-        }));
-        const country_links = country_nodes.map( v => ({
-            source: v.name,
-            target: v.target
-        }));
+        graph.nodes = nodes;
+        graph.links = links;
 
-        graph.nodes.push(...country_nodes);
-        graph.links.push(...country_links);
+        const sources = nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
 
-        changeView();
+        // https://observablehq.com/d/cedc594061a988c6
+        graph1.nodes = nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
+        graph1.links = links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
+
+        // show spinner when changing view from round 1 to 2 and vice versa
+        d3.select("#switch-data")
+            .on("click", function(){
+                var button = d3.select(this);
+                if (button.text() === "Grupează după caz"){
+                    changeView(graph);
+                    button.text("Grupează după țară");
+                } else {
+                    changeView(graph1);
+                    button.text("Grupează după caz");
+                };
+            })
+
+        changeView(graph1);
     });
 
-    // append the svg object to the chart div
-    // appends a 'group' element to 'svg'
-    // moves the 'group' element to the top left margin
+    const changeView = (graph) => {
+        d3.select("#chart").selectAll("*").remove();
 
-    const svg = d3.select("#chart")
-        .append("svg")
-        .attr("class", "chart-group")
-        .attr("preserveAspectRatio", "xMidYMid")
-        .attr("width", svg_width)
-        .attr("height", svg_height)
-        .attr("viewBox", '0, 0 ' + svg_width + ' ' + svg_height)
-        .on("click", () => { unHighlight(); })
-            .append("g")
-                .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
-
-    const changeView = () => {
+        // append the svg object to the chart div
+        // appends a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("class", "chart-group")
+            .attr("preserveAspectRatio", "xMidYMid")
+            .attr("width", svg_width)
+            .attr("height", svg_height)
+            .attr("viewBox", '0, 0 ' + svg_width + ' ' + svg_height)
+            .on("click", () => { unHighlight(); })
+                .append("g")
+                    .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
 
         const types = Array.from(new Set(graph.nodes
             .filter(d => d.is_country_of_infection !== 1)
@@ -161,7 +148,15 @@ const updateRadius = (nRadius) => {
         const cases = Array.from(new Set(graph.nodes
             .filter(d => d.is_country_of_infection !== 1)
             .map(d => d.properties ? d.properties.case_no : "")));
-        const color = d3.scaleOrdinal(d3.schemePaired).domain(types);
+        const color = (status) => {
+            return status === "Confirmat"
+                ? "var(--main-confirmate)"
+                :  status === "Vindecat"
+                    ? "var(--main-recuperari"
+                    : status === "Decedat"
+                        ? "var(--main-decese)"
+                        : "#333";
+        };
 
         // graph.nodes.shift();
         const links = graph.links;
@@ -174,10 +169,10 @@ const updateRadius = (nRadius) => {
             }))
             .force("charge", d3.forceManyBody()
                                 .strength(-100)
-                                .distanceMax(1100))
+                                .distanceMax(1000))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius( d => {
-                return d.radius
+                return d.radius * 3
             }))
             .force("x", d3.forceX())
             .force("y", d3.forceY());
@@ -206,6 +201,7 @@ const updateRadius = (nRadius) => {
                 .join("path")
                     .attr("stroke", d => "#999")
                     .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
+        link.exit().remove();
 
         const node = svg.append("g")
             .attr("stroke-linecap", "round")
@@ -214,40 +210,91 @@ const updateRadius = (nRadius) => {
             .data(nodes)
             .join("g")
                 .call(drag(simulation));
-        
+
         node.append("circle")
-            .attr("class", d => `CO-${d.properties.case_no}`)
+            .attr("class", d => d.properties && `CO-${d.properties.case_no}`)
             .attr("stroke", "white")
             .attr("stroke-width", 1.5)
-            .attr("r", 8)
+            .attr("r", 5)
             .attr("fill", d => {
                 return (d.is_country_of_infection)
                     ? "black"
-                    : (d.parent ? color(d.parent.properties.county) : color(d.properties.county)); 
+                    : (d.properties && d.parent
+                        ? color(d.parent.properties.status)
+                        : d.properties ? color(d.properties.status) : "black");
             })
-            .attr("stroke", d => { return d.properties.status === "Vindecat" ? 'green' : '#333'; })
-            .on("mouseenter", d => highlight(d));
-            // .on("mouseleave", (d) => { unHighlight(); });
-            
+            .attr("stroke", d => "#333")
+            .on("mouseenter", d => highlight(d))
+            .on("mouseover", fade(.2))
+            .on("mouseout", fade(1));
+
         node.append("text")
-                .attr("x", 8)
-                .attr("y", "0.31em")
-                .text(d => {
-                    return d.is_country_of_infection ? d.country_name : ("#" + d.name);
-                })
-                .clone(true).lower()
-                .attr("fill", "none")
-                .attr("stroke", "white")
-                .attr("stroke-width", 3);
+            .attr("x", 8)
+            .attr("y", "0.31em")
+            .text(d => {
+                return d.is_country_of_infection ? d.country_name : ("#" + d.name);
+            })
+            .clone(true).lower()
+            .attr("fill", "none")
+            .attr("stroke", "white")
+            .attr("stroke-width", 3);
+        node.exit().remove();
 
         simulation.on("tick", () => {
             link.attr("d", linkArc);
             node.attr("transform", d => `translate(${d.x},${d.y})`);
         });
-        
+
+        // https://bl.ocks.org/martinjc/5e73d17699573ccd7c2d4468d61dce17/8c047553db6e8627553165ee283cfd525416605c
+        // build a dictionary of nodes that are linked
+        var linkedByIndex = {};
+        links.forEach(function(d) {
+            linkedByIndex[d.source.index + "," + d.target.index] = 1;
+        });
+
+        // check the dictionary to see if nodes are linked
+        function isConnected(a, b) {
+            return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index == b.index;
+        }
+
+        // fade nodes on hover
+        function fade(opacity) {
+            return function(d) {
+                // check all other nodes to see if they're connected
+                // to this one. if so, keep the opacity at 1, otherwise
+                // fade
+                node.style("stroke-opacity", function(o) {
+                    thisOpacity = isConnected(d, o) ? 1 : opacity;
+                    return thisOpacity;
+                });
+                node.style("fill-opacity", function(o) {
+                    thisOpacity = isConnected(d, o) ? 1 : opacity;
+                    return thisOpacity;
+                });
+                // also style link accordingly
+                link.style("stroke-opacity", function(o) {
+                    return o.source === d || o.target === d ? 1 : opacity;
+                });
+            };
+        }
+
         // Case slider
         // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
         d3.select("#nRadius").property("max", d3.max(cases));
+
+        // updateR the slider
+        const updateRadius = (nRadius) => {
+
+            // adjust the text on the range slider
+            d3.select("#nRadius-value").text(nRadius);
+            d3.select("#nRadius").property("value", nRadius);
+
+            // highlight case
+            d3.selectAll("circle")
+                .attr("r", 5);
+            d3.selectAll(".CO-" + nRadius)
+                .attr("r", 10);
+        }
 
         // when the input range changes highlight the circle
         d3.select("#nRadius").on("input", function() {
