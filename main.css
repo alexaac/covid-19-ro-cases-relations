@@ -26,7 +26,9 @@ body {
 svg.chart-group {
     width: 90%;
     height: 90%;
-    max-width: 900px;
+    margin-left: 50px;
+    margin-right: 50px;
+    max-width: 1000px;
 }
 
 .link {
