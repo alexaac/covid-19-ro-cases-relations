@@ -168,8 +168,8 @@ const linkArc = d => {
                 return name;
             }))
             .force("charge", d3.forceManyBody()
-                                .strength(-100)
-                                .distanceMax(1000))
+                                .strength(-60)
+                                .distanceMax(900))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius( d => {
                 return d.radius * 3
