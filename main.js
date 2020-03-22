@@ -137,10 +137,11 @@ const linkArc = d => {
             .attr("width", svg_width)
             .attr("height", svg_height)
             .attr("viewBox", '0, 0 ' + svg_width + ' ' + svg_height)
-            .on("click", () => { unHighlight(); })
-                .append("g")
-                    .attr("transform",
-                    "translate(" + margin.left + "," + margin.top + ")");
+            .on("click", () => { unHighlight(); });
+
+        var g = svg.append("g")
+            .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
 
         const types = Array.from(new Set(graph.nodes
             .filter(d => d.is_country_of_infection !== 1)
@@ -175,8 +176,17 @@ const linkArc = d => {
             .force("x", d3.forceX())
             .force("y", d3.forceY());
 
+        var zoom_handler = d3.zoom()
+            .on("zoom", zoom_actions);
+
+        zoom_handler(svg);
+
+        function zoom_actions(){
+            g.attr("transform", d3.event.transform)
+        }
+
         // Per-type markers, as they don't inherit styles.
-        svg.append("defs").selectAll("marker")
+        g.append("defs").selectAll("marker")
         .data(types)
                 .join("marker")
                     .attr("id", d => `arrow-${d}`)
@@ -191,7 +201,7 @@ const linkArc = d => {
                     .attr("fill", "#999")
                     .attr("d", "M0,-5L10,0L0,5");
         
-        const link = svg.append("g")
+        const link = g.append("g")
                 .attr("fill", "none")
                 .attr("stroke-width", 1.5)
                 .selectAll("path")
@@ -201,7 +211,7 @@ const linkArc = d => {
                     .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
         link.exit().remove();
 
-        const node = svg.append("g")
+        const node = g.append("g")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
             .selectAll("g")
@@ -222,9 +232,9 @@ const linkArc = d => {
                         : d.properties ? color(d.properties.status) : "black");
             })
             .attr("stroke", d => "#333")
-            .on("mouseenter", d => highlight(d))
-            .on("mouseover", fade(.2))
-            .on("mouseout", fade(1));
+            .on("touchend mouseenter", d => highlight(d))
+            .on("touchend mouseover", fade(.2))
+            .on("touchend mouseout", fade(1));
 
         node.append("text")
             .attr("x", 8)
