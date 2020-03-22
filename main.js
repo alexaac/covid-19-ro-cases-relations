@@ -153,9 +153,7 @@ const linkArc = d => {
                 ? "var(--main-confirmate)"
                 :  status === "Vindecat"
                     ? "var(--main-recuperari"
-                    : status === "Decedat"
-                        ? "var(--main-decese)"
-                        : "#333";
+                    : "var(--main-decese)";
         };
 
         // graph.nodes.shift();
@@ -168,7 +166,7 @@ const linkArc = d => {
                 return name;
             }))
             .force("charge", d3.forceManyBody()
-                                .strength(-60)
+                                .strength(-50)
                                 .distanceMax(900))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius( d => {
