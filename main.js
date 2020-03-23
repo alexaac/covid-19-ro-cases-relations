@@ -42,7 +42,7 @@ const tooltipHTML = (d) => {
             ? "Bărbat"
             : (d.properties.gender === 'Femeie'
                 ? "Femeie"
-                : "Gen necunoscut")) +
+                : "Gen nespecificat")) +
        (d.properties.age != null && d.properties.age != 0 ? (", " + d.properties.age) : "") +
        (d.properties.county != null && d.properties.county != "" ? (", din  " + d.properties.county) : "") + ".<br />" +
        (d.properties.status != null
