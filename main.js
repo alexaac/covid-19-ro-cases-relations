@@ -42,7 +42,11 @@ const tooltipHTML = (d) => {
        (d.properties.age != null && d.properties.age != 0 ? (", " + d.properties.age) : "") +
        (d.properties.county != null && d.properties.county != "" ? (", din  " + d.properties.county) : "") + ".<br />" +
        (d.properties.status != null
-           ? ("Status: " + (d.properties.status === "Vindecat" ? "vindecat" : "spitalizat") + ".<br />")
+           ? ("Status: " + (d.properties.status === "Vindecat"
+                ? "vindecat"
+                : (d.properties.status === "Confirmat"
+                    ? "confirmat"
+                    : "deces")) + ".<br />")
            : "") +
        (d.properties.healing_date !== null ? ("Data recuperării: " + d.properties.healing_date + ".<br />") : "") +
        (d.properties.reference !== null && d.properties.reference !== "" ? ("Detalii: " + '<a href="' + d.properties.reference + '" target= "_blank">aici</a>') : "");
