@@ -2,8 +2,8 @@
 
 // set the dimensions and margins of the graph
 const margin = {top: 50, right: 50, bottom: 50, left: 50},
-    width = 1000 - margin.left - margin.right,
-    height = 1000 - margin.top - margin.bottom,
+    width = 1400 - margin.left - margin.right,
+    height = 1400 - margin.top - margin.bottom,
     svg_width = width + margin.left + margin.right,
     svg_height = height + margin.top + margin.bottom;
 
@@ -176,7 +176,7 @@ const linkArc = d => {
             }))
             .force("charge", d3.forceManyBody()
                                 .strength(-50)
-                                .distanceMax(900))
+                                .distanceMax(1400))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius( d => {
                 return d.radius * 3
