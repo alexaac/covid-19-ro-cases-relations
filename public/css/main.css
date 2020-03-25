@@ -12,14 +12,23 @@ body {
     padding: 0px;
 }
 
+:root {
+    --main-confirmate:#63ace7 ;
+    --main-recuperari: #00ffff;
+    --main-decese: #f3eaea;
+}
+
 .wrapper {
     margin: 0 20;
-    max-width: 1200px;
+    max-width: 1400px;
 }
 
 svg.chart-group {
     width: 100%;
-    max-width: 900px;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1400px;
 }
 
 .link {
