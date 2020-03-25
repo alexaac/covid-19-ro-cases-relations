@@ -102,34 +102,17 @@ const linkArc = d => {
     d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations").then( data => {
 
         const graph = { nodes: [], links: [] };
-        const graph1 = { nodes: [], links: [] };
 
         const nodes = data.data.nodes;
         const links = data.data.links;
 
-        graph.nodes = nodes;
-        graph.links = links;
-
         const sources = nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
 
         // https://observablehq.com/d/cedc594061a988c6
-        graph1.nodes = nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
-        graph1.links = links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
+        graph.nodes = nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
+        graph.links = links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
 
-        // show spinner when changing view from round 1 to 2 and vice versa
-        d3.select("#switch-data")
-            .on("click", function(){
-                var button = d3.select(this);
-                if (button.text() === "Grupează după caz"){
-                    changeView(graph);
-                    button.text("Grupează după țară");
-                } else {
-                    changeView(graph1);
-                    button.text("Grupează după caz");
-                };
-            })
-
-        changeView(graph1);
+        changeView(graph);
     });
 
     const changeView = (graph) => {
