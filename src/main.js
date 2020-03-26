@@ -2,8 +2,8 @@
 
 // set the dimensions and margins of the graph
 const margin = {top: 50, right: 50, bottom: 50, left: 50},
-    width = 1400 - margin.left - margin.right,
-    height = 1400 - margin.top - margin.bottom,
+    width = 1200 - margin.left - margin.right,
+    height = 1200 - margin.top - margin.bottom,
     svg_width = width + margin.left + margin.right,
     svg_height = height + margin.top + margin.bottom;
 
@@ -103,8 +103,15 @@ const linkArc = d => {
 
         const graph = { nodes: [], links: [] };
 
-        const nodes = data.data.nodes;
-        const links = data.data.links;
+        const nodes = data.data.nodes
+                        .sort(function(a,b) { return +a.name - +b.name; })
+                        .filter( d => d.name <= 500 );
+        const links = data.data.links
+                        .sort(function(a,b) { return +a.target - +b.target; })
+                        .filter( d => d.target <= 500 );
+
+        // const maxNode = data.data.nodes
+        //    .sort(function(a,b) { return +b.name - +a.name; })[0];
 
         const sources = nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
 
@@ -304,13 +311,13 @@ const linkArc = d => {
         updateRadius(1);
 
         /******************************** Title ********************************/
-        // svg.append("text")
-        //     .attr("x", (width / 2))
-        //     .attr("y", 0 - (margin.top))
-        //     .attr("text-anchor", "middle")
-        //     .style("font-size", "16px")
-        //     .style("text-decoration", "underline")
-        //     .text("Relația cazurilor confirmate");
+        svg.append("text")
+            .attr("x", (svg_width / 2))
+            .attr("y", 0 + (margin.top))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text("Relația cazurilor confirmate - primele 500 de cazuri");
 
     };
 
