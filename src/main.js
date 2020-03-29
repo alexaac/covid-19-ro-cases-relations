@@ -103,15 +103,8 @@ const linkArc = d => {
 
         const graph = { nodes: [], links: [] };
 
-        const nodes = data.data.nodes
-                        .sort(function(a,b) { return +a.name - +b.name; })
-                        .filter( d => d.name <= 500 );
-        const links = data.data.links
-                        .sort(function(a,b) { return +a.target - +b.target; })
-                        .filter( d => d.target <= 500 );
-
-        // const maxNode = data.data.nodes
-        //    .sort(function(a,b) { return +b.name - +a.name; })[0];
+        const nodes = data.data.nodes;
+        const links = data.data.links;
 
         const sources = nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
 
@@ -165,11 +158,11 @@ const linkArc = d => {
                 return name;
             }))
             .force("charge", d3.forceManyBody()
-                                .strength(-50)
-                                .distanceMax(1400))
+                                .strength(-60)
+                                .distanceMax(1200))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius( d => {
-                return d.radius * 3
+                return d.radius
             }))
             .force("x", d3.forceX())
             .force("y", d3.forceY());
@@ -317,7 +310,7 @@ const linkArc = d => {
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("text-decoration", "underline")
-            .text("Relația cazurilor confirmate - primele 500 de cazuri");
+            .text("Relația cazurilor confirmate");
 
     };
 
