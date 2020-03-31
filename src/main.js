@@ -1,5 +1,8 @@
 // https://gist.github.com/mbostock/1153292
 
+let dataset, graph = {nodes: [], links: []};
+let simulation, link, node, statusColor, countyColor;
+
 // set the dimensions and margins of the graph
 const margin = {top: 50, right: 50, bottom: 50, left: 50},
     width = 1200 - margin.left - margin.right,
@@ -37,7 +40,8 @@ const highlight = (d) => {
 };
 
 const tooltipHTML = (d) => {
-   return "<b>Cazul " + d.properties.case_no + "</b><br />" +
+    if (d.properties !== undefined) {
+        return "<b>Cazul " + d.properties.case_no + "</b><br />" +
        (d.properties.gender === 'Bărbat'
             ? "Bărbat"
             : (d.properties.gender === 'Femeie'
@@ -54,6 +58,9 @@ const tooltipHTML = (d) => {
            : "") +
        (d.properties.healing_date !== null ? ("Data recuperării: " + d.properties.healing_date + ".<br />") : "") +
        (d.properties.reference !== null && d.properties.reference !== "" ? ("Detalii: " + '<a href="' + d.properties.reference + '" target= "_blank">aici</a>') : "");
+    } else {
+        return d.name;
+    };
 };
 
 const unHighlight = () => {
@@ -101,10 +108,16 @@ const linkArc = d => {
     // d3.json("data/cases_relations.json").then( data => { // dummy data
     d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations").then( data => {
 
-        const graph = { nodes: [], links: [] };
+        dataset = data;
 
-        const nodes = data.data.nodes;
-        const links = data.data.links;
+        setupGraph();
+        setTimeout(drawGraph(), 100);
+    });
+
+    const setupGraph = () => {
+
+        const nodes = dataset.data.nodes;
+        const links = dataset.data.links;
 
         const sources = nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
 
@@ -112,16 +125,33 @@ const linkArc = d => {
         graph.nodes = nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
         graph.links = links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
 
-        changeView(graph);
-    });
+    }
 
-    const changeView = (graph) => {
+    const drawGraph = () => {
+        // show spinner when changing view from round 1 to 2 and vice versa
+        d3.select("#switch-colors")
+            .on("click", function(){
+                var button = d3.select(this);
+                if (button.text() === "Colorează județe"){
+                    coloreazaJudete();
+                    button.text("Colorează status");
+                } else {
+                    coloreazaStatus();
+                    button.text("Colorează județe");
+                };
+            });
+
+        const types = Array.from(new Set(graph.nodes.filter(d => d.properties).map(d => d.properties && d.properties.county)));
+        countyColor = d3.scaleOrdinal(d3.schemePaired).domain(types);
+
+        statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
+
         d3.select("#chart").selectAll("*").remove();
 
         // append the svg object to the chart div
         // appends a 'group' element to 'svg'
         // moves the 'group' element to the top left margin
-        const svg = d3.select("#chart")
+        let svg = d3.select("#chart")
             .append("svg")
             .attr("class", "chart-group")
             .attr("preserveAspectRatio", "xMidYMid")
@@ -134,38 +164,26 @@ const linkArc = d => {
             .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-        const types = Array.from(new Set(graph.nodes
-            .filter(d => d.is_country_of_infection !== 1)
-            .map(d => d.source)));
-        const cases = Array.from(new Set(graph.nodes
-            .filter(d => d.is_country_of_infection !== 1)
-            .map(d => d.properties ? d.properties.case_no : "")));
-        const color = (status) => {
-            return status === "Confirmat"
-                ? "var(--main-confirmate)"
-                :  status === "Vindecat"
-                    ? "var(--main-recuperari"
-                    : "var(--main-decese)";
-        };
+        const cases = Array.from(new Set(graph.nodes.map(d => d.properties ? d.properties.case_no : "")));
 
-        // graph.nodes.shift();
         const links = graph.links;
         const nodes = graph.nodes;
 
-        const simulation = d3.forceSimulation(nodes)
+        simulation = d3.forceSimulation(nodes)
             .force("link", d3.forceLink(links).id( d => {
                 let name = JSON.parse(JSON.stringify(d)).name;
                 return name;
             }))
             .force("charge", d3.forceManyBody()
-                                .strength(-140)
-                                .distanceMax(1400))
+                .strength(-140)
+                .distanceMax(1400))
             .force("center", d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide().radius( d => {
-                return d.radius
+            return d.radius
             }))
             .force("x", d3.forceX())
-            .force("y", d3.forceY());
+            .force("y", d3.forceY())
+            .alphaDecay([0.02]);
 
         var zoom_handler = d3.zoom()
             .on("zoom", zoom_actions);
@@ -188,11 +206,10 @@ const linkArc = d => {
                     .attr("markerHeight", 6)
                     .attr("orient", "auto")
                 .append("path")
-                    .attr("fill", color)
                     .attr("fill", "#999")
                     .attr("d", "M0,-5L10,0L0,5");
         
-        const link = g.append("g")
+        link = g.append("g")
                 .attr("fill", "none")
                 .attr("stroke-width", 1.5)
                 .selectAll("path")
@@ -202,7 +219,7 @@ const linkArc = d => {
                     .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
         link.exit().remove();
 
-        const node = g.append("g")
+        node = g.append("g")
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
             .selectAll("g")
@@ -215,13 +232,6 @@ const linkArc = d => {
             .attr("stroke", "white")
             .attr("stroke-width", 1.5)
             .attr("r", 5)
-            .attr("fill", d => {
-                return (d.is_country_of_infection)
-                    ? "black"
-                    : (d.properties && d.parent
-                        ? color(d.parent.properties.status)
-                        : d.properties ? color(d.properties.status) : "black");
-            })
             .attr("stroke", d => "#333")
             .on("touchend mouseenter", d => highlight(d))
             .on("touchend mouseover", fade(.2))
@@ -312,6 +322,58 @@ const linkArc = d => {
             .style("text-decoration", "underline")
             .text("Relația cazurilor confirmate");
 
+        svg.append('g')
+            .attr('class', 'categoryLegend');
+
+        coloreazaStatus();
+        createLegend(20, 50, statusColor);
     };
+
+    const coloreazaStatus = () => {
+        let svg = d3.select("#chart").select('svg');
+
+        svg.selectAll('circle')
+            .transition().duration(100)
+            .attr("fill", d => {
+                return (d.is_country_of_infection)
+                    ? "black"
+                    : (d.parent && d.parent.properties
+                        ? statusColor(d.parent.properties.status)
+                        : d.properties ? statusColor(d.properties.status) : "black");
+            });
+
+        createLegend(20, 50, statusColor);
+    }
+
+    const coloreazaJudete = () => {
+        let svg = d3.select("#chart").select('svg');
+
+        svg.selectAll('circle')
+            .transition().duration(100)
+            .attr("fill", d => {
+                return (d.is_country_of_infection)
+                    ? "black"
+                    : (d.parent && d.parent.properties
+                            ? countyColor(d.parent.properties.county)
+                            : d.properties ? countyColor(d.properties.county) : "");
+            });
+
+        createLegend(20, 50, countyColor);
+    }
+
+    const createLegend = (x, y, colorScale) => {
+        let svg = d3.select("#chart").select('svg');
+
+        svg.selectAll('.categoryLegend')
+            .attr('transform', `translate(${x},${y})`);
+
+        const categoryLegend = d3.legendColor()
+                                .shape('path', d3.symbol().type(d3.symbolCircle).size(150)())
+                                .shapePadding(10)
+                                .scale(colorScale);
+
+        d3.select('.categoryLegend')
+            .call(categoryLegend);
+    }
 
 }).call(this);
