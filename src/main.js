@@ -146,7 +146,9 @@ const linkArc = d => {
             .map(d => d.properties && d.properties.county)))
             .sort((a,b) => d3.ascending(a,b));
 
-        countyColor = d3.scaleOrdinal(d3.schemePaired).domain(types);
+        countyColor = d3.scaleOrdinal()
+            .domain(types)
+            .range(d3.quantize(t => d3.interpolateSpectral(t), types.length));
 
         statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
 
