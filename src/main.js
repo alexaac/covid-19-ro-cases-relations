@@ -141,7 +141,11 @@ const linkArc = d => {
                 };
             });
 
-        const types = Array.from(new Set(graph.nodes.filter(d => d.properties).map(d => d.properties && d.properties.county)));
+        const types = Array.from(new Set(graph.nodes
+            .filter(d => d.properties)
+            .map(d => d.properties && d.properties.county)))
+            .sort((a,b) => d3.ascending(a,b));
+
         countyColor = d3.scaleOrdinal(d3.schemePaired).domain(types);
 
         statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
