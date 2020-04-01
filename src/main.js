@@ -145,10 +145,8 @@ const linkArc = d => {
             .filter(d => d.properties)
             .map(d => d.properties && d.properties.county)))
             .sort((a,b) => d3.ascending(a,b));
-
-        countyColor = d3.scaleOrdinal()
-            .domain(types)
-            .range(d3.quantize(t => d3.interpolateSpectral(t), types.length));
+        const countyColors = ["#4cbf84", "#8e6def", "#c0c72d", "#605fd6", "#64bf44", "#bc5fd4", "#4ac66b", "#c946a2", "#9cbe3a", "#5581f2", "#e8ab24", "#8575db", "#cca334", "#4f8be2", "#dd6227", "#41d1e8", "#e04845", "#4bd1b1", "#e14286", "#6cad66", "#dd6acc", "#80a84c", "#8567bb", "#b6a546", "#af8ee6", "#c9793e", "#5a90d4", "#d84f59", "#57c8c6", "#d36272", "#50a283", "#d26d98", "#8ba76d", "#9b6bb2", "#b59d58", "#e6a2e7", "#c98762", "#59a3d0", "#ca7b78", "#9a97d2", "#c382a5", "#b872ad"];
+        countyColor = d3.scaleOrdinal(countyColors).domain(types);
 
         statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
 
@@ -217,7 +215,7 @@ const linkArc = d => {
         
         link = g.append("g")
                 .attr("fill", "none")
-                .attr("stroke-width", 1.5)
+                .attr("stroke-width", 0.5)
                 .selectAll("path")
                 .data(links)
                 .join("path")
@@ -236,7 +234,7 @@ const linkArc = d => {
         node.append("circle")
             .attr("class", d => d.properties && `CO-${d.properties.case_no}`)
             .attr("stroke", "white")
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 0.5)
             .attr("r", 5)
             .attr("stroke", d => "#333")
             .on("touchend mouseenter", d => highlight(d))

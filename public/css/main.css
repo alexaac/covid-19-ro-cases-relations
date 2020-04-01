@@ -33,7 +33,7 @@ svg.chart-group {
 .link {
     fill: none;
     stroke: grey;
-    stroke-width: 1.5px;
+    stroke-width: 0.5px;
 }
 
 #licensing {
@@ -49,7 +49,7 @@ svg.chart-group {
 }
 
 circle {
-    stroke-width: 1.5px;
+    stroke-width: 0.5px;
 }
 
 text {
