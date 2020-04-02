@@ -67,6 +67,7 @@ text {
 }
 
 .node-labels {
+    user-select: none;
     font-size: 8px;
     stroke-width: 3px;
     pointer-events: none;
