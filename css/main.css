@@ -66,6 +66,12 @@ text {
     font: 11px sans-serif;
 }
 
+.land {
+    fill: #E8E8E8;
+    stroke: #fff;
+    stroke-width: 2;
+}
+
 .node-labels {
     user-select: none;
     font-size: 8px;
@@ -78,6 +84,20 @@ text {
     font-size: 16px;
     text-decoration: underline;
     text-anchor: middle;
+}
+
+#toggle-map {
+    position: absolute;
+    right: 15px; top: 50px;
+    z-index: 100;
+    width: 150px;
+}
+
+#switch-colors {
+    position: absolute;
+    right: 15px; top: 15px;
+    z-index: 100;
+    width: 150px;
 }
 
 tooltip_div.tooltip {
