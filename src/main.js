@@ -21,7 +21,7 @@ Promise.all(promises).then( data => {
     setupGraph();
     setTimeout(drawGraph(), 100);
 }).catch(
-    error => console.log(error);
+    error => console.log(error)
 );
 
 const setupGraph = () => {
