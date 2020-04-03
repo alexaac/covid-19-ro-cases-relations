@@ -1,17 +1,20 @@
 // simulation drag
-export const drag = simulation => {
+export const drag = (simulation, positioning) => {
     const dragstarted = d => {
+        if (positioning === 'map') { return };
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
     }
 
     const dragged = d => {
+        if (positioning === 'map') { return };
         d.fx = d3.event.x;
         d.fy = d3.event.y;
     }
 
     const dragended = d => {
+        if (positioning === 'map') { return };
         if (!d3.event.active) simulation.alphaTarget(0);
         d.fx = null;
         d.fy = null;
