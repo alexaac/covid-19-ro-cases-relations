@@ -18,6 +18,11 @@ body {
     --main-decese: #f3eaea;
 }
 
+h1 {
+    text-align: center;
+    font: 16px sans-serif;
+}
+
 .wrapper {
     margin: 0 20;
     margin-left: auto;
@@ -98,6 +103,25 @@ text {
     right: 15px; top: 15px;
     z-index: 100;
     width: 75px;
+}
+
+.slider {
+    position: absolute;
+    right: 0px; top: 135px;
+    z-index: 100;
+    text-align: center;
+}
+
+.range {
+    height: 300px;
+}
+
+.slider-label {
+    position: absolute;
+    right: 0px; top: -20px;
+    z-index: 100;
+    text-align: center;
+    width: 60px;
 }
 
 tooltip_div.tooltip {
