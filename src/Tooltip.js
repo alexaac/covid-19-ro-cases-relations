@@ -6,10 +6,7 @@ export const tooltip_div = d3.select("body")
    .style("display", "none");
 
 export const highlight = (d) => {
-    if (d.is_country_of_infection) {
-        return;
-    };
- 
+    // TODO: slider
     let left = d3.event.pageX -20;
     let top = d3.event.pageY + 20;
  
@@ -17,10 +14,20 @@ export const highlight = (d) => {
       left = d3.event.pageX - 40;
     }
  
+    d3.selectAll("circle")
+        .attr("r", 5);
+
     tooltip_div.transition()
         .duration(200)
         .style("opacity", .9);
- 
+
+    d3.selectAll(".CO-" + d.name)
+        .attr("r", 15);
+
+    // adjust the text on the range slider
+    d3.select("#nRadius-value").text(d.name);
+    d3.select("#nRadius").property("value", d.name);
+
     tooltip_div.html(tooltipHTML(d))
         .style("left", left + 'px')
         .style("top", top + 'px')

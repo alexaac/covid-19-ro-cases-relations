@@ -89,22 +89,26 @@ const drawGraph = () => {
     // updateR the slider
     const updateRadius = (nRadius) => {
 
-        // adjust the text on the range slider
-        d3.select("#nRadius-value").text(nRadius);
-        d3.select("#nRadius").property("value", nRadius);
+        if (cases.includes(nRadius)) {
+            // adjust the text on the range slider
+            d3.select("#nRadius-value").text(nRadius);
+            d3.select("#nRadius").property("value", nRadius);
 
-        // highlight case
-        d3.selectAll("circle")
-            .attr("r", 5);
-        d3.selectAll(".CO-" + nRadius)
-            .attr("r", 10);
+            // highlight case
+            d3.selectAll("circle")
+                .attr("r", 5);
+            d3.select(".CO-" + nRadius)
+                .attr("r", 15)
+                .dispatch('mouseover');
+        }
     }
+
     // when the input range changes highlight the circle
     d3.select("#nRadius").on("input", function() {
         updateRadius(+this.value);
     });
-    // Select first case
-    updateRadius(1);
+    // Select latest case
+    updateRadius(d3.max(cases));
 
     // Setup the simulation
     // https://gist.github.com/mbostock/1153292
@@ -204,9 +208,12 @@ const drawGraph = () => {
     nodes.append("circle")
         .attr("class", d => d.properties && `CO-${d.properties.case_no}`)
         .attr("r", 5)
-        // .on("touchend mouseenter", d => Tooltip.highlight(d))
-        .on("touchmove mouseover", d => { Tooltip.highlight(d);  fade(nodes, links, .2) })
-        .on("touchend mouseout", fade(nodes, links, 1));
+        .on("touchmove mouseover", d => {
+            Tooltip.highlight(d);
+            // fade(nodes, links, .2);
+        })
+        // .on("touchend mouseout", fade(nodes, links, 1))
+        ;
 
     nodes.append("text")
         .attr("class", "node-labels")
@@ -217,13 +224,6 @@ const drawGraph = () => {
         })
         .clone(true).lower();
     nodes.exit().remove();
-
-    // Add the title
-    svg.append("text")
-        .attr("class", "title")
-        .attr("x", (Config.svg_width / 2))
-        .attr("y", 20)
-        .text("Relația cazurilor confirmate");
 
     // Color the legend for counties
     Layout.coloreazaStatus();

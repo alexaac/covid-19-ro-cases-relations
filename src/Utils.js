@@ -14,7 +14,7 @@ export const setFade = links => {
 
     // fade nodes on hover
     const fade = (node, link, opacity) => {
-        
+        // TODO redo
         return function(d) {
             // check all other nodes to see if they're connected
             // to this one. if so, keep the opacity at 1, otherwise
