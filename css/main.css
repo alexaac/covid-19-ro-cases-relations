@@ -95,30 +95,37 @@ text {
     position: absolute;
     right: 15px; top: 60px;
     z-index: 100;
-    width: 75px;
+    width: 60px;
+    font-size: 12px;
 }
 
 #switch-colors {
     position: absolute;
     right: 15px; top: 15px;
     z-index: 100;
-    width: 75px;
+    width: 60px;
+    font-size: 12px;
 }
 
 .slider {
     position: absolute;
-    right: 0px; top: 135px;
+    right: -140px; top: 250px;
     z-index: 100;
     text-align: center;
+    -webkit-transform:rotate(270deg);
+    -moz-transform:rotate(270deg);
+    -o-transform:rotate(270deg);
+    -ms-transform:rotate(270deg);
+    transform:rotate(270deg);
 }
 
 .range {
-    height: 300px;
+    width: 300px;
 }
 
 .slider-label {
     position: absolute;
-    right: 0px; top: -20px;
+    right: 15px; top: 110px;
     z-index: 100;
     text-align: center;
     width: 60px;
@@ -148,6 +155,14 @@ tooltip_div.tooltip {
     .wrapper {
         width: 97%;
         max-width: 767px;
+    }
+
+    #toggle-map {
+        width: 75px;
+    }
+
+    #switch-colors {
+        width: 75px;
     }
 }
 
