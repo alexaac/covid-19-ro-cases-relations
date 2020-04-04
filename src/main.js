@@ -72,12 +72,12 @@ const drawGraph = () => {
     d3.select("#switch-colors")
         .on("click", function(){
             const button = d3.select(this);
-            if (button.text() === "Colorează județe"){
+            if (button.text() === "Județe"){
                 Layout.coloreazaJudete(countyColor);
-                button.text("Colorează status");
+                button.text("Stare");
             } else {
                 Layout.coloreazaStatus(Layout.statusColor);
-                button.text("Colorează județe");
+                button.text("Județe");
             };
         });
 
@@ -267,12 +267,12 @@ const drawGraph = () => {
     d3.select("#toggle-map")
         .on("click", function(){
             const button = d3.select(this);
-            if (button.text() === "Grupează pe hartă"){
+            if (button.text() === "Hartă"){
                 toggle();
-                button.text("Arată diagrama");
+                button.text("Grafic");
             } else {
                 toggle();
-                button.text("Grupează pe hartă");
+                button.text("Hartă");
             };
         });
 

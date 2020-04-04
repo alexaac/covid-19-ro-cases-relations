@@ -90,14 +90,14 @@ text {
     position: absolute;
     right: 15px; top: 60px;
     z-index: 100;
-    width: 100px;
+    width: 75px;
 }
 
 #switch-colors {
     position: absolute;
     right: 15px; top: 15px;
     z-index: 100;
-    width: 100px;
+    width: 75px;
 }
 
 tooltip_div.tooltip {
@@ -124,14 +124,6 @@ tooltip_div.tooltip {
     .wrapper {
         width: 97%;
         max-width: 767px;
-    }
-
-    #toggle-map {
-        width: 160px;
-    }
-
-    #switch-colors {
-        width: 160px;
     }
 }
 
