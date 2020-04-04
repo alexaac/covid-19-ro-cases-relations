@@ -269,7 +269,7 @@ const drawGraph = () => {
             const button = d3.select(this);
             if (button.text() === "Hartă"){
                 toggle();
-                button.text("Grafic");
+                button.text("Rețea");
             } else {
                 toggle();
                 button.text("Hartă");
