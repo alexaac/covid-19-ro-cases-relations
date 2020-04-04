@@ -88,16 +88,16 @@ text {
 
 #toggle-map {
     position: absolute;
-    right: 15px; top: 50px;
+    right: 15px; top: 60px;
     z-index: 100;
-    width: 160px;
+    width: 100px;
 }
 
 #switch-colors {
     position: absolute;
     right: 15px; top: 15px;
     z-index: 100;
-    width: 160px;
+    width: 100px;
 }
 
 tooltip_div.tooltip {
@@ -124,6 +124,14 @@ tooltip_div.tooltip {
     .wrapper {
         width: 97%;
         max-width: 767px;
+    }
+
+    #toggle-map {
+        width: 160px;
+    }
+
+    #switch-colors {
+        width: 160px;
     }
 }
 
