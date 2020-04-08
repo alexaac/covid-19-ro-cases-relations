@@ -63,17 +63,11 @@ const drawGraph = () => {
         .on("zoom", zoom_actions);
 
     // Change colors from status to counties and vice versa
-    const counties = Array.from(new Set(graph.nodes
-        .filter(d => d.properties)
-        .map(d => d.properties && d.properties.county)))
-        .sort((a,b) => d3.ascending(a,b));
-    const countyColor = d3.scaleOrdinal(Layout.countyColors).domain(counties);
-
     d3.select("#switch-colors")
         .on("click", function(){
             const button = d3.select(this);
             if (button.text() === "Județe"){
-                Layout.coloreazaJudete(countyColor);
+                Layout.coloreazaJudete(Layout.countyColor);
                 button.text("Stare");
             } else {
                 Layout.coloreazaStatus(Layout.statusColor);

@@ -1,6 +1,16 @@
 export const statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
 
-export const countyColors = ["#4cbf84", "#8e6def", "#c0c72d", "#605fd6", "#64bf44", "#bc5fd4", "#4ac66b", "#c946a2", "#9cbe3a", "#5581f2", "#e8ab24", "#8575db", "#f0cc6b", "#4f8be2", "#dd6227", "#41d1e8", "#e04845", "#4bd1b1", "#e14286", "#6cad66", "#dd6acc", "#80a84c", "#8567bb", "#b6a546", "#af8ee6", "#c9793e", "#5a90d4", "#d84f59", "#57c8c6", "#d36272", "#50a283", "#d26d98", "#8ba76d", "#9b6bb2", "#b59d58", "#e6a2e7", "#c98762", "#59a3d0", "#ca7b78", "#9a97d2", "#c382a5", "#b872ad"];
+// https://medialab.github.io/iwanthue/
+// hcl[0]>=0 && hcl[0]<=340
+//     && hcl[1]>=30 && hcl[1]<=80
+//     && hcl[2]>=35 && hcl[2]<=100
+const countyColors = [
+    "#e4588c", "#35d394", "#ba1ea8", "#4caf1c", "#1848ca", "#aad42b", "#9b85ff", "#068400", "#8b2487", "#97ff8b", "#d60042", "#00ae87", "#f94740", "#48d3ff", "#d17300", "#5ea2ff", "#cfb100", "#53498f", "#ffe353", "#325383", "#86a700", "#ff9eeb", "#007f30", "#d9b6ff", "#3b5c12", "#89c2ff", "#964000", "#00bfbb", "#ff6f54", "#01aac6", "#ffb65d", "#008857", "#ff8e90", "#145f36", "#952e31", "#fffea6", "#8e3440", "#5a936f", "#883d0c", "#ffaf81", "#82401e", "#b09764", "#855b00"
+];
+const counties = [
+    "ALBA", "ARAD", "ARGEȘ", "BACĂU", "BIHOR", "BISTRIȚA-NĂSĂUD", "BOTOȘANI", "BRAȘOV", "BRĂILA", "BUCUREȘTI", "BUZĂU", "CARAȘ-SEVERIN", "CLUJ", "CONSTANȚA", "COVASNA", "CĂLĂRAȘI", "DOLJ", "DÂMBOVIȚA", "GALAȚI", "GIURGIU", "GORJ", "HARGHITA", "HUNEDOARA", "IALOMIȚA", "IAȘI", "ILFOV", "JUDEȚ NECUNOSCUT", "MARAMUREȘ", "MEHEDINȚI", "MUREȘ", "NEAMȚ", "OLT", "PRAHOVA", "SATU MARE", "SIBIU", "SUCEAVA", "SĂLAJ", "TELEORMAN", "TIMIȘ", "TULCEA", "VASLUI", "VRANCEA", "VÂLCEA"
+];
+export const countyColor = d3.scaleOrdinal(countyColors).domain(counties);
 
 export const coloreazaStatus = () => {
     let svg = d3.select("#chart").select('svg');
