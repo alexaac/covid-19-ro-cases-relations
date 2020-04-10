@@ -58,7 +58,7 @@ const drawGraph = () => {
         g.attr("transform", d3.event.transform);
     };
     const zoom_handler = d3.zoom()
-        .scaleExtent([0.5, 6])
+        .scaleExtent([0.5, 10])
         .on("zoom", zoom_actions);
 
     // Add legends
