@@ -6,7 +6,7 @@ import * as Layout from './Layout';
 
 let graph = {nodes: [], links: []};
 let simulation, links, nodes;
-let casesData, geoData;
+let casesData, geoData, layer, geoCounties;
 let positioning = 'diagram';
 
 const promises = [
@@ -32,12 +32,8 @@ const setupGraph = () => {
     graph.nodes = casesData.data.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
     graph.links = casesData.data.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
 
-}
-
-const drawGraph = () => {
-    const layer = "judete_wgs84";
-
-    const geoCounties = topojson.feature(geoData, geoData.objects[layer]).features;
+    layer = "judete_wgs84";
+    geoCounties = topojson.feature(geoData, geoData.objects[layer]).features;
 
     let countiesCentroids = d3.map();
     geoCounties.forEach( d => {
@@ -54,13 +50,21 @@ const drawGraph = () => {
             d.longitude = countiesCentroids.get(d.properties.county) && countiesCentroids.get(d.properties.county).lon;
         };
     });
+}
 
+const drawGraph = () => {
     // Zoom by scroll, pan
     const zoom_actions = () => {
         g.attr("transform", d3.event.transform);
     };
     const zoom_handler = d3.zoom()
+        .scaleExtent([0.5, 6])
         .on("zoom", zoom_actions);
+
+    // Add legends
+    Layout.createLegend(Layout.statusColor, 300, 300, 'status-legend');
+    Layout.createLegend(Layout.countyColor, 900, 1100, 'county-legend');
+    Layout.showLegend('status-legend');
 
     // Change colors from status to counties and vice versa
     d3.select("#switch-colors")
@@ -221,9 +225,6 @@ const drawGraph = () => {
 
     // Color the legend for counties
     Layout.coloreazaStatus();
-    svg.append('g')
-        .attr('class', 'category-legend');
-    Layout.createLegend(Layout.statusColor);
 
     // Apply zoom handler
     zoom_handler(svg);
@@ -244,7 +245,7 @@ const drawGraph = () => {
         update(links.transition(t), nodes.transition(t));
     };
 
-    const toggle = () => {
+    const toggleMap = () => {
         if (positioning === "diagram") {
             positioning = "map";
             map.attr("opacity", 1);
@@ -262,11 +263,31 @@ const drawGraph = () => {
         .on("click", function(){
             const button = d3.select(this);
             if (button.text() === "Hartă"){
-                toggle();
+                toggleMap();
                 button.text("Rețea");
             } else {
-                toggle();
+                toggleMap();
                 button.text("Hartă");
+            };
+        });
+
+    const toggleLegend = (show) => {
+        if (show) {
+            d3.select("#legend-div").classed("hide", false);
+        } else {
+            d3.select("#legend-div").classed("hide", true);
+        };
+    };
+    d3.select("#legend-div").classed("hide", true);
+    d3.select("#toggle-legend")
+        .on("click", function(){
+            const button = d3.select(this);
+            if (button.text() === "Legenda"){
+                toggleLegend(true);
+                button.text("Ascunde");
+            } else {
+                toggleLegend(false);
+                button.text("Legenda");
             };
         });
 
