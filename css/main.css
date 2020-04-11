@@ -100,7 +100,7 @@ text {
 
 #switch-colors {
     position: absolute;
-    right: 15px; top: 45px;
+    right: 15px; top: 85px;
     z-index: 100;
     width: 65px;
     font-size: 12px;
@@ -108,7 +108,7 @@ text {
 
 #toggle-map {
     position: absolute;
-    right: 15px; top: 75px;
+    right: 15px; top: 115px;
     z-index: 100;
     width: 65px;
     font-size: 12px;
@@ -116,7 +116,7 @@ text {
 
 #toggle-legend {
     position: absolute;
-    right: 15px; top: 105px;
+    right: 15px; top: 145px;
     z-index: 100;
     width: 65px;
     font-size: 12px;
@@ -124,7 +124,7 @@ text {
 
 .slider {
     position: absolute;
-    right: 15px; bottom: 15px;
+    left: 15px; top: 45px;
     z-index: 100;
     text-align: center;
     -moz-border-radius: 5px;
@@ -138,7 +138,7 @@ text {
 .county-legend, .status-legend {
     font-size: 10px;
     position: absolute;
-    left: 15px; top: 45px;
+    left: 15px; top: 85px;
     z-index: 100;
     -moz-border-radius: 5px;
     border-radius: 5px;
@@ -150,7 +150,7 @@ text {
 }
 
 .status-legend {
-    height: 20%;
+    height: 30%;
 }
 
 .county-legend {
@@ -176,23 +176,42 @@ tooltip_div.tooltip {
     font-family:  "EB Garamond", serif;
 }
 
+/* Smaller devices */
+@media (min-width: 340px) {
+    #switch-colors {
+        right: 15px; top: 45px;
+    }
+
+    #toggle-map {
+        right: 15px; top: 75px;
+    }
+
+    #toggle-legend {
+        right: 15px; top: 105px;
+    }
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 550px) {
     .wrapper {
         width: 97%;
     }
 
+    #switch-colors {
+        width: 75px;
+        right: 15px; top: 45px;
+    }
+
     #toggle-map {
         width: 75px;
+        right: 15px; top: 75px;
     }
 
     #toggle-legend {
         width: 75px;
+        right: 15px; top: 105px;
     }
 
-    #switch-colors {
-        width: 75px;
-    }
 }
 
 /* Large devices (large desktops, 1200px and up) */
