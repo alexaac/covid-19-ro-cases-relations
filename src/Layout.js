@@ -51,7 +51,7 @@ export const createLegend = (colorScale, height, vbHeight, legendClass) => {
             .attr('class', legendClass)
         .append("svg")
             .attr('class', "category-legend")
-            .attr("width", 120)
+            .attr("width", 110)
             .attr("height", height)
             .attr("preserveAspectRatio", "xMidYMid")
             .attr("viewBox", '-10, -10 ' + 120 + ' ' + vbHeight)
