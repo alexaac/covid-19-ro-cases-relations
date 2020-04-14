@@ -225,7 +225,7 @@ svg.chart-group a {
 
 .slider {
     position: absolute;
-    left: 0; top: 0; right: 10px;
+    left: 10px; top: 0; right: 10px;
     margin-top: 10px;
     z-index: 100;
     text-align: center;
