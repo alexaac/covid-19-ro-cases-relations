@@ -12,16 +12,32 @@
     </head>
 
     <body>
-        <div class="up-title"><h1>Relația cazurilor confirmate</h1></div>
         <div class="wrapper">
-            <button id="switch-colors" title="Colorează județe">Județe</button>
-            <button id="toggle-map" title="Grupează pe hartă">Hartă</button>
-            <button id="toggle-legend" title="Arată Legenda">Legenda</button>
+            <div class="side-pannel">
+                <div class="control control-group">
+                    <a id="color-counties" class="counties-icon" href="#" title="Colorează județe"></a>
+                    <a id="color-status" class="status-icon" href="#" title="Colorează stare"></a>
+                </div>
+                <div class="control control-group">
+                    <a id="show-map" class="map-icon" href="#" title="Hartă"></a>
+                    <a id="show-graph" class="graph-icon" href="#" title="Rețea"></a>
+                    <a id="toggle-legend" class="legend-icon" href="#" title="Legenda"></a>
+                </div>
+                <div class="control control-group">
+                    <a id="zoom-in" class="zoom-in-icon" href="#" title="Zoom In"></a>
+                    <a id="zoom-out" class="zoom-out-icon" href="#" title="Zoom Out"></a>
+                    <a id="reset-zoom" class="zoom-reset-icon" href="#" title="Zoom la hartă"></a>
+                </div>
+                <div class="control control-group">
+                    <a id="show-info" class="info-icon" href="#" title="Info"></a>
+                </div>
+            </div>
             <div class="slider">
-                Nod <span id="nRadius-value">…</span>
+                Caz <span id="nRadius-value">…</span>
                 <input class="range" type="range" min="1" max="1500" id="nRadius">
             </div>
-            <div id="chart"></div>
+            <div id="spinner"></div>
+            <div id="chart" class="grabbable"></div>
             <div id="legend-div"></div>
         </div>
 
@@ -29,6 +45,7 @@
         <script src="https://d3js.org/topojson.v2.min.js"></script>
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js'></script>
         
         <script src="bundle.js"></script>
 

@@ -21,7 +21,7 @@ export const highlight = (d) => {
         .duration(200)
         .style("opacity", .9);
 
-    d3.selectAll(".CO-" + d.name)
+    d3.select("#CO-" + d.name)
         .attr("r", 15);
 
     // adjust the text on the range slider

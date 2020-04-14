@@ -7,7 +7,34 @@ import * as Layout from './Layout';
 let graph = {nodes: [], links: []};
 let simulation, links, nodes;
 let casesData, geoData, layer, geoCounties;
-let positioning = 'diagram';
+let positioning = 'diagram', legendStatus = true, infoStatus = true;
+
+(() => {
+
+// Spinner
+// options for loading spinner
+let opts = {
+        lines: 9,
+        length: 4,
+        width: 5,
+        radius: 12,
+        scale: 1,
+        corners: 1,
+        color: '#f40000',
+        opacity: 0.25,
+        rotate: 0,
+        direction: 1,
+        speed: 1,
+        trail: 30,
+        fps: 20,
+        zIndex: 2e9,
+        className: 'spinner',
+        shadow: false,
+        hwaccel: false,
+        position: 'absolute',
+    },
+    target = document.getElementById('spinner'),
+    spinner;
 
 const promises = [
     d3.json("data/judete_wgs84.json"),
@@ -18,6 +45,7 @@ Promise.all(promises).then( data => {
     geoData = data[0];
     casesData = data[1];
 
+    spinner = new Spinner(opts).spin(target);
     setupGraph();
     setTimeout(drawGraph(), 100);
 }).catch(
@@ -54,12 +82,46 @@ const setupGraph = () => {
 
 const drawGraph = () => {
     // Zoom by scroll, pan
-    const zoom_actions = () => {
+    const zoomed = () => {
         g.attr("transform", d3.event.transform);
     };
-    const zoom_handler = d3.zoom()
-        .scaleExtent([0.5, 10])
-        .on("zoom", zoom_actions);
+
+    const zoom = d3.zoom()
+      .scaleExtent([0.2, 10])
+      .on("zoom", zoomed);
+
+    const resetZoom = () => {
+        g.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity,
+            d3.zoomTransform(g.node()).invert([Config.svg_width / 2, Config.svg_height / 2])
+        );
+    };
+
+    d3.select("#zoom-in").on("click", () => g.transition().call(zoom.scaleBy, 2));
+    d3.select("#zoom-out").on("click", () => g.transition().call(zoom.scaleBy, 0.5));
+    d3.select("#reset-zoom").on("click", () => resetZoom());
+
+    // Info
+    d3.select("#show-info").on("click", () => showInfo());
+
+    const showInfo = () => {
+        if (infoStatus === true) {
+            Tooltip.tooltip_div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            Tooltip.tooltip_div.html("<strong>Relația cazurilor confirmate</strong>.<br/><br/>Puteți selecta un caz, și da click pentru a centra graficul pe acesta,<br/> sau simplu mouse-over pentru a vedea detaliile.<br/>Click înafara punctului pentru a ascunde detaliile.")
+                .style("left", Config.svg_width / 2 + 'px')
+                .style("top", Config.svg_height / 2 + 'px')
+                .style("display", null);
+            infoStatus = false;
+        } else {
+            Tooltip.tooltip_div.transition()
+                .duration(200)
+                .style("opacity", 0);
+            infoStatus = true;
+        }
+    }
 
     // Add legends
     Layout.createLegend(Layout.statusColor, 300, 300, 'status-legend');
@@ -67,26 +129,18 @@ const drawGraph = () => {
     Layout.showLegend('status-legend');
 
     // Change colors from status to counties and vice versa
-    d3.select("#switch-colors")
-        .on("click", function(){
-            const button = d3.select(this);
-            if (button.text() === "Județe"){
-                Layout.coloreazaJudete(Layout.countyColor);
-                button.text("Stare");
-            } else {
-                Layout.coloreazaStatus(Layout.statusColor);
-                button.text("Județe");
-            };
-        });
+    d3.select("#color-counties")
+        .on("click", () => Layout.coloreazaJudete(Layout.countyColor));
+    d3.select("#color-status")
+        .on("click", () => Layout.coloreazaStatus(Layout.statusColor));
 
     // Case slider to highlight nodes by id
     // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
     const cases = Array.from(new Set(graph.nodes.map(d => d.properties ? d.properties.case_no : "")));
 
     d3.select("#nRadius").property("max", d3.max(cases));
-    // updateR the slider
+    // update the slider
     const updateRadius = (nRadius) => {
-
         if (cases.includes(nRadius)) {
             // adjust the text on the range slider
             d3.select("#nRadius-value").text(nRadius);
@@ -95,11 +149,22 @@ const drawGraph = () => {
             // highlight case
             d3.selectAll("circle")
                 .attr("r", 5);
-            d3.select(".CO-" + nRadius)
+            d3.select("#CO-" + nRadius)
                 .attr("r", 15)
-                .dispatch('mouseover');
+                .dispatch('mouseover')
+                .dispatch('click');
         }
     }
+
+    const panTo = d => {
+        d3.event.stopPropagation();
+        g.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity
+                .translate(Config.width / 2, Config.height / 2)
+                .translate(-d.x, -d.y)
+        );
+    };
 
     // when the input range changes highlight the circle
     d3.select("#nRadius").on("input", function() {
@@ -125,10 +190,10 @@ const drawGraph = () => {
             return name;
         }))
         .force("charge", d3.forceManyBody()
-            .strength(-140)
-            .distanceMax(1400))
+            .strength(-100)
+            .distanceMax(1000))
         .force("center", d3.forceCenter(Config.width / 2, Config.height / 2))
-        .force('collision', d3.forceCollide().radius( d =>  d.radius ))
+        // .force('collision', d3.forceCollide().radius( d =>  d.radius ))
         .force("x", d3.forceX())
         .force("y", d3.forceY())
         .alphaDecay([0.02]);
@@ -145,9 +210,8 @@ const drawGraph = () => {
             .attr("height", Config.svg_height)
             .attr("viewBox", '0, 0 ' + Config.svg_width + ' ' + Config.svg_height)
             .on("click", () => { Tooltip.unHighlight(); });
-    const g = svg.append("g")
-        .attr("transform",
-        "translate(" + Config.margin.left + "," + Config.margin.top + ")");
+    const g = svg.append("g");
+        // .attr("transform-origin", "50% 50% 0");
 
     // Add counties map
     const geojsonFeatures = topojson.feature(geoData, {
@@ -203,15 +267,14 @@ const drawGraph = () => {
             .call(Simulation.drag(simulation, positioning));
 
     const fade = Utils.setFade(graph.links);
+
     nodes.append("circle")
-        .attr("class", d => d.properties && `CO-${d.properties.case_no}`)
+        .attr("id", d => d.properties && `CO-${d.properties.case_no}`)
         .attr("r", 5)
         .on("touchmove mouseover", d => {
             Tooltip.highlight(d);
             // fade(nodes, links, .2);
-        })
-        // .on("touchend mouseout", fade(nodes, links, 1))
-        ;
+        }).on("click", panTo);
 
     nodes.append("text")
         .attr("class", "node-labels")
@@ -227,7 +290,7 @@ const drawGraph = () => {
     Layout.coloreazaStatus();
 
     // Apply zoom handler
-    zoom_handler(svg);
+    zoom(svg);
 
     // Toggle map
     // https://bl.ocks.org/cmgiven/4cfa1a95f9b952622280a90138842b79
@@ -245,7 +308,7 @@ const drawGraph = () => {
         update(links.transition(t), nodes.transition(t));
     };
 
-    const toggleMap = () => {
+    const toggleMap = (positioning) => {
         if (positioning === "diagram") {
             positioning = "map";
             map.attr("opacity", 1);
@@ -259,36 +322,35 @@ const drawGraph = () => {
         nodes.call(Simulation.drag(simulation, positioning));
     };
 
-    d3.select("#toggle-map")
-        .on("click", function(){
-            const button = d3.select(this);
-            if (button.text() === "Hartă"){
-                toggleMap();
-                button.text("Rețea");
-            } else {
-                toggleMap();
-                button.text("Hartă");
-            };
-        });
+    d3.select("#show-map")
+        .on("click", () => toggleMap("diagram"));
+    d3.select("#show-graph")
+        .on("click", () => toggleMap("map"));
 
-    const toggleLegend = (show) => {
-        if (show) {
+    const toggleLegend = () => {
+        if (legendStatus === true) {
             d3.select("#legend-div").classed("hide", false);
+            legendStatus = false;
         } else {
             d3.select("#legend-div").classed("hide", true);
+            legendStatus = true;
         };
     };
     d3.select("#legend-div").classed("hide", true);
     d3.select("#toggle-legend")
-        .on("click", function(){
-            const button = d3.select(this);
-            if (button.text() === "Legenda"){
-                toggleLegend(true);
-                button.text("Ascunde");
-            } else {
-                toggleLegend(false);
-                button.text("Legenda");
-            };
-        });
+        .on("click", () => toggleLegend());
 
+    g.transition().call(zoom.scaleBy, 0.5);
+
+    setTimeout(function() {
+        simulation.stop();
+        spinner.stop();
+        d3.select("tooltip_div").classed("tooltip-abs", true);
+        d3.select("#CO-" + d3.max(cases))
+            .attr("r", 15)
+            .dispatch('mouseover')
+            .dispatch('click');
+    }, 10000);
 };
+
+}).call(this);
