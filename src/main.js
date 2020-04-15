@@ -110,7 +110,7 @@ const drawGraph = () => {
             Tooltip.tooltip_div.transition()
                 .duration(200)
                 .style("opacity", .9);
-            Tooltip.tooltip_div.html("<strong>Relația cazurilor confirmate</strong>.<br/><br/>Puteți selecta un caz, și da click pentru a centra graficul pe acesta,<br/> sau simplu mouse-over pentru a vedea detaliile.<br/>Click înafara punctului pentru a ascunde detaliile.")
+            Tooltip.tooltip_div.html("<strong>Relația cazurilor confirmate</strong>.<br/><br/>Situaţia până la data în care s-au raportat oficial aceste informaţii.")
                 .style("left", Config.svg_width / 2 + 'px')
                 .style("top", Config.svg_height / 2 + 'px')
                 .style("display", null);
