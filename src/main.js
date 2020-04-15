@@ -350,7 +350,7 @@ const drawGraph = () => {
             .attr("r", 15)
             .dispatch('mouseover')
             .dispatch('click');
-    }, 10000);
+    }, 5000);
 };
 
 }).call(this);
