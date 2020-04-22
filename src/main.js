@@ -7,7 +7,7 @@ import * as Layout from './Layout';
 let graph = {nodes: [], links: []};
 let simulation, links, nodes;
 let casesData, geoData, layer, geoCounties;
-let positioning = 'diagram', legendStatus = true, infoStatus = true;
+let positioning = 'diagram', legendStatus = true, infoStatus = true, searchStatus = true;
 
 (() => {
 
@@ -152,6 +152,7 @@ const drawGraph = () => {
             // adjust the text on the range slider
             d3.select("#nRadius-value").text(nRadius);
             d3.select("#nRadius").property("value", nRadius);
+            d3.select("#search-input").property("value", nRadius);
 
             // highlight case
             d3.selectAll("circle")
@@ -346,6 +347,36 @@ const drawGraph = () => {
     d3.select("#legend-div").classed("hide", false);
     d3.select("#toggle-legend")
         .on("click", () => toggleLegend());
+
+    const searchByCaseId = (caseId) => {
+        if (cases.includes(caseId)) {
+            // highlight case
+            d3.selectAll("circle")
+                .attr("r", 5);
+            d3.select("#CO-" + caseId)
+                .attr("r", 15)
+                .dispatch('mouseover')
+                .dispatch('click');
+        }
+    }
+    d3.select("#nRadius").on("input", function() {
+        updateRadius(+this.value);
+    });
+
+    d3.select("#search-case")
+        .on("click", () => {
+            if (searchStatus === true) {
+                d3.select("#search-input").classed("hide", false);
+                searchStatus = false;
+            } else {
+                d3.select("#search-input").classed("hide", true);
+                searchStatus = true;
+            };
+        });
+    d3.select("#search-input")
+        .on("input", function() {
+            searchByCaseId(+this.value);
+        });
 
     g.transition().call(zoom.scaleBy, 0.5);
 
