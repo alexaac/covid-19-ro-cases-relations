@@ -161,8 +161,8 @@ svg.chart-group a {
 	background-repeat: no-repeat;
 	display: block;
 	height: 36px;
-	width: 36px;
-    line-height: 36px;
+	width: 50px;
+    line-height: 50px;
     background-size: contain;
     cursor: pointer;
 }
@@ -234,6 +234,14 @@ svg.chart-group a {
     background-image: url(../icons/alarm-clock.svg);
 }
 
+.search-icon {
+    background-image: url(../icons/search.svg);
+}
+
+#search-input {
+    width: 50px;
+}
+
 .slider {
     position: absolute;
     top: 0; right: 10px;
@@ -285,7 +293,7 @@ tooltip_div.tooltip {
 }
 
 .tooltip-abs {
-    right: 60px; top: 60px;
+    right: 70px; top: 60px;
 }
 
 tooltip_div, .slider, .county-legend, .status-legend, .gender-legend, .age-legend, .control {
@@ -299,7 +307,7 @@ tooltip_div, .slider, .county-legend, .status-legend, .gender-legend, .age-legen
 /* Smaller devices */
 @media (max-width: 340px) {
     .slider {
-        left: 0; top: 0; right: 50px;
+        left: 0; top: 0; right: 70px;
     }
     .side-pannel {
         top: 0;
