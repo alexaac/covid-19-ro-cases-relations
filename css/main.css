@@ -16,6 +16,9 @@ body {
     --main-confirmate:#63ace7 ;
     --main-recuperari: #00ffff;
     --main-decese: #f3eaea;
+    --main-barbat:#6c4e97;
+    --main-femeie: #d4855a;
+    --main-null: #fff;
 }
 
 h1 {
@@ -188,11 +191,11 @@ svg.chart-group a {
 
 /* http://alessioatzeni.com/metrize-icons/ */
 .counties-icon {
-    background-image: url(../icons/grids.svg);
+    background-image: url(../icons/pin.svg);
 }
 
 .status-icon {
-    background-image: url(../icons/grid-big.svg);
+    background-image: url(../icons/like-add.svg);
 }
 
 .legend-icon {
@@ -223,6 +226,14 @@ svg.chart-group a {
     background-image: url(../icons/info.svg);
 }
 
+.gender-icon {
+    background-image: url(../icons/sign-male.svg);
+}
+
+.age-icon {
+    background-image: url(../icons/alarm-clock.svg);
+}
+
 .slider {
     position: absolute;
     top: 0; right: 10px;
@@ -232,7 +243,7 @@ svg.chart-group a {
     padding: 5px;
 }
 
-.county-legend, .status-legend {
+.county-legend, .status-legend, .gender-legend, .age-legend {
     font-size: 10px;
     position: absolute;
     left: 10px; top: 55px;
@@ -241,8 +252,16 @@ svg.chart-group a {
     overflow-y: auto;
 }
 
-.status-legend {
+.gender-legend {
     height: 30%;
+}
+
+.status-legend {
+    height: 40%;
+}
+
+.age-legend {
+    height: 50%;
 }
 
 .county-legend {
@@ -269,7 +288,7 @@ tooltip_div.tooltip {
     right: 60px; top: 60px;
 }
 
-tooltip_div, .slider, .county-legend, .status-legend, .control {
+tooltip_div, .slider, .county-legend, .status-legend, .gender-legend, .age-legend, .control {
     -moz-border-radius: 5px;
     border-radius: 5px;
     background: none no-repeat scroll center center #fff;
