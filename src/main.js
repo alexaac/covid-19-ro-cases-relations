@@ -124,15 +124,22 @@ const drawGraph = () => {
     }
 
     // Add legends
-    Layout.createLegend(Layout.statusColor, 300, 300, 'status-legend');
-    Layout.createLegend(Layout.countyColor, 900, 1100, 'county-legend');
-    Layout.showLegend('status-legend');
+    Layout.createLegend(Layout.statusColor, 300, 300, "status-legend", "Stare");
+    Layout.createLegend(Layout.countyColor, 900, 1100, "county-legend", "Județ");
+    Layout.createLegend(Layout.genderColor, 200, 200, "gender-legend", "Gen");
+    Layout.createLegend(Layout.ageColor, 400, 400, "age-legend", "Vârstă");
+
+    Layout.showLegend("status-legend");
 
     // Change colors from status to counties and vice versa
     d3.select("#color-counties")
         .on("click", () => Layout.coloreazaJudete(Layout.countyColor));
     d3.select("#color-status")
         .on("click", () => Layout.coloreazaStatus(Layout.statusColor));
+    d3.select("#color-gender")
+        .on("click", () => Layout.coloreazaGen(Layout.genderColor));
+    d3.select("#color-age")
+        .on("click", () => Layout.coloreazaVarsta(Layout.ageColor));
 
     // Case slider to highlight nodes by id
     // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
@@ -329,14 +336,14 @@ const drawGraph = () => {
 
     const toggleLegend = () => {
         if (legendStatus === true) {
-            d3.select("#legend-div").classed("hide", false);
+            d3.select("#legend-div").classed("hide", true);
             legendStatus = false;
         } else {
-            d3.select("#legend-div").classed("hide", true);
+            d3.select("#legend-div").classed("hide", false);
             legendStatus = true;
         };
     };
-    d3.select("#legend-div").classed("hide", true);
+    d3.select("#legend-div").classed("hide", false);
     d3.select("#toggle-legend")
         .on("click", () => toggleLegend());
 

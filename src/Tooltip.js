@@ -59,6 +59,9 @@ export const tooltipHTML = (d) => {
 };
 
 export const unHighlight = () => {
+    d3.selectAll("circle")
+        .attr("r", 5);
+
     tooltip_div.transition()
         .duration(200)
         .style("opacity", 0);

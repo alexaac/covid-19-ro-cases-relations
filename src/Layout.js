@@ -1,4 +1,4 @@
-export const statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
+export const statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari)", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
 
 // https://medialab.github.io/iwanthue/
 // hcl[0]>=0 && hcl[0]<=340
@@ -12,6 +12,12 @@ const counties = [
 ];
 export const countyColor = d3.scaleOrdinal(countyColors).domain(counties);
 
+export const genderColor = d3.scaleOrdinal(["var(--main-barbat)", "var(--main-femeie)"]).domain(["Bărbat", "Femeie"]);
+
+export const ageColor = d3.scaleQuantile()
+    .domain([0, 100])
+    .range(d3.schemeSpectral[10]);
+
 export const coloreazaStatus = () => {
     let svg = d3.select("#chart").select('svg');
 
@@ -20,9 +26,7 @@ export const coloreazaStatus = () => {
         .attr("fill", d => {
             return (d.is_country_of_infection)
                 ? "black"
-                : (d.parent && d.parent.properties
-                    ? statusColor(d.parent.properties.status)
-                    : d.properties ? statusColor(d.properties.status) : "black");
+                : d.properties ? statusColor(d.properties.status) : ""
         });
 
     showLegend('status-legend');
@@ -36,15 +40,49 @@ export const coloreazaJudete = (countyColor) => {
         .attr("fill", d => {
             return (d.is_country_of_infection)
                 ? "black"
-                : (d.parent && d.parent.properties
-                        ? countyColor(d.parent.properties.county)
-                        : d.properties ? countyColor(d.properties.county) : "");
+                : d.properties ? countyColor(d.properties.county) : ""
         });
 
     showLegend('county-legend');
 }
 
-export const createLegend = (colorScale, height, vbHeight, legendClass) => {
+export const coloreazaGen = (genderColor) => {
+    let svg = d3.select("#chart").select('svg');
+
+    svg.selectAll('circle')
+        .transition().duration(100)
+        .attr("fill", d => {
+            return (d.is_country_of_infection)
+                ? "black"
+                : d.properties
+                    ? d.properties.gender === null
+                        ? "var(--main-null)"
+                        : genderColor(d.properties.gender)
+                    : ""
+        });
+
+    showLegend('gender-legend');
+}
+
+export const coloreazaVarsta = (ageColor) => {
+    let svg = d3.select("#chart").select('svg');
+
+    svg.selectAll('circle')
+        .transition().duration(100)
+        .attr("fill", d => {
+            return (d.is_country_of_infection)
+                ? "black"
+                : d.properties
+                    ? d.properties.age === null
+                        ? "var(--main-null)"
+                        : ageColor(d.properties.age)
+                    : ""
+        });
+
+    showLegend('age-legend');
+}
+
+export const createLegend = (colorScale, height, vbHeight, legendClass, legendTitle) => {
 
     const legend = d3.select("#legend-div")
         .append("div")
@@ -61,17 +99,28 @@ export const createLegend = (colorScale, height, vbHeight, legendClass) => {
     const categoryLegend = d3.legendColor()
                             .shape('path', d3.symbol().type(d3.symbolCircle).size(150)())
                             .shapePadding(10)
+                            .title(legendTitle)
+                            .titleWidth(100)
+                            .labelFormat(d3.format(".0f"))
+                            .labelAlign("start")
                             .scale(colorScale);
 
     legend.call(categoryLegend);
 }
 
 export const showLegend = category => {
+    d3.select(".county-legend").classed("hide", true);
+    d3.select(".status-legend").classed("hide", true);
+    d3.select(".gender-legend").classed("hide", true);
+    d3.select(".age-legend").classed("hide", true);
+
     if (category === 'county-legend') {
         d3.select(".county-legend").classed("hide", false);
-        d3.select(".status-legend").classed("hide", true);
     } else if (category === 'status-legend') {
-        d3.select(".county-legend").classed("hide", true);
         d3.select(".status-legend").classed("hide", false);
+    } else if (category === 'gender-legend') {
+        d3.select(".gender-legend").classed("hide", false);
+    } else if (category === 'age-legend') {
+        d3.select(".age-legend").classed("hide", false);
     }
 }
