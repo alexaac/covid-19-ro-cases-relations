@@ -296,7 +296,7 @@ const drawGraph = () => {
         .attr("opacity", 0);
 
     const xLabel = timeGraph.append("text")
-        .attr("y", Config.svg_height + 50)
+        .attr("y", Config.svg_height + 70)
         .attr("x", Config.svg_width / 2)
         .attr("font-size", "16px")
         .attr("text-anchor", "middle")
@@ -310,7 +310,7 @@ const drawGraph = () => {
         .attr("font-weight", "bold")
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
-        .attr("transform", "rotate(-90)");
+        .attr("transform", "rotate(-65)");
     const yAxis = timeGraph.append("g")
         .call(d3.axisLeft(yScale)
             .ticks(10));
