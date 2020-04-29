@@ -321,7 +321,7 @@ const drawGraph = () => {
         .attr("x", -200)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
-        .text("Order per day")
+        .text("Ordonarea pe zi")
 
     // Add counties map
     const geojsonFeatures = topojson.feature(geoData, {
