@@ -1,13 +1,48 @@
 import * as Config from './Config';
 import * as Tooltip from './Tooltip';
 import * as Simulation from './Simulation';
-import * as Utils from './Utils';
 import * as Layout from './Layout';
 
 let graph = {nodes: [], links: []};
 let simulation, links, nodes;
 let casesData, geoData, layer, geoCounties;
 let positioning = 'diagram', legendStatus = true, infoStatus = true, searchStatus = true;
+let idToNodeFnc, idToNode, idToTargetNodesFnc, idToTargetNodes;
+let parseTime = d3.timeParse("%d-%m-%Y");
+let formattedData = [];
+
+const hash = window.top.location.hash.substr(1);
+
+
+const locale = d3.timeFormatLocale({
+    "dateTime": "%A, %e %B %Y г. %X",
+    "date": "%d.%m.%Y",
+    "time": "%H:%M:%S",
+    "periods": ["AM", "PM"],
+    "days": ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"],
+    "shortDays": ["Lu", "Ma", "Mi", "Jo", "Vi", "Sa", "Du"],
+    "months": ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"],
+    "shortMonths": ["Ian", "Feb", "Mart", "Apr", "Mai", "Iun", "Iul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+});
+
+const formatMillisecond = locale.format(".%L"),
+    formatSecond = locale.format(":%S"),
+    formatMinute = locale.format("%I:%M"),
+    formatHour = locale.format("%I %p"),
+    formatDay = locale.format("%a %d"),
+    formatWeek = locale.format("%b %d"),
+    formatMonth = locale.format("%B"),
+    formatYear = locale.format("%Y");
+
+function multiFormat(date) {
+    return (d3.timeSecond(date) < date ? formatMillisecond
+    : d3.timeMinute(date) < date ? formatSecond
+    : d3.timeHour(date) < date ? formatMinute
+    : d3.timeDay(date) < date ? formatHour
+    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+    : d3.timeYear(date) < date ? formatMonth
+    : formatYear)(date);
+}
 
 (() => {
 
@@ -56,9 +91,34 @@ const setupGraph = () => {
 
     const sources = casesData.data.nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
 
+    graph.nodes = casesData.data.nodes;
+    graph.links = casesData.data.links;
+
+    idToNodeFnc = () => {
+        let dict = {};
+        graph.nodes.forEach(function(n) {
+            dict[n.name] = n;
+        });
+        return dict;
+    }
+    idToTargetNodesFnc = () => {
+        let dict = {};
+        graph.nodes.forEach(function (n) {
+            dict[n.name] = [];
+            graph.links.forEach(function (l) {
+                if (l.source === n.name) {
+                    dict[n.name].push(l.target);
+                }
+            });
+        });
+        return dict;
+    }
+    idToNode = idToNodeFnc();
+    idToTargetNodes = idToTargetNodesFnc();
+
     // https://observablehq.com/d/cedc594061a988c6
-    graph.nodes = casesData.data.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
-    graph.links = casesData.data.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
+    // graph.nodes = graph.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
+    // graph.links = graph.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
 
     layer = "judete_wgs84";
     geoCounties = topojson.feature(geoData, geoData.objects[layer]).features;
@@ -76,8 +136,28 @@ const setupGraph = () => {
         if (d.properties !== undefined) {
             d.latitude = countiesCentroids.get(d.properties.county) && countiesCentroids.get(d.properties.county).lat;
             d.longitude = countiesCentroids.get(d.properties.county) && countiesCentroids.get(d.properties.county).lon;
+            d.date = parseTime(d.properties.diagnostic_date).getTime();
+            d.name = +d.name;
         };
     });
+    graph.nodes.sort((a,b) => a.date - b.date);
+
+    var ed_data = d3.nest()
+        .key(function(d) { return d.properties.diagnostic_date; })
+        // .key(function(d) { return d.properties.county; })
+        // .rollup(function(v) { return v.length; })
+        .entries(graph.nodes);
+    ed_data.forEach(function(key){
+        let valuesArr = [...key["values"] ].sort((a,b) => a.name - b.name);
+        let valuesPerDay = valuesArr.map(function(d){
+                d.dayOrder = valuesArr.indexOf(d) + 1;
+                return d;
+            });
+        formattedData.push(...valuesPerDay)
+    });
+
+    graph.nodes = formattedData;
+
 }
 
 const drawGraph = () => {
@@ -141,29 +221,6 @@ const drawGraph = () => {
     d3.select("#color-age")
         .on("click", () => Layout.coloreazaVarsta(Layout.ageColor));
 
-    // Case slider to highlight nodes by id
-    // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
-    const cases = Array.from(new Set(graph.nodes.map(d => d.properties ? d.properties.case_no : "")));
-
-    d3.select("#nRadius").property("max", d3.max(cases));
-    // update the slider
-    const updateRadius = (nRadius) => {
-        if (cases.includes(nRadius)) {
-            // adjust the text on the range slider
-            d3.select("#nRadius-value").text(nRadius);
-            d3.select("#nRadius").property("value", nRadius);
-            d3.select("#search-input").property("value", nRadius);
-
-            // highlight case
-            d3.selectAll("circle")
-                .attr("r", 5);
-            d3.select("#CO-" + nRadius)
-                .attr("r", 15)
-                .dispatch('mouseover')
-                .dispatch('click');
-        }
-    }
-
     const panTo = d => {
         d3.event.stopPropagation();
         g.transition().duration(750).call(
@@ -174,21 +231,34 @@ const drawGraph = () => {
         );
     };
 
-    // when the input range changes highlight the circle
-    d3.select("#nRadius").on("input", function() {
-        updateRadius(+this.value);
-    });
-    // Select latest case
-    updateRadius(d3.max(cases));
-
     // Setup the simulation
     // https://gist.github.com/mbostock/1153292
 
     const ticked = () => {
-        update(links, nodes)
+        update(links, nodes, positioning)
     };
-    const update = (links, nodes) => {
-        links.attr("d", Simulation.linkArc);
+
+    const xScale = d3.scaleTime()
+        .domain(d3.extent(graph.nodes, function(d) { return d.date; }))
+        .range([0, Config.svg_width]);
+    const yScale = d3.scaleLinear()
+        .domain(d3.extent(graph.nodes, function(d) { return d.dayOrder; }))
+        .range([Config.svg_height, 0]);
+
+    const update = (links, nodes, positioning) => {
+        links.attr("d", d => {
+            if (positioning === 'arcs') {
+                yScale(d.dayOrder)
+
+                let start = xScale(idToNode[d.source.name].date);
+                let end = xScale(idToNode[d.target.name].date);
+                const arcPath = ['M', start, yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,",",
+                            start < end ? 1: 0, end, yScale(idToNode[d.target.name].dayOrder)].join(' ');
+                return arcPath;
+            } else {
+                return Simulation.linkArc(d)
+            }
+        });
         nodes.attr("transform", d => `translate(${d.x},${d.y})`);
     };
 
@@ -221,6 +291,38 @@ const drawGraph = () => {
     const g = svg.append("g");
         // .attr("transform-origin", "50% 50% 0");
 
+    const timeGraph = g.append("g")
+        .attr("class", "time-graph")
+        .attr("opacity", 0);
+
+    const xLabel = timeGraph.append("text")
+        .attr("y", Config.svg_height + 50)
+        .attr("x", Config.svg_width / 2)
+        .attr("font-size", "16px")
+        .attr("text-anchor", "middle")
+        .text("Ziua");
+    const xAxis = timeGraph.append("g")
+        .attr("transform", "translate(0," + (Config.svg_height) + ")")
+        .call(d3.axisBottom(xScale)
+            .ticks(20)
+            .tickFormat(multiFormat));
+    xAxis.selectAll('text')
+        .attr("font-weight", "bold")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("transform", "rotate(-90)");
+    const yAxis = timeGraph.append("g")
+        .call(d3.axisLeft(yScale)
+            .ticks(10));
+    yAxis.selectAll('text').attr("font-weight", "bold");
+    const yLabel = timeGraph.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -50)
+        .attr("x", -200)
+        .attr("font-size", "20px")
+        .attr("text-anchor", "middle")
+        .text("Order per day")
+
     // Add counties map
     const geojsonFeatures = topojson.feature(geoData, {
         type: "GeometryCollection",
@@ -230,7 +332,7 @@ const drawGraph = () => {
     const thisMapPath = d3.geoPath()
         .projection(
             Config.projection
-                  .fitSize([Config.width, Config.height], geojsonFeatures)
+                  .fitSize([Config.svg_width, Config.svg_height], geojsonFeatures)
                   );
 
     const map = g.append("g")
@@ -264,6 +366,8 @@ const drawGraph = () => {
             .selectAll("path")
             .data(graph.links)
             .join("path")
+                .attr("class", d => `CO-links-${d.source.name}`)
+                .classed("links", true)
                 .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
     links.exit().remove();
 
@@ -274,18 +378,23 @@ const drawGraph = () => {
         .join("g")
             .call(Simulation.drag(simulation, positioning));
 
-    const fade = Utils.setFade(graph.links);
-
     nodes.append("circle")
         .attr("id", d => d.properties && `CO-${d.properties.case_no}`)
         .attr("r", 5)
-        .on("touchmove mouseover", d => {
-            Tooltip.highlight(d);
-            // fade(nodes, links, .2);
-        }).on("click", panTo);
+        .on("touchmove mouseover", function(d) {
+            Tooltip.highlight(d, idToTargetNodes, cases);
+        })
+        .on("touchend mouseout", d => {
+            // d3.selectAll("circle")
+            //     .style("opacity", 1);
+            // d3.selectAll(".link")
+            //     .style("opacity", 1);
+        })
+        .on("click", panTo);
 
     nodes.append("text")
-        .attr("class", "node-labels")
+        .attr("class", d => `CO-labels-${d.name}`)
+        .classed("node-labels", true)
         .attr("x", 8)
         .attr("y", "0.31em")
         .text(d => {
@@ -294,6 +403,17 @@ const drawGraph = () => {
         .clone(true).lower();
     nodes.exit().remove();
 
+    // links.on("touchmove mouseover", function(d) {
+    //         d3.select(this)
+    //             .style("stroke", "firebrick");
+    //         d3.select("#CO-" + d.source.name)
+    //             .dispatch('mouseover');
+    //         // d3.selectAll("text")
+    //         //     .attr("opacity", 0)
+    //     })
+    //     .on("touchend mouseout", function(d) {
+    //     });
+
     // Color the legend for counties
     Layout.coloreazaStatus();
 
@@ -301,39 +421,61 @@ const drawGraph = () => {
     zoom(svg);
 
     // Toggle map
-    // https://bl.ocks.org/cmgiven/4cfa1a95f9b952622280a90138842b79
-    const fixed = (immediate) => {
-        graph.nodes.forEach(function (d) {
-            const pos = Config.projection([d.longitude, d.latitude]);
-            d.x = pos[0] || d.x;
-            d.y = pos[1] || d.y;
-        });
+    const fixed = (positioning, immediate) => {
+        if (positioning === "map") {
+            graph.nodes.forEach(function (d) {
+                const pos = Config.projection([d.longitude, d.latitude]);
+                d.x = pos[0] || d.x;
+                d.y = pos[1] || d.y;
+            });
+        } else {
+            graph.nodes.forEach(function (d) {
+                d.x = xScale(d.date);
+                d.y = yScale(d.dayOrder);
+            });
+        }
 
         const t = d3.transition()
             .duration(immediate ? 0 : 800)
             .ease(d3.easeElastic.period(0.5));
 
-        update(links.transition(t), nodes.transition(t));
+        update(links.transition(t), nodes.transition(t), positioning);
     };
+    const showMap = () => {
+        positioning = "map";
+        map.attr("opacity", 1);
+        timeGraph.attr("opacity", 0);
+        simulation.stop();
+        fixed(positioning, 0);
 
-    const toggleMap = (positioning) => {
-        if (positioning === "diagram") {
-            positioning = "map";
-            map.attr("opacity", 1);
-            simulation.stop();
-            fixed();
-        } else {
-            positioning = "diagram";
-            map.attr("opacity", 0.25);
-            simulation.alpha(1).restart();
-        };
+        nodes.call(Simulation.drag(simulation, positioning));
+    };
+    const showGraph = () => {
+        positioning = "diagram";
+        map.attr("opacity", 0.25);
+        timeGraph.attr("opacity", 0);
+        simulation.alpha(1).restart();
+
+        nodes.call(Simulation.drag(simulation, positioning));
+    };
+    const showArcs = () => {
+        positioning = "arcs";
+        map.attr("opacity", 0);
+        timeGraph.attr("opacity", 1);
+        simulation.stop();
+        // d3.selectAll("circle")
+        //     .attr("r", 1);
+        fixed(positioning, 0);
+
         nodes.call(Simulation.drag(simulation, positioning));
     };
 
     d3.select("#show-map")
-        .on("click", () => toggleMap("diagram"));
+        .on("click", () => showMap());
     d3.select("#show-graph")
-        .on("click", () => toggleMap("map"));
+        .on("click", () => showGraph());
+    d3.select("#show-arcs")
+        .on("click", () => showArcs());
 
     const toggleLegend = () => {
         if (legendStatus === true) {
@@ -359,9 +501,6 @@ const drawGraph = () => {
                 .dispatch('click');
         }
     }
-    d3.select("#nRadius").on("input", function() {
-        updateRadius(+this.value);
-    });
 
     d3.select("#search-case")
         .on("click", () => {
@@ -380,14 +519,92 @@ const drawGraph = () => {
 
     g.transition().call(zoom.scaleBy, 0.5);
 
+    d3.select("#play-cases")
+        .on("click", () => {
+            d3.select("#play-cases").classed("hide", true);
+            d3.select("#pause-cases").classed("hide", false);
+            playCases();
+        });
+    d3.select("#pause-cases")
+        .on("click", () => {
+            d3.select("#pause-cases").classed("hide", true);
+            d3.select("#play-cases").classed("hide",false);
+            pauseCases();
+        });
+
+    let playCasesNow;
+    const cases = Array.from(new Set(graph.nodes.map(d => d.properties ? +d.properties.case_no : "")));
+    const clonedCases = [...cases];
+    let thisCaseId;
+    let thisCaseOrder;
+
+    // Case slider to highlight nodes by id
+    // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
+
+    // when the input range changes highlight the circle
+    d3.select("#nRadius").on("input", function() {
+        updateRadius(+this.value);
+    });
+    d3.select("#nRadius").property("max", cases.length-1);
+    // update the slider
+    const updateRadius = (nRadius) => {
+        // adjust the text on the range slider
+        d3.select("#nRadius-value").text(cases[nRadius]);
+        d3.select("#nRadius").property("value", cases[nRadius]);
+        d3.select("#search-input").property("value", cases[nRadius]);
+
+        // highlight case
+        d3.selectAll("circle")
+            .attr("r", 5);
+        d3.select("#CO-" + cases[nRadius])
+            .attr("r", 15)
+            .dispatch('mouseover');
+            // .dispatch('click');
+    }
+    // Select latest case
+    updateRadius(cases.length-1);
+
+    const playCases = () => {
+        g.transition().call(zoom.scaleBy, 1);
+        thisCaseOrder = d3.select("#nRadius").node().value;
+        if (+thisCaseOrder === (+cases.length - 1)) thisCaseOrder = 0;
+
+        playCasesNow = setInterval(function() {
+            thisCaseId = cases[thisCaseOrder];
+            if (thisCaseId !== undefined) {
+                updateRadius(thisCaseOrder);
+                thisCaseOrder++;
+            } else {
+                clearInterval(playCasesNow);
+            }
+        }, 200);
+    };
+    const pauseCases = () => {
+        clearInterval(playCasesNow);
+    };
+
+    d3.select(".slider")
+        .attr("transform", "translate(0," + (Config.svg_height) + ")");
+
+    // shortcut to graphs
+    if (hash !== undefined) {
+        if (hash === "map") {
+            d3.select("#show-map").dispatch("click");
+        } else if (hash === "graph") {
+            d3.select("#show-graph").dispatch("click");
+        } else if (hash === "arcs") {
+            d3.select("#show-arcs").dispatch("click");
+        }
+    }
+
     setTimeout(function() {
         simulation.stop();
         spinner.stop();
         d3.select("tooltip_div").classed("tooltip-abs", true);
         d3.select("#CO-" + d3.max(cases))
             .attr("r", 15)
-            .dispatch('mouseover')
-            .dispatch('click');
+            .dispatch('mouseover');
+            // .dispatch('click');
     }, 5000);
 };
 

@@ -51,6 +51,7 @@ svg.chart-group {
     fill: none;
     stroke: #999;
     stroke-width: 1px;
+    cursor: pointer;
 }
 
 #licensing {
@@ -137,7 +138,7 @@ svg.chart-group a {
 .side-pannel {
     position: absolute;
     right: 0;
-    top: 50px;
+    top: 0;
     z-index: 100;
     font-size: 12px;
     pointer-events: none;
@@ -190,6 +191,15 @@ svg.chart-group a {
 }
 
 /* http://alessioatzeni.com/metrize-icons/ */
+
+.play-icon {
+    background-image: url(../icons/play.svg);
+}
+
+.pause-icon {
+    background-image: url(../icons/pause.svg);
+}
+
 .counties-icon {
     background-image: url(../icons/pin.svg);
 }
@@ -208,6 +218,10 @@ svg.chart-group a {
 
 .graph-icon {
     background-image: url(../icons/graphs.svg);
+}
+
+.arcs-icon {
+    background-image: url(../icons/bezier.svg);
 }
 
 .zoom-in-icon {
@@ -244,11 +258,15 @@ svg.chart-group a {
 
 .slider {
     position: absolute;
-    top: 0; right: 10px;
+    left: 10px; top: 0; right: 62px;
     margin-top: 10px;
     z-index: 100;
     text-align: center;
     padding: 5px;
+}
+
+.range {
+    width: 100%;
 }
 
 .county-legend, .status-legend, .gender-legend, .age-legend {
@@ -296,7 +314,7 @@ tooltip_div.tooltip {
     right: 70px; top: 60px;
 }
 
-tooltip_div, .slider, .county-legend, .status-legend, .gender-legend, .age-legend, .control {
+tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .control {
     -moz-border-radius: 5px;
     border-radius: 5px;
     background: none no-repeat scroll center center #fff;
