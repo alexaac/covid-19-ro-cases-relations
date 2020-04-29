@@ -11,7 +11,7 @@ let idToNodeFnc, idToNode, idToTargetNodesFnc, idToTargetNodes;
 let parseTime = d3.timeParse("%d-%m-%Y");
 let formattedData = [];
 
-const hash = window.top.location.hash.substr(1);
+// const hash = window.top.location.hash.substr(1);
 
 
 const locale = d3.timeFormatLocale({
@@ -586,16 +586,16 @@ const drawGraph = () => {
     d3.select(".slider")
         .attr("transform", "translate(0," + (Config.svg_height) + ")");
 
-    // shortcut to graphs
-    if (hash !== undefined) {
-        if (hash === "map") {
-            d3.select("#show-map").dispatch("click");
-        } else if (hash === "graph") {
-            d3.select("#show-graph").dispatch("click");
-        } else if (hash === "arcs") {
-            d3.select("#show-arcs").dispatch("click");
-        }
-    }
+    // // shortcut to graphs
+    // if (hash !== undefined) {
+    //     if (hash === "map") {
+    //         d3.select("#show-map").dispatch("click");
+    //     } else if (hash === "graph") {
+    //         d3.select("#show-graph").dispatch("click");
+    //     } else if (hash === "arcs") {
+    //         d3.select("#show-arcs").dispatch("click");
+    //     }
+    // }
 
     setTimeout(function() {
         simulation.stop();
