@@ -90,8 +90,6 @@ export const tooltipHTML = (d) => {
 
 export const unHighlight = () => {
     d3.selectAll("circle")
-        .attr("r", 5);
-    d3.selectAll("circle")
         .style("opacity", 1);
     d3.selectAll(".link")
         .style("opacity", 1);
@@ -100,6 +98,8 @@ export const unHighlight = () => {
 };
 
 export const hideTooltip = () => {
+    d3.selectAll("circle")
+        .attr("r", 5);
     tooltip_div.transition()
         .duration(200)
         .style("opacity", 0);
