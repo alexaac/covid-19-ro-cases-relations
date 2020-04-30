@@ -308,10 +308,11 @@ tooltip_div.tooltip {
     line-height: 12pt;
     font-family:  "EB Garamond", serif;
     max-width: 160px;
+    z-index: 1000;
 }
 
 .tooltip-abs {
-    right: 70px; top: 60px;
+    right: 70px; top: 55px;
 }
 
 tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .control {
