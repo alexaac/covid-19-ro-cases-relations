@@ -387,7 +387,7 @@ const drawGraph = () => {
         .on("touchend mouseout", d => {
             setTimeout(function() {
                 Tooltip.unHighlight();
-            }, 5000);
+            }, 10000);
         })
         .on("click", panTo);
 
