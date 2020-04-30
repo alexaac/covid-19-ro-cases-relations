@@ -81,6 +81,7 @@ export const tooltipHTML = (d) => {
             : "") +
         (d.properties.diagnostic_date !== null ? ("Data confirmării: " + d.properties.diagnostic_date + ".<br />") : "") +
         (d.properties.healing_date !== null ? ("Data recuperării: " + d.properties.healing_date + ".<br />") : "") +
+        (d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania" ? ("Țara de infectare: " + d.properties.country_of_infection + ".<br />") : "") +
         (d.properties.reference !== null && d.properties.reference !== "" ? ("Detalii: " + '<a href="' + d.properties.reference + '" target= "_blank">aici</a>') : "");
     } else {
         return d.name;
@@ -94,6 +95,8 @@ export const unHighlight = () => {
         .style("opacity", 1);
     d3.selectAll(".link")
         .style("opacity", 1);
+    d3.selectAll(".node-labels")
+        .style("opacity", "1");
     tooltip_div.transition()
         .duration(200)
         .style("opacity", 0);

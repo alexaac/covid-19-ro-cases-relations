@@ -10,7 +10,7 @@ let positioning = 'diagram', legendStatus = true, infoStatus = true, searchStatu
 let idToNodeFnc, idToNode, idToTargetNodesFnc, idToTargetNodes;
 let parseTime = d3.timeParse("%d-%m-%Y");
 let formattedData = [];
-
+let cases;
 // const hash = window.top.location.hash.substr(1);
 
 
@@ -94,6 +94,12 @@ const setupGraph = () => {
     graph.nodes = casesData.data.nodes;
     graph.links = casesData.data.links;
 
+    cases = Array.from(new Set(graph.nodes.map(d => d.properties ? +d.properties.case_no : "")));
+
+    // https://observablehq.com/d/cedc594061a988c6
+    graph.nodes = graph.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
+    graph.links = graph.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
+
     idToNodeFnc = () => {
         let dict = {};
         graph.nodes.forEach(function(n) {
@@ -115,10 +121,6 @@ const setupGraph = () => {
     }
     idToNode = idToNodeFnc();
     idToTargetNodes = idToTargetNodesFnc();
-
-    // https://observablehq.com/d/cedc594061a988c6
-    // graph.nodes = graph.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
-    // graph.links = graph.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
 
     layer = "judete_wgs84";
     geoCounties = topojson.feature(geoData, geoData.objects[layer]).features;
@@ -143,7 +145,9 @@ const setupGraph = () => {
     graph.nodes.sort((a,b) => a.date - b.date);
 
     var ed_data = d3.nest()
-        .key(function(d) { return d.properties.diagnostic_date; })
+        .key(function(d) {
+            return d.properties && d.properties.diagnostic_date;
+        })
         // .key(function(d) { return d.properties.county; })
         // .rollup(function(v) { return v.length; })
         .entries(graph.nodes);
@@ -157,7 +161,6 @@ const setupGraph = () => {
     });
 
     graph.nodes = formattedData;
-
 }
 
 const drawGraph = () => {
@@ -248,13 +251,15 @@ const drawGraph = () => {
     const update = (links, nodes, positioning) => {
         links.attr("d", d => {
             if (positioning === 'arcs') {
-                yScale(d.dayOrder)
-
-                let start = xScale(idToNode[d.source.name].date);
-                let end = xScale(idToNode[d.target.name].date);
-                const arcPath = ['M', start, yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,",",
-                            start < end ? 1: 0, end, yScale(idToNode[d.target.name].dayOrder)].join(' ');
-                return arcPath;
+                if (typeof(d.source.name) === "string") {
+                    return Simulation.linkArc(d)
+                } else {
+                    let start = xScale(idToNode[d.source.name].date) || 0;
+                    let end = xScale(idToNode[d.target.name].date);
+                    const arcPath = ['M', start, yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,",",
+                                start < end ? 1: 0, end, yScale(idToNode[d.target.name].dayOrder)].join(' ');
+                    return arcPath;
+                }
             } else {
                 return Simulation.linkArc(d)
             }
@@ -318,10 +323,10 @@ const drawGraph = () => {
     const yLabel = timeGraph.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -50)
-        .attr("x", -200)
+        .attr("x", -Config.svg_height / 2)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
-        .text("Ordonarea pe zi")
+        .text("Cazuri pe zi")
 
     // Add counties map
     const geojsonFeatures = topojson.feature(geoData, {
@@ -385,9 +390,9 @@ const drawGraph = () => {
             Tooltip.highlight(d, idToTargetNodes, cases);
         })
         .on("touchend mouseout", d => {
-            setTimeout(function() {
-                Tooltip.unHighlight();
-            }, 10000);
+            // setTimeout(function() {
+            //     Tooltip.unHighlight();
+            // }, 10000);
         })
         .on("click", panTo);
 
@@ -396,9 +401,7 @@ const drawGraph = () => {
         .classed("node-labels", true)
         .attr("x", 8)
         .attr("y", "0.31em")
-        .text(d => {
-            return d.is_country_of_infection ? d.country_name : ("#" + d.name);
-        })
+        .text(d => d.name)
         .clone(true).lower();
     nodes.exit().remove();
 
@@ -429,7 +432,7 @@ const drawGraph = () => {
             });
         } else {
             graph.nodes.forEach(function (d) {
-                d.x = xScale(d.date);
+                d.x = xScale(d.date) || -100;
                 d.y = yScale(d.dayOrder);
             });
         }
@@ -462,8 +465,6 @@ const drawGraph = () => {
         map.attr("opacity", 0);
         timeGraph.attr("opacity", 1);
         simulation.stop();
-        // d3.selectAll("circle")
-        //     .attr("r", 1);
         fixed(positioning, 0);
 
         nodes.call(Simulation.drag(simulation, positioning));
@@ -532,7 +533,6 @@ const drawGraph = () => {
         });
 
     let playCasesNow;
-    const cases = Array.from(new Set(graph.nodes.map(d => d.properties ? +d.properties.case_no : "")));
     const clonedCases = [...cases];
     let thisCaseId;
     let thisCaseOrder;
@@ -574,7 +574,7 @@ const drawGraph = () => {
                 updateRadius(thisCaseOrder);
                 thisCaseOrder++;
             } else {
-                clearInterval(playCasesNow);
+                thisCaseOrder = 0;
             }
         }, 200);
     };
@@ -603,7 +603,9 @@ const drawGraph = () => {
         d3.select("#CO-" + d3.max(cases))
             .attr("r", 15)
             .dispatch('mouseover');
-            // .dispatch('click');
+        // setTimeout(function() {
+        //     Tooltip.unHighlight();
+        // }, 10000);
     }, 5000);
 };
 
