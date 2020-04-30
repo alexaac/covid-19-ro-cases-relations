@@ -385,10 +385,9 @@ const drawGraph = () => {
             Tooltip.highlight(d, idToTargetNodes, cases);
         })
         .on("touchend mouseout", d => {
-            // d3.selectAll("circle")
-            //     .style("opacity", 1);
-            // d3.selectAll(".link")
-            //     .style("opacity", 1);
+            setTimeout(function() {
+                Tooltip.unHighlight();
+            }, 5000);
         })
         .on("click", panTo);
 
