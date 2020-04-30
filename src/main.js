@@ -390,9 +390,7 @@ const drawGraph = () => {
             Tooltip.highlight(d, idToTargetNodes, cases);
         })
         .on("touchend mouseout", d => {
-            // setTimeout(function() {
-            //     Tooltip.unHighlight();
-            // }, 10000);
+            Tooltip.unHighlight();
         })
         .on("click", panTo);
 
