@@ -330,6 +330,14 @@ tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .contr
     .side-pannel {
         top: 0;
     }
+    .control a {
+        width: 36px;
+        line-height: 36px;
+    }
+
+    .control #search-input {
+        width: 36px;
+    }
 }
 
 /* Small devices (tablets, 768px and up) */
