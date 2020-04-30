@@ -97,7 +97,10 @@ export const unHighlight = () => {
         .style("opacity", 1);
     d3.selectAll(".node-labels")
         .style("opacity", "1");
+};
+
+export const hideTooltip = () => {
     tooltip_div.transition()
         .duration(200)
         .style("opacity", 0);
-};
+}

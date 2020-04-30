@@ -292,7 +292,7 @@ const drawGraph = () => {
             .attr("width", Config.svg_width)
             .attr("height", Config.svg_height)
             .attr("viewBox", '0, 0 ' + Config.svg_width + ' ' + Config.svg_height)
-            .on("click", () => { Tooltip.unHighlight(); });
+            .on("click", () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
     const g = svg.append("g");
         // .attr("transform-origin", "50% 50% 0");
 
