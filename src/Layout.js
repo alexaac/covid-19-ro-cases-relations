@@ -26,7 +26,7 @@ export const ageColor = d3.scaleQuantile()
     .domain([0, 100])
     .range(d3.schemeSpectral[10]);
 
-export const coloreazaStatus = () => {
+export const colorStatus = () => {
     let svg = d3.select("#chart").select('svg');
 
     svg.selectAll('circle')
@@ -40,7 +40,7 @@ export const coloreazaStatus = () => {
     showLegend('status-legend');
 }
 
-export const coloreazaJudete = () => {
+export const colorCounties = () => {
     let svg = d3.select("#chart").select('svg');
 
     svg.selectAll('circle')
@@ -54,7 +54,7 @@ export const coloreazaJudete = () => {
     showLegend('county-legend');
 }
 
-export const coloreazaGen = () => {
+export const colorGender = () => {
     let svg = d3.select("#chart").select('svg');
 
     svg.selectAll('circle')
@@ -72,7 +72,7 @@ export const coloreazaGen = () => {
     showLegend('gender-legend');
 }
 
-export const coloreazaVarsta = () => {
+export const colorAge = () => {
     let svg = d3.select("#chart").select('svg');
 
     svg.selectAll('circle')

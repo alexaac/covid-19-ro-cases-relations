@@ -13,8 +13,11 @@ let parseTime = d3.timeParse("%d-%m-%Y");
 let formattedData = [];
 let cases;
 let language;
-// const hash = window.top.location.hash.substr(1);
+let playCasesNow, thisCaseId, thisCaseOrder;
 
+// Switch the language to english/romanian
+language = d3.select("#language").node().value;
+let countiesSource = language === "ro" ? "data/judete_wgs84.json" : "../data/judete_wgs84.json";
 
 const locale = d3.timeFormatLocale({
     "dateTime": "%A, %e %B %Y г. %X",
@@ -74,7 +77,7 @@ let opts = {
     spinner;
 
 const promises = [
-    d3.json("data/judete_wgs84.json"),
+    d3.json(countiesSource),
     d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations")
 ];
 
@@ -166,8 +169,6 @@ const setupGraph = () => {
 }
 
 const drawGraph = () => {
-    language = d3.select("#language").node().value;
-
     // Zoom by scroll, pan
     const zoomed = () => {
         g.attr("transform", d3.event.transform);
@@ -220,23 +221,13 @@ const drawGraph = () => {
 
     // Change colors from status to counties and vice versa
     d3.select("#color-counties")
-        .on("click", () => Layout.coloreazaJudete());
+        .on("click", () => Layout.colorCounties());
     d3.select("#color-status")
-        .on("click", () => Layout.coloreazaStatus());
+        .on("click", () => Layout.colorStatus());
     d3.select("#color-gender")
-        .on("click", () => Layout.coloreazaGen());
+        .on("click", () => Layout.colorGender());
     d3.select("#color-age")
-        .on("click", () => Layout.coloreazaVarsta());
-
-    const panTo = d => {
-        d3.event.stopPropagation();
-        g.transition().duration(750).call(
-            zoom.transform,
-            d3.zoomIdentity
-                .translate(Config.width / 2, Config.height / 2)
-                .translate(-d.x, -d.y)
-        );
-    };
+        .on("click", () => Layout.colorAge());
 
     // Setup the simulation
     // https://gist.github.com/mbostock/1153292
@@ -388,6 +379,16 @@ const drawGraph = () => {
         .join("g")
             .call(Simulation.drag(simulation, positioning));
 
+    const panTo = d => {
+        d3.event.stopPropagation();
+        g.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity
+                .translate(Config.width / 2, Config.height / 2)
+                .translate(-d.x, -d.y)
+        );
+    };
+
     nodes.append("circle")
         .attr("id", d => d.properties && `CO-${d.properties.case_no}`)
         .attr("r", 5)
@@ -409,12 +410,12 @@ const drawGraph = () => {
     nodes.exit().remove();
 
     // Color the legend for counties
-    Layout.coloreazaStatus();
+    Layout.colorStatus();
 
     // Apply zoom handler
     zoom(svg);
 
-    // Toggle map
+    // Toggle between map, graph and timeline chart
     const fixed = (positioning, immediate) => {
         if (positioning === "map") {
             graph.nodes.forEach(function (d) {
@@ -469,6 +470,7 @@ const drawGraph = () => {
     d3.select("#show-arcs")
         .on("click", () => showArcs());
 
+    // Toggle the legend
     const toggleLegend = () => {
         if (legendStatus === true) {
             d3.select("#legend-div").classed("hide", true);
@@ -482,6 +484,7 @@ const drawGraph = () => {
     d3.select("#toggle-legend")
         .on("click", () => toggleLegend());
 
+    // Highlight and pan to searched Id
     const searchByCaseId = (caseId) => {
         if (cases.includes(caseId)) {
             // highlight case
@@ -509,8 +512,10 @@ const drawGraph = () => {
             searchByCaseId(+this.value);
         });
 
+    // Zoom to the group
     g.transition().call(zoom.scaleBy, 0.5);
 
+    // Start/stop the animation - highlight the cases ordered by day and case number
     d3.select("#play-cases")
         .on("click", () => {
             d3.select("#play-cases").classed("hide", true);
@@ -524,10 +529,24 @@ const drawGraph = () => {
             pauseCases();
         });
 
-    let playCasesNow;
-    const clonedCases = [...cases];
-    let thisCaseId;
-    let thisCaseOrder;
+    const playCases = () => {
+        g.transition().call(zoom.scaleBy, 1);
+        thisCaseOrder = d3.select("#nRadius").node().value;
+        if (+thisCaseOrder === (+cases.length - 1)) thisCaseOrder = 0;
+
+        playCasesNow = setInterval(function() {
+            thisCaseId = cases[thisCaseOrder];
+            if (thisCaseId !== undefined) {
+                updateRadius(thisCaseOrder);
+                thisCaseOrder++;
+            } else {
+                thisCaseOrder = 0;
+            }
+        }, 200);
+    };
+    const pauseCases = () => {
+        clearInterval(playCasesNow);
+    };
 
     // Case slider to highlight nodes by id
     // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
@@ -555,39 +574,7 @@ const drawGraph = () => {
     // Select latest case
     updateRadius(cases.length-1);
 
-    const playCases = () => {
-        g.transition().call(zoom.scaleBy, 1);
-        thisCaseOrder = d3.select("#nRadius").node().value;
-        if (+thisCaseOrder === (+cases.length - 1)) thisCaseOrder = 0;
-
-        playCasesNow = setInterval(function() {
-            thisCaseId = cases[thisCaseOrder];
-            if (thisCaseId !== undefined) {
-                updateRadius(thisCaseOrder);
-                thisCaseOrder++;
-            } else {
-                thisCaseOrder = 0;
-            }
-        }, 200);
-    };
-    const pauseCases = () => {
-        clearInterval(playCasesNow);
-    };
-
-    d3.select(".slider")
-        .attr("transform", "translate(0," + (Config.svg_height) + ")");
-
-    // // shortcut to graphs
-    // if (hash !== undefined) {
-    //     if (hash === "map") {
-    //         d3.select("#show-map").dispatch("click");
-    //     } else if (hash === "graph") {
-    //         d3.select("#show-graph").dispatch("click");
-    //     } else if (hash === "arcs") {
-    //         d3.select("#show-arcs").dispatch("click");
-    //     }
-    // }
-
+    // Zoom to latest case, when loading spinner stops
     setTimeout(function() {
         simulation.stop();
         spinner.stop();
@@ -595,9 +582,6 @@ const drawGraph = () => {
         d3.select("#CO-" + d3.max(cases))
             .attr("r", 15)
             .dispatch('mouseover');
-        // setTimeout(function() {
-        //     Tooltip.unHighlight();
-        // }, 10000);
     }, 5000);
 };
 

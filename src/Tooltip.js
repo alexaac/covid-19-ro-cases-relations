@@ -65,7 +65,7 @@ export const highlight = (d, idToTargetNodes, cases) => {
 export const tooltipHTML = (d) => {
     if (d.properties !== undefined) {
         let language = d3.select("#language").node().value;
-        console.log(language);
+
         let labels = {
             cazulLabel: { "ro": "Cazul", "en": "Case" },
             maleLabel: { "ro": "Bărbat", "en": "Male" },
