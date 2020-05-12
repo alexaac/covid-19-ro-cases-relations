@@ -64,25 +64,66 @@ export const highlight = (d, idToTargetNodes, cases) => {
 
 export const tooltipHTML = (d) => {
     if (d.properties !== undefined) {
-        return "<b>Cazul " + d.properties.case_no + "</b><br />" +
-        (d.properties.gender === 'Bărbat'
-                ? "Bărbat"
-                : (d.properties.gender === 'Femeie'
-                    ? "Femeie"
-                    : "Gen nespecificat")) +
-        (d.properties.age != null && d.properties.age != 0 ? (", " + d.properties.age) : "") +
-        (d.properties.county != null && d.properties.county != "" ? (", din  " + d.properties.county) : "") + ".<br />" +
-        (d.properties.status != null
-            ? ("Status: " + (d.properties.status === "Vindecat"
-                    ? "vindecat"
-                    : (d.properties.status === "Confirmat"
-                        ? "confirmat"
-                        : "deces")) + ".<br />")
-            : "") +
-        (d.properties.diagnostic_date !== null ? ("Data confirmării: " + d.properties.diagnostic_date + ".<br />") : "") +
-        (d.properties.healing_date !== null ? ("Data recuperării: " + d.properties.healing_date + ".<br />") : "") +
-        (d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania" ? ("Țara de infectare: " + d.properties.country_of_infection + ".<br />") : "") +
-        (d.properties.reference !== null && d.properties.reference !== "" ? ("Detalii: " + '<a href="' + d.properties.reference + '" target= "_blank">aici</a>') : "");
+        let language = d3.select("#language").node().value;
+        console.log(language);
+        let labels = {
+            cazulLabel: { "ro": "Cazul", "en": "Case" },
+            maleLabel: { "ro": "Bărbat", "en": "Male" },
+            femaleLabel: { "ro": "Femeie", "en": "Female" },
+            unspecLabel: { "ro": "Gen nespecificat", "en": "Unspecified gender" },
+            statusLabel: { "ro": "Stare", "en": "Status" },
+            releasedLabel: { "ro": "vindecat", "en": "released" },
+            confirmedLabel: { "ro": "confirmat", "en": "confirmed" },
+            deceasedLabel: { "ro": "deces", "en": "deceased" },
+            confdateLabel: { "ro": "Data confirmării", "en": "Confirmation date" },
+            recoverydateLabel: { "ro": "Data recuperării", "en": "Recovery date" },
+            infectionCountryLabel: { "ro": "Țara de infectare", "en": "Country of infection" },
+            detailsLabel: { "ro": "Detalii", "en": "Details" },
+            aiciLabel: { "ro": "aici", "en": "here" },
+        };
+
+        let genderInfo = d.properties.gender === "Bărbat"
+                ? labels.maleLabel[language]
+                : (d.properties.gender === "Femeie"
+                    ? labels.femaleLabel[language]
+                    : labels.unspecLabel[language]),
+            ageInfo = d.properties.age != null && d.properties.age != 0
+                ? (", " + d.properties.age)
+                : "",
+            countyInfo = d.properties.county != null && d.properties.county != ""
+                ? (", " + d.properties.county)
+                : "",
+            statusInfo = d.properties.status != null
+                ? (labels.statusLabel[language] + ": " + (d.properties.status === "Vindecat"
+                        ? labels.releasedLabel[language]
+                        : (d.properties.status === "Confirmat"
+                            ? labels.confirmedLabel[language]
+                            : labels.deceasedLabel[language])) + ".<br />")
+                : "",
+            diagnosticDateInfo = d.properties.diagnostic_date !== null
+                ? (labels.confdateLabel[language] + ": " + d.properties.diagnostic_date + ".<br />")
+                : "",
+            healingDateInfo = d.properties.healing_date !== null
+                ? (labels.recoverydateLabel[language] + ": " + d.properties.healing_date + ".<br />")
+                : "",
+            countyOfInfectionInfo = d.properties.country_of_infection !== null 
+                                    && d.properties.country_of_infection !== "România"
+                                    && d.properties.country_of_infection !== "Romania"
+                ? (labels.infectionCountryLabel[language] + ": " + d.properties.country_of_infection + ".<br />")
+                : "",
+            referenceInfo = d.properties.reference !== null && d.properties.reference !== ""
+                ? (labels.detailsLabel[language] + ": " + '<a href="' + d.properties.reference + '" target= "_blank">'+ labels.aiciLabel[language] +'</a>')
+                : "";
+
+        return "<b>" + labels.cazulLabel[language] + " " + d.properties.case_no + "</b>" +
+            // genderInfo + ageInfo +
+            countyInfo + ".<br />" +
+            statusInfo +
+            diagnosticDateInfo +
+            healingDateInfo +
+            countyOfInfectionInfo +
+            referenceInfo
+        ;
     } else {
         return d.name;
     };

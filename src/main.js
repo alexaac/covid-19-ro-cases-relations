@@ -2,6 +2,7 @@ import * as Config from './Config';
 import * as Tooltip from './Tooltip';
 import * as Simulation from './Simulation';
 import * as Layout from './Layout';
+import * as Translate from './Translate';
 
 let graph = {nodes: [], links: []};
 let simulation, links, nodes;
@@ -11,6 +12,7 @@ let idToNodeFnc, idToNode, idToTargetNodesFnc, idToTargetNodes;
 let parseTime = d3.timeParse("%d-%m-%Y");
 let formattedData = [];
 let cases;
+let language;
 // const hash = window.top.location.hash.substr(1);
 
 
@@ -164,6 +166,8 @@ const setupGraph = () => {
 }
 
 const drawGraph = () => {
+    language = d3.select("#language").node().value;
+
     // Zoom by scroll, pan
     const zoomed = () => {
         g.attr("transform", d3.event.transform);
@@ -193,7 +197,7 @@ const drawGraph = () => {
             Tooltip.tooltip_div.transition()
                 .duration(200)
                 .style("opacity", .9);
-            Tooltip.tooltip_div.html("<strong>Relația cazurilor confirmate</strong>.<br/><br/>Situaţia până la data în care s-au raportat oficial aceste informaţii.")
+            Tooltip.tooltip_div.html(Translate.infoHtml(language))
                 .style("left", Config.svg_width / 2 + 'px')
                 .style("top", Config.svg_height / 2 + 'px')
                 .style("display", null);
@@ -207,22 +211,22 @@ const drawGraph = () => {
     }
 
     // Add legends
-    Layout.createLegend(Layout.statusColor, 300, 300, "status-legend", "Stare");
-    Layout.createLegend(Layout.countyColor, 900, 1100, "county-legend", "Județ");
-    Layout.createLegend(Layout.genderColor, 200, 200, "gender-legend", "Gen");
-    Layout.createLegend(Layout.ageColor, 400, 400, "age-legend", "Vârstă");
+    Layout.createLegend(Layout.statusColor(language), 300, 300, "status-legend", Translate.status(language));
+    Layout.createLegend(Layout.countyColor, 900, 1100, "county-legend", Translate.county(language));
+    Layout.createLegend(Layout.genderColor(language), 200, 200, "gender-legend", Translate.gender(language));
+    Layout.createLegend(Layout.ageColor, 400, 400, "age-legend", Translate.age(language));
 
     Layout.showLegend("status-legend");
 
     // Change colors from status to counties and vice versa
     d3.select("#color-counties")
-        .on("click", () => Layout.coloreazaJudete(Layout.countyColor));
+        .on("click", () => Layout.coloreazaJudete());
     d3.select("#color-status")
-        .on("click", () => Layout.coloreazaStatus(Layout.statusColor));
+        .on("click", () => Layout.coloreazaStatus());
     d3.select("#color-gender")
-        .on("click", () => Layout.coloreazaGen(Layout.genderColor));
+        .on("click", () => Layout.coloreazaGen());
     d3.select("#color-age")
-        .on("click", () => Layout.coloreazaVarsta(Layout.ageColor));
+        .on("click", () => Layout.coloreazaVarsta());
 
     const panTo = d => {
         d3.event.stopPropagation();
@@ -273,8 +277,9 @@ const drawGraph = () => {
             return name;
         }))
         .force("charge", d3.forceManyBody()
-            .strength(-100)
-            .distanceMax(1000))
+            // .strength(-50)
+            // .distanceMax(1000)
+            )
         .force("center", d3.forceCenter(Config.width / 2, Config.height / 2))
         // .force('collision', d3.forceCollide().radius( d =>  d.radius ))
         .force("x", d3.forceX())
@@ -390,7 +395,7 @@ const drawGraph = () => {
             Tooltip.highlight(d, idToTargetNodes, cases);
         })
         .on("touchend mouseout", d => {
-            Tooltip.unHighlight();
+            // Tooltip.unHighlight();
         })
         .on("click", panTo);
 
@@ -399,20 +404,9 @@ const drawGraph = () => {
         .classed("node-labels", true)
         .attr("x", 8)
         .attr("y", "0.31em")
-        .text(d => d.name)
+        .text(d => typeof(d.name) === "string" ? d.name : "")
         .clone(true).lower();
     nodes.exit().remove();
-
-    // links.on("touchmove mouseover", function(d) {
-    //         d3.select(this)
-    //             .style("stroke", "firebrick");
-    //         d3.select("#CO-" + d.source.name)
-    //             .dispatch('mouseover');
-    //         // d3.selectAll("text")
-    //         //     .attr("opacity", 0)
-    //     })
-    //     .on("touchend mouseout", function(d) {
-    //     });
 
     // Color the legend for counties
     Layout.coloreazaStatus();

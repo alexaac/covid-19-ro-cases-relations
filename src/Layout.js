@@ -1,4 +1,8 @@
-export const statusColor = d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari)", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"]);
+export const statusColor = (language) => {
+    return language === "ro"
+        ? d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari)", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"])
+        : d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari)", "var(--main-decese)"]).domain(["Confirmed", "Discharged", "Deceased"]);
+};
 
 // https://medialab.github.io/iwanthue/
 // hcl[0]>=0 && hcl[0]<=340
@@ -12,7 +16,11 @@ const counties = [
 ];
 export const countyColor = d3.scaleOrdinal(countyColors).domain(counties);
 
-export const genderColor = d3.scaleOrdinal(["var(--main-barbat)", "var(--main-femeie)"]).domain(["Bărbat", "Femeie"]);
+export const genderColor = (language) => {
+    return language === "ro"
+        ? d3.scaleOrdinal(["var(--main-barbat)", "var(--main-femeie)"]).domain(["Bărbat", "Femeie"])
+        : d3.scaleOrdinal(["var(--main-barbat)", "var(--main-femeie)"]).domain(["Male", "Female"]);
+};
 
 export const ageColor = d3.scaleQuantile()
     .domain([0, 100])
@@ -26,13 +34,13 @@ export const coloreazaStatus = () => {
         .attr("fill", d => {
             return (d.is_country_of_infection)
                 ? "black"
-                : d.properties ? statusColor(d.properties.status) : ""
+                : d.properties ? statusColor("ro")(d.properties.status) : ""
         });
 
     showLegend('status-legend');
 }
 
-export const coloreazaJudete = (countyColor) => {
+export const coloreazaJudete = () => {
     let svg = d3.select("#chart").select('svg');
 
     svg.selectAll('circle')
@@ -46,7 +54,7 @@ export const coloreazaJudete = (countyColor) => {
     showLegend('county-legend');
 }
 
-export const coloreazaGen = (genderColor) => {
+export const coloreazaGen = () => {
     let svg = d3.select("#chart").select('svg');
 
     svg.selectAll('circle')
@@ -57,14 +65,14 @@ export const coloreazaGen = (genderColor) => {
                 : d.properties
                     ? d.properties.gender === null
                         ? "var(--main-null)"
-                        : genderColor(d.properties.gender)
+                        : genderColor("ro")(d.properties.gender)
                     : ""
         });
 
     showLegend('gender-legend');
 }
 
-export const coloreazaVarsta = (ageColor) => {
+export const coloreazaVarsta = () => {
     let svg = d3.select("#chart").select('svg');
 
     svg.selectAll('circle')
