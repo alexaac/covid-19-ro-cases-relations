@@ -7,7 +7,7 @@ import * as Translate from './Translate';
 let graph = {nodes: [], links: []};
 let simulation, links, nodes;
 let casesData, geoData, layer, geoCounties;
-let positioning = 'diagram', legendStatus = true, infoStatus = true, searchStatus = true;
+let positioning = 'diagram', legendStatus = false, infoStatus = true, searchStatus = true;
 let idToNodeFnc, idToNode, idToTargetNodesFnc, idToTargetNodes;
 let parseTime = d3.timeParse("%d-%m-%Y");
 let formattedData = [];
@@ -216,8 +216,6 @@ const drawGraph = () => {
     Layout.createLegend(Layout.countyColor, 900, 1100, "county-legend", Translate.county(language));
     Layout.createLegend(Layout.genderColor(language), 200, 200, "gender-legend", Translate.gender(language));
     Layout.createLegend(Layout.ageColor, 400, 400, "age-legend", Translate.age(language));
-
-    Layout.showLegend("status-legend");
 
     // Change colors from status to counties and vice versa
     d3.select("#color-counties")
@@ -480,7 +478,7 @@ const drawGraph = () => {
             legendStatus = true;
         };
     };
-    d3.select("#legend-div").classed("hide", false);
+    d3.select("#legend-div").classed("hide", true);
     d3.select("#toggle-legend")
         .on("click", () => toggleLegend());
 
