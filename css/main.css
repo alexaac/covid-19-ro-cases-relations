@@ -252,6 +252,19 @@ svg.chart-group a {
     background-image: url(../icons/search.svg);
 }
 
+.ro-icon:after, .en-icon:after {
+    font: normal 20px/20px helvetica;
+    display: inline-block;
+}
+
+.ro-icon:after {
+    content: '🇷🇴';
+}
+
+.en-icon:after {
+    content: '🇬🇧';
+}
+
 #search-input {
     width: 50px;
 }
