@@ -318,8 +318,7 @@ const drawGraph = () => {
     // Apply zoom handler
     svg.call(zoom);
     // Zoom to the group
-    zoom.extent();
-    svg.call(zoom.scaleBy, 0.5);
+    svg.call(zoom.scaleTo, 0.5);
 
     // Timeline
     const timeGraph = g.append("g")
@@ -545,7 +544,7 @@ const drawGraph = () => {
         });
 
     const playCases = () => {
-        g.transition().call(zoom.scaleBy, 1);
+        svg.call(zoom.scaleTo, 0.5);
         thisCaseOrder = d3.select("#nRadius").node().value;
         if (+thisCaseOrder === (+cases.length - 1)) thisCaseOrder = 0;
 
