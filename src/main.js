@@ -169,27 +169,6 @@ const setupGraph = () => {
 }
 
 const drawGraph = () => {
-    // Zoom by scroll, pan
-    const zoomed = () => {
-        g.attr("transform", d3.event.transform);
-    };
-
-    const zoom = d3.zoom()
-      .scaleExtent([0.2, 10])
-      .on("zoom", zoomed);
-
-    const resetZoom = () => {
-        g.transition().duration(750).call(
-            zoom.transform,
-            d3.zoomIdentity,
-            d3.zoomTransform(g.node()).invert([Config.svg_width / 2, Config.svg_height / 2])
-        );
-    };
-
-    d3.select("#zoom-in").on("click", () => g.transition().call(zoom.scaleBy, 2));
-    d3.select("#zoom-out").on("click", () => g.transition().call(zoom.scaleBy, 0.5));
-    d3.select("#reset-zoom").on("click", () => resetZoom());
-
     // Info
     d3.select("#show-info").on("click", () => showInfo());
 
@@ -288,8 +267,55 @@ const drawGraph = () => {
             .attr("viewBox", '0, 0 ' + Config.svg_width + ' ' + Config.svg_height)
             .on("click", () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
     const g = svg.append("g");
-        // .attr("transform-origin", "50% 50% 0");
 
+    // Zoom by scroll, pan
+    const hideLabels = function(z) {
+        g.selectAll('.node-labels').classed('hidden', function(d) {
+            if (typeof(d.name) !== "string") {
+                return z <= 1.5;
+            } else {
+                return false;
+            }
+        });
+    };
+
+    const zoomed = () => {
+        g.attr("transform", d3.event.transform);
+        g.selectAll('.node-labels')
+            .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+        return hideLabels(d3.event.transform.k);
+    }
+
+    const zoom = d3.zoom()
+        .scaleExtent([0.2, 10])
+        .on("zoom", zoomed);
+
+    const panTo = d => {
+        d3.event.stopPropagation();
+        svg.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity.translate(Config.width / 2, Config.height / 2)
+                .scale(2)
+                .translate(-d.x, -d.y),
+            d3.mouse(svg.node())
+        );
+    };
+
+    const resetZoom = () => {
+        g.transition().duration(750).call(
+            zoom.transform,
+            d3.zoomIdentity,
+            d3.zoomTransform(g.node()).invert([Config.svg_width / 2, Config.svg_height / 2])
+        );
+    };
+
+    d3.select("#zoom-in")
+        .on("click", () => svg.transition().call(zoom.scaleBy, 2));
+    d3.select("#zoom-out")
+        .on("click", () => svg.transition().call(zoom.scaleBy, 0.5));
+    d3.select("#reset-zoom").on("click", () => resetZoom());
+
+    // Timeline
     const timeGraph = g.append("g")
         .attr("class", "time-graph")
         .attr("opacity", 0);
@@ -377,16 +403,6 @@ const drawGraph = () => {
         .join("g")
             .call(Simulation.drag(simulation, positioning));
 
-    const panTo = d => {
-        d3.event.stopPropagation();
-        g.transition().duration(750).call(
-            zoom.transform,
-            d3.zoomIdentity
-                .translate(Config.width / 2, Config.height / 2)
-                .translate(-d.x, -d.y)
-        );
-    };
-
     nodes.append("circle")
         .attr("id", d => d.properties && `CO-${d.properties.case_no}`)
         .attr("r", 5)
@@ -403,15 +419,13 @@ const drawGraph = () => {
         .classed("node-labels", true)
         .attr("x", 8)
         .attr("y", "0.31em")
-        .text(d => typeof(d.name) === "string" ? d.name : "")
+        .text(d => d.name)
         .clone(true).lower();
+
     nodes.exit().remove();
 
     // Color the legend for counties
     Layout.colorStatus();
-
-    // Apply zoom handler
-    zoom(svg);
 
     // Toggle between map, graph and timeline chart
     const fixed = (positioning, immediate) => {
@@ -510,9 +524,6 @@ const drawGraph = () => {
             searchByCaseId(+this.value);
         });
 
-    // Zoom to the group
-    g.transition().call(zoom.scaleBy, 0.5);
-
     // Start/stop the animation - highlight the cases ordered by day and case number
     d3.select("#play-cases")
         .on("click", () => {
@@ -571,6 +582,13 @@ const drawGraph = () => {
     }
     // Select latest case
     updateRadius(cases.length-1);
+
+    // Apply zoom handler
+    svg.call(zoom);
+    // Zoom to the group
+    zoom.extent();
+    svg.call(zoom.scaleBy, 0.5);
+    hideLabels(0.9);
 
     // Zoom to latest case, when loading spinner stops
     setTimeout(function() {

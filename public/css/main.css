@@ -74,6 +74,9 @@ svg.chart-group {
 .label {
     /* text-transform: uppercase; */
 }
+.node-labels.hidden {
+    display: none;
+}
 
 #spinner {
     max-width: 600px;
