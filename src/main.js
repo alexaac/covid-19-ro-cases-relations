@@ -315,6 +315,12 @@ const drawGraph = () => {
         .on("click", () => svg.transition().call(zoom.scaleBy, 0.5));
     d3.select("#reset-zoom").on("click", () => resetZoom());
 
+    // Apply zoom handler
+    svg.call(zoom);
+    // Zoom to the group
+    zoom.extent();
+    svg.call(zoom.scaleBy, 0.5);
+
     // Timeline
     const timeGraph = g.append("g")
         .attr("class", "time-graph")
@@ -583,11 +589,7 @@ const drawGraph = () => {
     // Select latest case
     updateRadius(cases.length-1);
 
-    // Apply zoom handler
-    svg.call(zoom);
-    // Zoom to the group
-    zoom.extent();
-    svg.call(zoom.scaleBy, 0.5);
+    // Hide case labels first
     hideLabels(0.9);
 
     // Zoom to latest case, when loading spinner stops
