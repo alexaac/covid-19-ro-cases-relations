@@ -24,15 +24,16 @@
                 </div>
                 <div class="control control-group">
                     <a id="toggle-legend" class="legend-icon" href="#" title="Legenda"></a>
-                    <a id="color-status" class="status-icon" href="#" title="Stare"></a>
                     <a id="color-counties" class="counties-icon" href="#" title="Județe"></a>
                     <a id="color-gender" class="gender-icon" href="#" title="Gen"></a>
                     <a id="color-age" class="age-icon" href="#" title="Vârsta"></a>
+                    <a id="color-status" class="status-icon" href="#" title="Stare"></a>
                 </div>
                 <div class="control control-group">
                     <a id="show-map" class="map-icon" href="#" title="Hartă"></a>
-                    <a id="show-graph" class="graph-icon" href="#" title="Rețea"></a>
+                    <a id="show-map-clusters" class="map-clusters-icon" href="#" title="Clustere"></a>
                     <a id="show-arcs" class="arcs-icon" href="#" title="Timp"></a>
+                    <a id="show-graph" class="graph-icon" href="#" title="Rețea"></a>
                 </div>
                 <div class="control control-group">
                     <a id="zoom-in" class="zoom-in-icon" href="#" title="Zoom In"></a>
@@ -55,6 +56,7 @@
             <div id="chart" class="grabbable"></div>
             <div id="legend-div"></div>
             <input type="hidden" id="language" name="language" value="ro">
+            <input type="hidden" id="positioning" name="positioning" value="diagram">
         </div>
 
         <script src="//d3js.org/d3.v5.min.js"></script>
@@ -62,6 +64,7 @@
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js'></script>
+        <script src="https://unpkg.com/d3-force-attract@latest"></script>
         
         <script src="bundle.js"></script>
 
