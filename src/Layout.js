@@ -1,3 +1,6 @@
+import * as Config from './Config';
+import * as Simulation from './Simulation';
+
 export const statusColor = (language) => {
     return language === "ro"
         ? d3.scaleOrdinal(["var(--main-confirmate)", "var(--main-recuperari)", "var(--main-decese)"]).domain(["Confirmat", "Vindecat", "Decedat"])
@@ -27,9 +30,9 @@ export const ageColor = d3.scaleQuantile()
     .range(d3.schemeSpectral[10]);
 
 export const colorStatus = () => {
-    let svg = d3.select("#chart").select('svg');
+    let svg = d3.select("#chart").select("svg");
 
-    svg.selectAll('circle')
+    svg.selectAll(".nodes")
         .transition().duration(100)
         .attr("fill", d => {
             return (d.is_country_of_infection)
@@ -37,13 +40,13 @@ export const colorStatus = () => {
                 : d.properties ? statusColor("ro")(d.properties.status) : ""
         });
 
-    showLegend('status-legend');
+    showLegend("status-legend");
 }
 
 export const colorCounties = () => {
-    let svg = d3.select("#chart").select('svg');
+    let svg = d3.select("#chart").select("svg");
 
-    svg.selectAll('circle')
+    svg.selectAll(".nodes")
         .transition().duration(100)
         .attr("fill", d => {
             return (d.is_country_of_infection)
@@ -51,13 +54,13 @@ export const colorCounties = () => {
                 : d.properties ? countyColor(d.properties.county) : ""
         });
 
-    showLegend('county-legend');
+    showLegend("county-legend");
 }
 
 export const colorGender = () => {
-    let svg = d3.select("#chart").select('svg');
+    let svg = d3.select("#chart").select("svg");
 
-    svg.selectAll('circle')
+    svg.selectAll(".nodes")
         .transition().duration(100)
         .attr("fill", d => {
             return (d.is_country_of_infection)
@@ -69,13 +72,13 @@ export const colorGender = () => {
                     : ""
         });
 
-    showLegend('gender-legend');
+    showLegend("gender-legend");
 }
 
 export const colorAge = () => {
-    let svg = d3.select("#chart").select('svg');
+    let svg = d3.select("#chart").select("svg");
 
-    svg.selectAll('circle')
+    svg.selectAll(".nodes")
         .transition().duration(100)
         .attr("fill", d => {
             return (d.is_country_of_infection)
@@ -87,25 +90,25 @@ export const colorAge = () => {
                     : ""
         });
 
-    showLegend('age-legend');
+    showLegend("age-legend");
 }
 
 export const createLegend = (colorScale, height, vbHeight, legendClass, legendTitle) => {
 
     const legend = d3.select("#legend-div")
         .append("div")
-            .attr('class', legendClass)
+            .attr("class", legendClass)
         .append("svg")
-            .attr('class', "category-legend")
+            .attr("class", "category-legend")
             .attr("width", 110)
             .attr("height", height)
             .attr("preserveAspectRatio", "xMidYMid")
-            .attr("viewBox", '-10, -10 ' + 120 + ' ' + vbHeight)
+            .attr("viewBox", "-10, -10 " + 120 + " " + vbHeight)
             .attr("x", 0)
             .attr("y", 0);
 
     const categoryLegend = d3.legendColor()
-                            .shape('path', d3.symbol().type(d3.symbolCircle).size(150)())
+                            .shape("path", d3.symbol().type(d3.symbolCircle).size(150)())
                             .shapePadding(10)
                             .title(legendTitle)
                             .titleWidth(100)
@@ -122,13 +125,171 @@ export const showLegend = category => {
     d3.select(".gender-legend").classed("hide", true);
     d3.select(".age-legend").classed("hide", true);
 
-    if (category === 'county-legend') {
+    if (category === "county-legend") {
         d3.select(".county-legend").classed("hide", false);
-    } else if (category === 'status-legend') {
+    } else if (category === "status-legend") {
         d3.select(".status-legend").classed("hide", false);
-    } else if (category === 'gender-legend') {
+    } else if (category === "gender-legend") {
         d3.select(".gender-legend").classed("hide", false);
-    } else if (category === 'age-legend') {
+    } else if (category === "age-legend") {
         d3.select(".age-legend").classed("hide", false);
     }
 }
+
+export const hideLabels = function(z) {
+    d3.selectAll(".node-labels")
+        .classed("hidden", d => {
+            if (typeof(d.name) !== "string") {
+                return z <= 2;
+            } else {
+                return false;
+            }
+        });
+    d3.selectAll(".labels")
+        .classed("hidden", d => d.r < 10 / z);
+};
+
+export const updateRadius = (cases, nRadius) => {
+    // adjust the text on the range slider
+    d3.select("#nRadius-value").text(cases[nRadius]);
+    d3.select("#nRadius").property("value", cases[nRadius]);
+    d3.select("#search-input").property("value", cases[nRadius]);
+
+    // highlight case
+    d3.selectAll(".nodes")
+        .attr("r", 5);
+    d3.select("#CO-" + cases[nRadius])
+        .attr("r", 15)
+        .dispatch("mouseover");
+        // .dispatch("click");
+}
+
+export const fixed = (nodes, positioning, immediate, idToNode, xScale, yScale) => {
+    if (positioning === "map" || positioning === "clusters") {
+        nodes.forEach(function (d) {
+            const pos = Config.projection([d.longitude, d.latitude]);
+            d.x = pos[0] || d.x;
+            d.y = pos[1] || d.y;
+        });
+    } else {
+        nodes.forEach(function (d) {
+            d.x = xScale(d.date) || -100;
+            d.y = yScale(d.dayOrder);
+        });
+    }
+
+    const t = d3.transition()
+        .duration(immediate ? 0 : 800)
+        .ease(d3.easeElastic.period(0.5));
+        
+    Simulation.update(idToNode, d3.selectAll(".nodes").transition(t), d3.selectAll(".links").transition(t), d3.selectAll(".node-labels").transition(t), positioning, xScale, yScale)
+
+};
+
+const zoomed = () => {
+    let zoomableGroup = d3.selectAll(".zoomable-group");
+
+    zoomableGroup.attr("transform", d3.event.transform);
+    zoomableGroup.selectAll(".node-labels > text")
+        .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+    zoomableGroup.selectAll(".labels > text")
+        .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+    return hideLabels(d3.event.transform.k);
+}
+
+export const zoom = d3.zoom()
+    .scaleExtent([0.2, 10])
+    .on("zoom", zoomed);
+
+export const resetZoom = () => {
+    let zoomableGroup = d3.selectAll(".zoomable-group");
+
+    zoomableGroup.transition().duration(750).call(
+        zoom.transform,
+        d3.zoomIdentity,
+        d3.zoomTransform(zoomableGroup.node()).invert([Config.svg_width / 2, Config.svg_height / 2]),
+    );
+};
+
+export const panTo = d => {
+    let svg = d3.selectAll("svg");
+
+    d3.event.stopPropagation();
+    svg.transition().duration(750).call(
+        zoom.transform,
+        d3.zoomIdentity.translate(Config.svg_width / 2, Config.svg_height / 2)
+            .scale(2)
+            .translate(-d.x, -d.y),
+        d3.mouse(svg.node())
+    );
+};
+
+export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
+    let positioning = "map";
+    d3.select("#positioning").attr("value", "map");
+
+    simulation.stop();
+
+    d3.selectAll('.nodes-group').style("opacity", 1);
+    d3.selectAll('.land').attr("opacity", 1);
+    d3.selectAll('.time-graph').attr("opacity", 0);
+    d3.selectAll('.pack-group').attr("opacity", 1);
+    
+    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
+
+    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
+    d3.selectAll('.tooltip').style("opacity", 1);
+};
+
+export const showMapClusters = (graph, simulation, idToNode, xScale, yScale, playCasesNow) => {
+    let positioning = "clusters";
+    d3.select("#positioning").attr("value", "clusters");
+    
+    simulation.stop();
+
+    d3.selectAll('.land').attr("opacity", 1);
+    d3.selectAll('.time-graph').attr("opacity", 0);
+    d3.selectAll('.pack-group').attr("opacity", 1);
+    
+    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
+
+    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
+
+    d3.selectAll('.nodes-group').style("opacity", 0);
+    d3.selectAll('.tooltip').style("opacity", 0);
+
+    d3.select("#pause-cases").classed("hide", true);
+    d3.select("#play-cases").classed("hide",false);
+    clearInterval(playCasesNow);
+};
+
+export const showGraph = (simulation) => {
+    let positioning = "diagram";
+    d3.select("#positioning").attr("value", "diagram");
+
+    simulation.alpha(1).restart();
+
+    d3.selectAll('.nodes-group').style("opacity", 1);
+    d3.selectAll('.land').attr("opacity", 0.25);
+    d3.selectAll('.time-graph').attr("opacity", 0);
+    d3.selectAll('.pack-group').attr("opacity", 0);
+    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
+    d3.selectAll('.tooltip').style("opacity", 1);
+};
+
+export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
+    let positioning = "arcs";
+    d3.select("#positioning").attr("value", "arcs");
+
+    simulation.stop();
+
+    d3.selectAll('.nodes-group').style("opacity", 1);
+    d3.selectAll('.land').attr("opacity", 0);
+    d3.selectAll('.time-graph').attr("opacity", 1);
+    d3.selectAll('.pack-group').attr("opacity", 0);
+    
+    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
+
+    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
+    d3.selectAll('.tooltip').style("opacity", 1);
+};

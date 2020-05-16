@@ -1,3 +1,6 @@
+import * as Config from './Config';
+import * as Language from './Language';
+
 // use a tooltip to show node info
 export const tooltip_div = d3.select("body")
    .append("tooltip_div")
@@ -5,16 +8,23 @@ export const tooltip_div = d3.select("body")
    .style("opacity", 0)
    .style("display", "none");
 
-export const highlight = (d, idToTargetNodes, cases) => {
-    // TODO: slider
+export const highlight = (d, cases) => {
+    let positioning = d3.select("#positioning").node().value;
+
+    if (positioning === "clusters") {
+        return;
+    };
+
     let left = d3.event.pageX -20;
     let top = d3.event.pageY + 20;
  
+    let caseId = d.name;
+
     if (window.innerWidth - left < 150){
-      left = d3.event.pageX - 40;
+        left = d3.event.pageX - 40;
     }
  
-    d3.selectAll("circle")
+    d3.selectAll(".nodes")
         .attr("r", 5)
         .style("opacity", 0.3);
     d3.selectAll(".links")
@@ -27,26 +37,23 @@ export const highlight = (d, idToTargetNodes, cases) => {
         .duration(200)
         .style("opacity", .9);
 
-    d3.select("#CO-" + d.name)
+    d3.select("#CO-" + caseId)
         .attr("r", 15)
         .style("opacity", 1);
-    d3.selectAll(".CO-links-" + d.name)
+    d3.selectAll(".CO-links-" + caseId)
         .style("stroke", "firebrick")
         .transition()
-            .duration(500)
+            .duration(200)
             .attr("stroke-dashoffset", 0)
             .style("opacity", 1)
             .on("end", function(d, i) {
-                if (i === 0)  
-                d3.selectAll("circle")
-                    .filter(function(noded) {
-                        return idToTargetNodes[d.source.name].includes(noded.name) || +d.source.name === +noded.name})
+                if (i === 0)
+                d3.selectAll(".CO-nodes-" + caseId)
                     .style("opacity", "1");
-                    d3.selectAll(".node-labels")
-                    .filter(function(noded) {
-                        return idToTargetNodes[d.source.name].includes(noded.name) || +d.source.name === +noded.name})
+                d3.selectAll(".CO-labels-" + caseId)
                     .style("opacity", "1");
             });
+       
     d3.selectAll(".CO-labels-" + d.name)
         .style("color", "firebrick")
         .style("opacity", 1);
@@ -130,7 +137,7 @@ export const tooltipHTML = (d) => {
 };
 
 export const unHighlight = () => {
-    d3.selectAll("circle")
+    d3.selectAll(".nodes")
         .style("opacity", 1);
     d3.selectAll(".link")
         .style("opacity", 1);
@@ -139,9 +146,40 @@ export const unHighlight = () => {
 };
 
 export const hideTooltip = () => {
-    d3.selectAll("circle")
+    d3.selectAll(".nodes")
         .attr("r", 5);
     tooltip_div.transition()
         .duration(200)
         .style("opacity", 0);
 }
+
+export const highlightSearchedId = (caseId) => {
+    // highlight case
+    d3.selectAll(".nodes")
+        .attr("r", 5);
+    d3.select("#CO-" + caseId)
+        .attr("r", 15)
+        .dispatch('mouseover')
+        .dispatch('click');
+}
+
+export const toggleInfo = (infoStatus) => {
+    if (infoStatus === true) {
+        tooltip_div.transition()
+            .duration(200)
+            .style("opacity", .9);
+        tooltip_div.html(Language.infoHtml(language))
+            .style("left", Config.svg_width / 2 + 'px')
+            .style("top", Config.svg_height / 2 + 'px')
+            .style("display", null);
+        infoStatus = false;
+    } else {
+        tooltip_div.transition()
+            .duration(200)
+            .style("opacity", 0);
+        infoStatus = true;
+    }
+
+    return infoStatus;
+}
+

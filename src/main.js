@@ -1,81 +1,32 @@
 import * as Config from './Config';
-import * as Tooltip from './Tooltip';
-import * as Simulation from './Simulation';
+import * as Data from './Data';
+import * as Draw from './Draw';
 import * as Layout from './Layout';
-import * as Translate from './Translate';
+import * as Tooltip from './Tooltip';
+import * as Language from './Language';
+import * as Simulation from './Simulation';
 
 let graph = {nodes: [], links: []};
-let simulation, links, nodes;
-let casesData, geoData, layer, geoCounties;
-let positioning = 'diagram', legendStatus = false, infoStatus = true, searchStatus = true;
-let idToNodeFnc, idToNode, idToTargetNodesFnc, idToTargetNodes;
-let parseTime = d3.timeParse("%d-%m-%Y");
-let formattedData = [];
-let cases;
-let language;
-let playCasesNow, thisCaseId, thisCaseOrder;
+let svg, simulation, xScale, yScale, zoomableGroup, idToNode;
+let sources, casesData, geoData, layer, geoCounties, geojsonFeatures;
+let legendStatus = false, infoStatus = true, searchStatus = true;
+let cases, playCasesNow, thisCaseId, thisCaseOrder;
+let countiesCentroids = d3.map();
+
+let positioning = d3.select("#positioning").node().value;
 
 // Switch the language to english/romanian
-language = d3.select("#language").node().value;
+let language = d3.select("#language").node().value;
 let countiesSource = language === "ro" ? "data/judete_wgs84.json" : "../data/judete_wgs84.json";
-
-const locale = d3.timeFormatLocale({
-    "dateTime": "%A, %e %B %Y г. %X",
-    "date": "%d.%m.%Y",
-    "time": "%H:%M:%S",
-    "periods": ["AM", "PM"],
-    "days": ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"],
-    "shortDays": ["Lu", "Ma", "Mi", "Jo", "Vi", "Sa", "Du"],
-    "months": ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"],
-    "shortMonths": ["Ian", "Feb", "Mart", "Apr", "Mai", "Iun", "Iul", "Aug", "Sept", "Oct", "Nov", "Dec"]
-});
-
-const formatMillisecond = locale.format(".%L"),
-    formatSecond = locale.format(":%S"),
-    formatMinute = locale.format("%I:%M"),
-    formatHour = locale.format("%I %p"),
-    formatDay = locale.format("%a %d"),
-    formatWeek = locale.format("%b %d"),
-    formatMonth = locale.format("%B"),
-    formatYear = locale.format("%Y");
-
-function multiFormat(date) {
-    return (d3.timeSecond(date) < date ? formatMillisecond
-    : d3.timeMinute(date) < date ? formatSecond
-    : d3.timeHour(date) < date ? formatMinute
-    : d3.timeDay(date) < date ? formatHour
-    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
-    : d3.timeYear(date) < date ? formatMonth
-    : formatYear)(date);
-}
 
 (() => {
 
-// Spinner
-// options for loading spinner
-let opts = {
-        lines: 9,
-        length: 4,
-        width: 5,
-        radius: 12,
-        scale: 1,
-        corners: 1,
-        color: '#f40000',
-        opacity: 0.25,
-        rotate: 0,
-        direction: 1,
-        speed: 1,
-        trail: 30,
-        fps: 20,
-        zIndex: 2e9,
-        className: 'spinner',
-        shadow: false,
-        hwaccel: false,
-        position: 'absolute',
-    },
+// Options for loading spinner
+let opts = {lines: 9, length: 4, width: 5, radius: 12, scale: 1, corners: 1, color: '#f40000', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 30, fps: 20, zIndex: 2e9, className: 'spinner', shadow: false, hwaccel: false, position: 'absolute'},
     target = document.getElementById('spinner'),
     spinner;
 
+// Load data
 const promises = [
     d3.json(countiesSource),
     d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations")
@@ -94,7 +45,7 @@ Promise.all(promises).then( data => {
 
 const setupGraph = () => {
 
-    const sources = casesData.data.nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
+    sources = casesData.data.nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== "România" && d.properties.country_of_infection !== "Romania");
 
     graph.nodes = casesData.data.nodes;
     graph.links = casesData.data.links;
@@ -105,96 +56,95 @@ const setupGraph = () => {
     graph.nodes = graph.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
     graph.links = graph.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
 
-    idToNodeFnc = () => {
-        let dict = {};
-        graph.nodes.forEach(function(n) {
-            dict[n.name] = n;
-        });
-        return dict;
-    }
-    idToTargetNodesFnc = () => {
-        let dict = {};
-        graph.nodes.forEach(function (n) {
-            dict[n.name] = [];
-            graph.links.forEach(function (l) {
-                if (l.source === n.name) {
-                    dict[n.name].push(l.target);
-                }
-            });
-        });
-        return dict;
-    }
-    idToNode = idToNodeFnc();
-    idToTargetNodes = idToTargetNodesFnc();
-
     layer = "judete_wgs84";
     geoCounties = topojson.feature(geoData, geoData.objects[layer]).features;
+    geojsonFeatures = topojson.feature(geoData, {
+        type: "GeometryCollection",
+        geometries: geoData.objects[layer].geometries
+    });
 
-    let countiesCentroids = d3.map();
     geoCounties.forEach( d => {
         let county = d.properties.county;
+        // Get lat, lon for nodes within county
         countiesCentroids.set(county, {
             lat: d.properties.lat,
             lon: d.properties.lon,
         });
+        d.id = county;
+        d.centroid = Config.projection.fitSize([Config.svg_width, Config.svg_height], geojsonFeatures)([d.properties.lon, d.properties.lat]);
+        // Set force for group by county
+        d.force = {};
+        d.force.x = d.centroid[0];
+        d.force.y = d.centroid[1];
+        d.force.foc_x = d.centroid[0];
+        d.force.foc_y = d.centroid[1];
     });
 
-    graph.nodes.forEach( d => {
-        if (d.properties !== undefined) {
-            d.latitude = countiesCentroids.get(d.properties.county) && countiesCentroids.get(d.properties.county).lat;
-            d.longitude = countiesCentroids.get(d.properties.county) && countiesCentroids.get(d.properties.county).lon;
-            d.date = parseTime(d.properties.diagnostic_date).getTime();
-            d.name = +d.name;
-        };
-    });
-    graph.nodes.sort((a,b) => a.date - b.date);
-
-    var ed_data = d3.nest()
-        .key(function(d) {
-            return d.properties && d.properties.diagnostic_date;
-        })
-        // .key(function(d) { return d.properties.county; })
-        // .rollup(function(v) { return v.length; })
-        .entries(graph.nodes);
-    ed_data.forEach(function(key){
-        let valuesArr = [...key["values"] ].sort((a,b) => a.name - b.name);
-        let valuesPerDay = valuesArr.map(function(d){
-                d.dayOrder = valuesArr.indexOf(d) + 1;
-                return d;
-            });
-        formattedData.push(...valuesPerDay)
-    });
-
-    graph.nodes = formattedData;
+    graph.nodes = Data.formatNodes(graph.nodes, countiesCentroids);
 }
 
 const drawGraph = () => {
-    // Info
-    d3.select("#show-info").on("click", () => showInfo());
-
-    const showInfo = () => {
-        if (infoStatus === true) {
-            Tooltip.tooltip_div.transition()
-                .duration(200)
-                .style("opacity", .9);
-            Tooltip.tooltip_div.html(Translate.infoHtml(language))
-                .style("left", Config.svg_width / 2 + 'px')
-                .style("top", Config.svg_height / 2 + 'px')
-                .style("display", null);
-            infoStatus = false;
-        } else {
-            Tooltip.tooltip_div.transition()
-                .duration(200)
-                .style("opacity", 0);
-            infoStatus = true;
-        }
-    }
-
     // Add legends
-    Layout.createLegend(Layout.statusColor(language), 300, 300, "status-legend", Translate.status(language));
-    Layout.createLegend(Layout.countyColor, 900, 1100, "county-legend", Translate.county(language));
-    Layout.createLegend(Layout.genderColor(language), 200, 200, "gender-legend", Translate.gender(language));
-    Layout.createLegend(Layout.ageColor, 400, 400, "age-legend", Translate.age(language));
+    Layout.createLegend(Layout.statusColor(language), 300, 300, "status-legend", Language.status(language));
+    Layout.createLegend(Layout.countyColor, 900, 1100, "county-legend", Language.county(language));
+    Layout.createLegend(Layout.genderColor(language), 200, 200, "gender-legend", Language.gender(language));
+    Layout.createLegend(Layout.ageColor, 400, 400, "age-legend", Language.age(language));
+
+    // Set scales for nodes by time
+    xScale = d3.scaleTime()
+        .domain(d3.extent(graph.nodes, function(d) { return d.date; }))
+        .range([0, Config.svg_width]);
+    yScale = d3.scaleLinear()
+        .domain(d3.extent(graph.nodes, function(d) { return d.dayOrder; }))
+        .range([Config.svg_height, 0]);
+
+    // Map nodes name with nodes details
+    idToNode = Data.idToNodeFnc(graph);
+
+    // Setup the simulation
+    // https://gist.github.com/mbostock/1153292
+    const ticked = () => {
+        Simulation.update(idToNode, d3.selectAll('.nodes'), d3.selectAll('.links'), d3.selectAll('.node-labels'), positioning, xScale, yScale);
+    };
+
+    simulation = Simulation.graphSimulation(graph);
+    simulation.on('tick', ticked);
+    simulation.force('link').links(graph.links);
+
+    // Append the svg object to the chart div
+    svg = d3.select("#chart")
+        .append("svg")
+            .attr("class", "chart-group")
+            .attr("preserveAspectRatio", "xMidYMid")
+            .attr("width", Config.svg_width)
+            .attr("height", Config.svg_height)
+            .attr("viewBox", '0, 0 ' + Config.svg_width + ' ' + Config.svg_height)
+            .on("click", () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
+    
+    // Append zoomable group
+    zoomableGroup = svg.append("g")
+        .attr("class", "zoomable-group");
+
+    // Zoom by scroll, pan
+    d3.select("#zoom-in")
+        .on("click", () => svg.transition().call(Layout.zoom.scaleBy, 2));
+    d3.select("#zoom-out")
+        .on("click", () => svg.transition().call(Layout.zoom.scaleBy, 0.5));
+    d3.select("#reset-zoom").on("click", () => svg.call(Layout.zoom.scaleTo, 0.5));
+
+    // Apply zoom handler and zoom out
+    svg.call(Layout.zoom)
+        .call(Layout.zoom.scaleTo, 0.5);
+
+    // Toggle between map, graph and timeline chart
+    d3.select("#show-map")
+        .on("click", () => Layout.showMap(graph, simulation, idToNode, xScale, yScale));
+    d3.select("#show-map-clusters")
+        .on("click", () => Layout.showMapClusters(graph, simulation, idToNode, xScale, yScale, playCasesNow));
+    d3.select("#show-graph")
+        .on("click", () => Layout.showGraph(simulation));
+    d3.select("#show-arcs")
+        .on("click", () => Layout.showArcs(graph, simulation, idToNode, xScale, yScale));
 
     // Change colors from status to counties and vice versa
     d3.select("#color-counties")
@@ -205,287 +155,6 @@ const drawGraph = () => {
         .on("click", () => Layout.colorGender());
     d3.select("#color-age")
         .on("click", () => Layout.colorAge());
-
-    // Setup the simulation
-    // https://gist.github.com/mbostock/1153292
-
-    const ticked = () => {
-        update(links, nodes, positioning)
-    };
-
-    const xScale = d3.scaleTime()
-        .domain(d3.extent(graph.nodes, function(d) { return d.date; }))
-        .range([0, Config.svg_width]);
-    const yScale = d3.scaleLinear()
-        .domain(d3.extent(graph.nodes, function(d) { return d.dayOrder; }))
-        .range([Config.svg_height, 0]);
-
-    const update = (links, nodes, positioning) => {
-        links.attr("d", d => {
-            if (positioning === 'arcs') {
-                if (typeof(d.source.name) === "string") {
-                    return Simulation.linkArc(d)
-                } else {
-                    let start = xScale(idToNode[d.source.name].date) || 0;
-                    let end = xScale(idToNode[d.target.name].date);
-                    const arcPath = ['M', start, yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,",",
-                                start < end ? 1: 0, end, yScale(idToNode[d.target.name].dayOrder)].join(' ');
-                    return arcPath;
-                }
-            } else {
-                return Simulation.linkArc(d)
-            }
-        });
-        nodes.attr("transform", d => `translate(${d.x},${d.y})`);
-    };
-
-    simulation = d3.forceSimulation(graph.nodes)
-        .force("link", d3.forceLink(graph.links).id( d => {
-            let name = JSON.parse(JSON.stringify(d)).name;
-            return name;
-        }))
-        .force("charge", d3.forceManyBody()
-            // .strength(-50)
-            // .distanceMax(1000)
-            )
-        .force("center", d3.forceCenter(Config.width / 2, Config.height / 2))
-        // .force('collision', d3.forceCollide().radius( d =>  d.radius ))
-        .force("x", d3.forceX())
-        .force("y", d3.forceY())
-        .alphaDecay([0.02]);
-        // .stop();
-
-    simulation.on('tick', ticked);
-    simulation.force('link').links(graph.links);
-    // Append the svg object to the chart div, and a group for nodes and links
-    const svg = d3.select("#chart")
-        .append("svg")
-            .attr("class", "chart-group")
-            .attr("preserveAspectRatio", "xMidYMid")
-            .attr("width", Config.svg_width)
-            .attr("height", Config.svg_height)
-            .attr("viewBox", '0, 0 ' + Config.svg_width + ' ' + Config.svg_height)
-            .on("click", () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
-    const g = svg.append("g");
-
-    // Zoom by scroll, pan
-    const hideLabels = function(z) {
-        g.selectAll('.node-labels').classed('hidden', function(d) {
-            if (typeof(d.name) !== "string") {
-                return z <= 1.5;
-            } else {
-                return false;
-            }
-        });
-    };
-
-    const zoomed = () => {
-        g.attr("transform", d3.event.transform);
-        g.selectAll('.node-labels')
-            .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
-        return hideLabels(d3.event.transform.k);
-    }
-
-    const zoom = d3.zoom()
-        .scaleExtent([0.2, 10])
-        .on("zoom", zoomed);
-
-    const panTo = d => {
-        d3.event.stopPropagation();
-        svg.transition().duration(750).call(
-            zoom.transform,
-            d3.zoomIdentity.translate(Config.width / 2, Config.height / 2)
-                .scale(2)
-                .translate(-d.x, -d.y),
-            d3.mouse(svg.node())
-        );
-    };
-
-    const resetZoom = () => {
-        g.transition().duration(750).call(
-            zoom.transform,
-            d3.zoomIdentity,
-            d3.zoomTransform(g.node()).invert([Config.svg_width / 2, Config.svg_height / 2])
-        );
-    };
-
-    d3.select("#zoom-in")
-        .on("click", () => svg.transition().call(zoom.scaleBy, 2));
-    d3.select("#zoom-out")
-        .on("click", () => svg.transition().call(zoom.scaleBy, 0.5));
-    d3.select("#reset-zoom").on("click", () => resetZoom());
-
-    // Apply zoom handler
-    svg.call(zoom);
-    // Zoom to the group
-    svg.call(zoom.scaleTo, 0.5);
-
-    // Timeline
-    const timeGraph = g.append("g")
-        .attr("class", "time-graph")
-        .attr("opacity", 0);
-
-    const xLabel = timeGraph.append("text")
-        .attr("y", Config.svg_height + 70)
-        .attr("x", Config.svg_width / 2)
-        .attr("font-size", "16px")
-        .attr("text-anchor", "middle")
-        .text("Ziua");
-    const xAxis = timeGraph.append("g")
-        .attr("transform", "translate(0," + (Config.svg_height) + ")")
-        .call(d3.axisBottom(xScale)
-            .ticks(20)
-            .tickFormat(multiFormat));
-    xAxis.selectAll('text')
-        .attr("font-weight", "bold")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("transform", "rotate(-65)");
-    const yAxis = timeGraph.append("g")
-        .call(d3.axisLeft(yScale)
-            .ticks(10));
-    yAxis.selectAll('text').attr("font-weight", "bold");
-    const yLabel = timeGraph.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", -50)
-        .attr("x", -Config.svg_height / 2)
-        .attr("font-size", "20px")
-        .attr("text-anchor", "middle")
-        .text("Cazuri pe zi")
-
-    // Add counties map
-    const geojsonFeatures = topojson.feature(geoData, {
-        type: "GeometryCollection",
-        geometries: geoData.objects[layer].geometries
-    });
-
-    const thisMapPath = d3.geoPath()
-        .projection(
-            Config.projection
-                  .fitSize([Config.svg_width, Config.svg_height], geojsonFeatures)
-                  );
-
-    const map = g.append("g")
-        .attr("class", "map-features")
-        .selectAll("path")
-            .data(geoCounties)
-            .enter()
-            .append("path")
-            .attr("d", thisMapPath)
-                .attr("class", "land")
-                .attr("opacity", 0.25);
-
-    // Add arrows for links
-    const markerTypes = Array.from(new Set(graph.nodes.map(d => d.source)));
-    g.append("defs").selectAll("marker")
-        .data(markerTypes)
-            .join("marker")
-                .attr("id", d => `arrow-${d}`)
-                .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 15)
-                .attr("refY", -0.5)
-                .attr("markerWidth", 6)
-                .attr("markerHeight", 6)
-                .attr("orient", "auto")
-            .append("path")
-                .attr("fill", "#999")
-                .attr("d", "M0,-5L10,0L0,5");
-    
-    links = g.append("g")
-            .attr("class", "link")
-            .selectAll("path")
-            .data(graph.links)
-            .join("path")
-                .attr("class", d => `CO-links-${d.source.name}`)
-                .classed("links", true)
-                .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
-    links.exit().remove();
-
-    nodes = g.append("g")
-        .attr("class", "node")
-        .selectAll("g")
-        .data(graph.nodes)
-        .join("g")
-            .call(Simulation.drag(simulation, positioning));
-
-    nodes.append("circle")
-        .attr("id", d => d.properties && `CO-${d.properties.case_no}`)
-        .attr("r", 5)
-        .on("touchmove mouseover", function(d) {
-            Tooltip.highlight(d, idToTargetNodes, cases);
-        })
-        .on("touchend mouseout", d => {
-            // Tooltip.unHighlight();
-        })
-        .on("click", panTo);
-
-    nodes.append("text")
-        .attr("class", d => `CO-labels-${d.name}`)
-        .classed("node-labels", true)
-        .attr("x", 8)
-        .attr("y", "0.31em")
-        .text(d => d.name)
-        .clone(true).lower();
-
-    nodes.exit().remove();
-
-    // Color the legend for counties
-    Layout.colorStatus();
-
-    // Toggle between map, graph and timeline chart
-    const fixed = (positioning, immediate) => {
-        if (positioning === "map") {
-            graph.nodes.forEach(function (d) {
-                const pos = Config.projection([d.longitude, d.latitude]);
-                d.x = pos[0] || d.x;
-                d.y = pos[1] || d.y;
-            });
-        } else {
-            graph.nodes.forEach(function (d) {
-                d.x = xScale(d.date) || -100;
-                d.y = yScale(d.dayOrder);
-            });
-        }
-
-        const t = d3.transition()
-            .duration(immediate ? 0 : 800)
-            .ease(d3.easeElastic.period(0.5));
-
-        update(links.transition(t), nodes.transition(t), positioning);
-    };
-    const showMap = () => {
-        positioning = "map";
-        map.attr("opacity", 1);
-        timeGraph.attr("opacity", 0);
-        simulation.stop();
-        fixed(positioning, 0);
-
-        nodes.call(Simulation.drag(simulation, positioning));
-    };
-    const showGraph = () => {
-        positioning = "diagram";
-        map.attr("opacity", 0.25);
-        timeGraph.attr("opacity", 0);
-        simulation.alpha(1).restart();
-
-        nodes.call(Simulation.drag(simulation, positioning));
-    };
-    const showArcs = () => {
-        positioning = "arcs";
-        map.attr("opacity", 0);
-        timeGraph.attr("opacity", 1);
-        simulation.stop();
-        fixed(positioning, 0);
-
-        nodes.call(Simulation.drag(simulation, positioning));
-    };
-
-    d3.select("#show-map")
-        .on("click", () => showMap());
-    d3.select("#show-graph")
-        .on("click", () => showGraph());
-    d3.select("#show-arcs")
-        .on("click", () => showArcs());
 
     // Toggle the legend
     const toggleLegend = () => {
@@ -502,18 +171,6 @@ const drawGraph = () => {
         .on("click", () => toggleLegend());
 
     // Highlight and pan to searched Id
-    const searchByCaseId = (caseId) => {
-        if (cases.includes(caseId)) {
-            // highlight case
-            d3.selectAll("circle")
-                .attr("r", 5);
-            d3.select("#CO-" + caseId)
-                .attr("r", 15)
-                .dispatch('mouseover')
-                .dispatch('click');
-        }
-    }
-
     d3.select("#search-case")
         .on("click", () => {
             if (searchStatus === true) {
@@ -526,8 +183,13 @@ const drawGraph = () => {
         });
     d3.select("#search-input")
         .on("input", function() {
-            searchByCaseId(+this.value);
+            if (cases.includes(+this.value)) {
+                Tooltip.highlightSearchedId(+this.value);
+            }
         });
+
+    // General page info
+    d3.select("#show-info").on("click", () => infoStatus = Tooltip.toggleInfo(infoStatus));
 
     // Start/stop the animation - highlight the cases ordered by day and case number
     d3.select("#play-cases")
@@ -544,14 +206,14 @@ const drawGraph = () => {
         });
 
     const playCases = () => {
-        svg.call(zoom.scaleTo, 0.5);
+        svg.call(Layout.zoom.scaleTo, 0.5);
         thisCaseOrder = d3.select("#nRadius").node().value;
         if (+thisCaseOrder === (+cases.length - 1)) thisCaseOrder = 0;
 
         playCasesNow = setInterval(function() {
             thisCaseId = cases[thisCaseOrder];
             if (thisCaseId !== undefined) {
-                updateRadius(thisCaseOrder);
+                Layout.updateRadius(cases, thisCaseOrder);
                 thisCaseOrder++;
             } else {
                 thisCaseOrder = 0;
@@ -565,31 +227,32 @@ const drawGraph = () => {
     // Case slider to highlight nodes by id
     // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
 
-    // when the input range changes highlight the circle
+    // When the input range changes highlight the circle
     d3.select("#nRadius").on("input", function() {
-        updateRadius(+this.value);
+        Layout.updateRadius(cases, +this.value);
     });
     d3.select("#nRadius").property("max", cases.length-1);
-    // update the slider
-    const updateRadius = (nRadius) => {
-        // adjust the text on the range slider
-        d3.select("#nRadius-value").text(cases[nRadius]);
-        d3.select("#nRadius").property("value", cases[nRadius]);
-        d3.select("#search-input").property("value", cases[nRadius]);
+    Layout.updateRadius(cases, cases.length-1);
 
-        // highlight case
-        d3.selectAll("circle")
-            .attr("r", 5);
-        d3.select("#CO-" + cases[nRadius])
-            .attr("r", 15)
-            .dispatch('mouseover');
-            // .dispatch('click');
-    }
-    // Select latest case
-    updateRadius(cases.length-1);
+
+    // Draw cases by time
+    Draw.TimeLine(xScale, yScale);
+
+    // Draw counties map
+    Draw.CountiesMap(geoCounties, geojsonFeatures);
+
+    // Draw nodes and links
+    Draw.NodesAndLinks(graph, cases, simulation, positioning);
+
+    // Define the secondary simulation, for county groups
+    Draw.CirclesPacks(geoCounties, graph.nodes);
+
+    // Color the legend for counties
+    Layout.colorStatus();
 
     // Hide case labels first
-    hideLabels(0.9);
+    Layout.hideLabels(0.9);
+
 
     // Zoom to latest case, when loading spinner stops
     setTimeout(function() {
@@ -600,6 +263,7 @@ const drawGraph = () => {
             .attr("r", 15)
             .dispatch('mouseover');
     }, 5000);
+   
 };
 
 }).call(this);
