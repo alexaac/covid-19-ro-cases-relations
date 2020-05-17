@@ -136,19 +136,6 @@ export const showLegend = category => {
     }
 }
 
-export const hideLabels = function(z) {
-    d3.selectAll(".node-labels")
-        .classed("hidden", d => {
-            if (typeof(d.name) !== "string") {
-                return z <= 2;
-            } else {
-                return false;
-            }
-        });
-    d3.selectAll(".labels")
-        .classed("hidden", d => d.r < 10 / z);
-};
-
 export const updateRadius = (cases, nRadius) => {
     // adjust the text on the range slider
     d3.select("#nRadius-value").text(cases[nRadius]);
@@ -157,34 +144,12 @@ export const updateRadius = (cases, nRadius) => {
 
     // highlight case
     d3.selectAll(".nodes")
-        .attr("r", 5);
+        .attr("r", d => d.r)
     d3.select("#CO-" + cases[nRadius])
-        .attr("r", 15)
+        .attr("r", d => 3 * d.r)
         .dispatch("mouseover");
         // .dispatch("click");
 }
-
-export const fixed = (nodes, positioning, immediate, idToNode, xScale, yScale) => {
-    if (positioning === "map" || positioning === "clusters") {
-        nodes.forEach(function (d) {
-            const pos = Config.projection([d.longitude, d.latitude]);
-            d.x = pos[0] || d.x;
-            d.y = pos[1] || d.y;
-        });
-    } else {
-        nodes.forEach(function (d) {
-            d.x = xScale(d.date) || -100;
-            d.y = yScale(d.dayOrder);
-        });
-    }
-
-    const t = d3.transition()
-        .duration(immediate ? 0 : 800)
-        .ease(d3.easeElastic.period(0.5));
-        
-    Simulation.update(idToNode, d3.selectAll(".nodes").transition(t), d3.selectAll(".links").transition(t), d3.selectAll(".node-labels").transition(t), positioning, xScale, yScale)
-
-};
 
 const zoomed = () => {
     let zoomableGroup = d3.selectAll(".zoomable-group");
@@ -196,6 +161,19 @@ const zoomed = () => {
         .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
     return hideLabels(d3.event.transform.k);
 }
+
+export const hideLabels = function(z) {
+    d3.selectAll(".node-labels")
+        .classed("hidden", d => {
+            if (typeof(d.name) !== "string") {
+                return z <= 1.9;
+            } else {
+                return false;
+            }
+        });
+    d3.selectAll(".labels")
+        .classed("hidden", d => d.r < 10 / z);
+};
 
 export const zoom = d3.zoom()
     .scaleExtent([0.2, 10])
@@ -224,8 +202,46 @@ export const panTo = d => {
     );
 };
 
+export const fixed = (nodes, positioning, immediate, idToNode, xScale, yScale) => {
+    if (positioning === "map" || positioning === "clusters") {
+        nodes.forEach(function (d) {
+            const pos = Config.projection([d.longitude, d.latitude]);
+            d.x = pos[0] || d.x;
+            d.y = pos[1] || d.y;
+        });
+    } else {
+        nodes.forEach(function (d) {
+            d.x = xScale(d.date) || -100;
+            d.y = yScale(d.dayOrder);
+        });
+    }
+
+    const t = d3.transition()
+        .duration(immediate ? 0 : 800)
+        .ease(d3.easeElastic.period(0.5));
+
+    Simulation.update(idToNode, d3.selectAll(".nodes").transition(t), d3.selectAll(".links").transition(t), d3.selectAll(".node-labels").transition(t), positioning, xScale, yScale)
+
+};
+
 export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
     let positioning = "map";
+    d3.select("#positioning").attr("value", "map");
+
+    simulation.stop();
+
+    d3.selectAll('.nodes-group').style("opacity", 1);
+    d3.selectAll('.land').attr("opacity", 1);
+    d3.selectAll('.time-graph').attr("opacity", 0);
+    d3.selectAll('.pack-group').attr("opacity", 0);
+    
+    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
+
+    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
+};
+
+export const showMapClusters = (graph, simulation, idToNode, xScale, yScale) => {
+    let positioning = "clusters";
     d3.select("#positioning").attr("value", "map");
 
     simulation.stop();
@@ -238,29 +254,7 @@ export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
     fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
 
     d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
-    d3.selectAll('.tooltip').style("opacity", 1);
-};
-
-export const showMapClusters = (graph, simulation, idToNode, xScale, yScale, playCasesNow) => {
-    let positioning = "clusters";
-    d3.select("#positioning").attr("value", "clusters");
-    
-    simulation.stop();
-
-    d3.selectAll('.land').attr("opacity", 1);
-    d3.selectAll('.time-graph').attr("opacity", 0);
-    d3.selectAll('.pack-group').attr("opacity", 1);
-    
-    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
-
-    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
-
     d3.selectAll('.nodes-group').style("opacity", 0);
-    d3.selectAll('.tooltip').style("opacity", 0);
-
-    d3.select("#pause-cases").classed("hide", true);
-    d3.select("#play-cases").classed("hide",false);
-    clearInterval(playCasesNow);
 };
 
 export const showGraph = (simulation) => {
@@ -274,7 +268,6 @@ export const showGraph = (simulation) => {
     d3.selectAll('.time-graph').attr("opacity", 0);
     d3.selectAll('.pack-group').attr("opacity", 0);
     d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
-    d3.selectAll('.tooltip').style("opacity", 1);
 };
 
 export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
@@ -291,5 +284,4 @@ export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
     fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
 
     d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
-    d3.selectAll('.tooltip').style("opacity", 1);
 };

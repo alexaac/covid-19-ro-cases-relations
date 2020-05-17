@@ -2,16 +2,24 @@ import * as Config from './Config';
 
 export const graphSimulation = (graph) => {
     return d3.forceSimulation(graph.nodes)
-        .force("link", d3.forceLink(graph.links).id( d => {
-            let name = JSON.parse(JSON.stringify(d)).name;
-            return name;
-        }))
-        .force("charge", d3.forceManyBody())
+        .force("link", d3.forceLink(graph.links).id( d => d.name))
         .force("center", d3.forceCenter(Config.svg_width / 2, Config.svg_height / 2))
+        .force("charge", d3.forceManyBody())
+        // .force("collision", d3.forceCollide().radius(d => d.radius))
         .force("x", d3.forceX())
         .force("y", d3.forceY())
         .alphaDecay([0.02]);
 };
+
+export const packSimulation = () => {
+    return d3.forceSimulation()
+    .force('collision', d3.forceCollide()
+        .radius(d => d.radius )
+        .strength(0.01))
+    .force('attract', d3.forceAttract()
+        .target(d => [d.foc_x, d.foc_y])
+        .strength(0.5));
+}
 
 // simulation drag
 export const drag = (simulation, positioning) => {

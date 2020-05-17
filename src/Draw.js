@@ -19,13 +19,7 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
         .attr("class", 'pack-group')
         .attr("opacity", 0);
 
-    sec_simulation = d3.forceSimulation()
-    .force('collision', d3.forceCollide()
-        .radius(d => d.radius )
-        .strength(0.01))
-    .force('attract', d3.forceAttract()
-        .target(d => [d.foc_x, d.foc_y])
-        .strength(0.5));
+    sec_simulation = Simulation.packSimulation();
 
     groupedByCountySource = d3.nest()
         .key( d => d.properties && d.properties.county)
@@ -100,9 +94,12 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
 
     // Draw the circle packs
     bubbles = packGroup.selectAll('.bubble').data(root.leaves());
-    en_bubbles = bubbles.enter().append('circle').attr("class", 'bubble')
+    en_bubbles = bubbles.enter()
+        .append('circle')
+        .attr("class", 'bubble')
         .attr("r", d => d.r)
-        .attr("fill", d => Layout.countyColor(d.parent.id) );
+        .on("touchmove mouseover", d => Tooltip.highlightSearchedId(d.id))
+        .attr("fill", d => Layout.countyColor(d.parent.id) )
     en_bubbles.append('title').text(function(d) {
             return (language === "ro"
                 ? d.data.parent + " - sursa nr. " + d.id + "\n" + d.value + " cazuri"
@@ -226,13 +223,9 @@ export const NodesAndLinks = (graph, cases, simulation, positioning) => {
         .attr("id", d => d.properties && `CO-${d.properties.case_no}`)
         .attr("class", d => d.properties && `CO-nodes-${d.properties.source_no}`)
         .classed("nodes", true)
-        .attr("r", 5)
-        .on("touchmove mouseover", function(d) {
-            Tooltip.highlight(d, cases, positioning);
-        })
-        .on("touchend mouseout", d => {
-            // Tooltip.unHighlight();
-        })
+        .attr("r", d => d.r)
+        .on("touchmove mouseover", d => Tooltip.highlight(d, cases))
+        // .on("touchend mouseout", d => Tooltip.unHighlight())
         .on("click", d => Layout.panTo(d));
 
     nodes.append('g')

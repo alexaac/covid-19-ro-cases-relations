@@ -245,7 +245,7 @@ const drawGraph = () => {
     Draw.NodesAndLinks(graph, cases, simulation, positioning);
 
     // Define the secondary simulation, for county groups
-    Draw.CirclesPacks(geoCounties, graph.nodes);
+    Draw.CirclesPacks(geoCounties, graph.nodes, cases);
 
     // Color the legend for counties
     Layout.colorStatus();
@@ -260,7 +260,7 @@ const drawGraph = () => {
         spinner.stop();
         d3.select("tooltip_div").classed("tooltip-abs", true);
         d3.select("#CO-" + d3.max(cases))
-            .attr("r", 15)
+            .attr("r", d => 2 * d.r)
             .dispatch('mouseover');
     }, 5000);
    

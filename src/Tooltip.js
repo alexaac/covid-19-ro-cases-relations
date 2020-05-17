@@ -25,7 +25,7 @@ export const highlight = (d, cases) => {
     }
  
     d3.selectAll(".nodes")
-        .attr("r", 5)
+        .attr("r", d => d.r)
         .style("opacity", 0.3);
     d3.selectAll(".links")
         .style("stroke", "#999")
@@ -38,7 +38,7 @@ export const highlight = (d, cases) => {
         .style("opacity", .9);
 
     d3.select("#CO-" + caseId)
-        .attr("r", 15)
+        .attr("r", d => 3 * d.r)
         .style("opacity", 1);
     d3.selectAll(".CO-links-" + caseId)
         .style("stroke", "firebrick")
@@ -54,13 +54,13 @@ export const highlight = (d, cases) => {
                     .style("opacity", "1");
             });
        
-    d3.selectAll(".CO-labels-" + d.name)
+    d3.selectAll(".CO-labels-" + caseId)
         .style("color", "firebrick")
         .style("opacity", 1);
 
     // adjust the text on the range slider
-    let name = cases.indexOf(d.name);
-    d3.select("#nRadius-value").text(d.name);
+    let name = cases.indexOf(caseId);
+    d3.select("#nRadius-value").text(caseId);
     d3.select("#nRadius").property("value", name);
 
     tooltip_div.html(tooltipHTML(d))
@@ -69,7 +69,7 @@ export const highlight = (d, cases) => {
         .style("display", null);
 };
 
-export const tooltipHTML = (d) => {
+export const tooltipHTML = (d) => {console.log(d.name);
     if (d.properties !== undefined) {
         let language = d3.select("#language").node().value;
 
@@ -147,20 +147,16 @@ export const unHighlight = () => {
 
 export const hideTooltip = () => {
     d3.selectAll(".nodes")
-        .attr("r", 5);
+        .attr("r", d => d.r)
     tooltip_div.transition()
         .duration(200)
         .style("opacity", 0);
 }
 
-export const highlightSearchedId = (caseId) => {
-    // highlight case
-    d3.selectAll(".nodes")
-        .attr("r", 5);
+export const highlightSearchedId = (caseId) => {console.log(caseId);
     d3.select("#CO-" + caseId)
-        .attr("r", 15)
-        .dispatch('mouseover')
-        .dispatch('click');
+        .dispatch('mouseover');
+        // .dispatch('click');
 }
 
 export const toggleInfo = (infoStatus) => {
