@@ -69,7 +69,7 @@ export const highlight = (d, cases) => {
         .style("display", null);
 };
 
-export const tooltipHTML = (d) => {console.log(d.name);
+export const tooltipHTML = (d) => {
     if (d.properties !== undefined) {
         let language = d3.select("#language").node().value;
 
@@ -153,7 +153,7 @@ export const hideTooltip = () => {
         .style("opacity", 0);
 }
 
-export const highlightSearchedId = (caseId) => {console.log(caseId);
+export const highlightSearchedId = (caseId) => {
     d3.select("#CO-" + caseId)
         .dispatch('mouseover');
         // .dispatch('click');
