@@ -111,7 +111,6 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
     en_bubble_labels.append('text')
         .text(d => d.value)
         .attr("dy", '0.35em');
-    Layout.hideLabels(1);
 
     // Move the circles to their place
     sec_simulation.nodes(geoCounties.map(d => d.force)).stop();
@@ -229,9 +228,9 @@ export const NodesAndLinks = (graph, cases, simulation, positioning) => {
         .on("click", d => Layout.panTo(d));
 
     nodes.append('g')
-        .attr("class", 'node-labels')
+        .classed("node-labels", true)
         .append("text")
-            .attr("class", d => `CO-labels-${d.name}`)
+            .attr("class", d => d.properties && `CO-labels-${d.properties.source_no} CO-labels-self-${d.properties.case_no}`)
             .attr("x", 8)
             .attr("y", "0.31em")
             .text(d => d.name)

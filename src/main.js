@@ -251,7 +251,7 @@ const drawGraph = () => {
     Layout.colorStatus();
 
     // Hide case labels first
-    Layout.hideLabels(0.9);
+    Layout.hideLabels(1);
 
 
     // Zoom to latest case, when loading spinner stops

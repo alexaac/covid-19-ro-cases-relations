@@ -30,7 +30,7 @@ export const highlight = (d, cases) => {
     d3.selectAll(".links")
         .style("stroke", "#999")
         .style("opacity", 0.3);
-    d3.selectAll(".node-labels")
+    d3.selectAll(".node-labels > text")
         .style("opacity", 0.3);
 
     tooltip_div.transition()
@@ -40,6 +40,8 @@ export const highlight = (d, cases) => {
     d3.select("#CO-" + caseId)
         .attr("r", d => 3 * d.r)
         .style("opacity", 1);
+    d3.selectAll(".CO-labels-self-" + caseId)
+        .style("opacity", "1");
     d3.selectAll(".CO-links-" + caseId)
         .style("stroke", "firebrick")
         .transition()
@@ -53,10 +55,6 @@ export const highlight = (d, cases) => {
                 d3.selectAll(".CO-labels-" + caseId)
                     .style("opacity", "1");
             });
-       
-    d3.selectAll(".CO-labels-" + caseId)
-        .style("color", "firebrick")
-        .style("opacity", 1);
 
     // adjust the text on the range slider
     let name = cases.indexOf(caseId);
@@ -141,7 +139,7 @@ export const unHighlight = () => {
         .style("opacity", 1);
     d3.selectAll(".link")
         .style("opacity", 1);
-    d3.selectAll(".node-labels")
+    d3.selectAll(".node-labels > text")
         .style("opacity", "1");
 };
 
