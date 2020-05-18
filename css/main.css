@@ -80,10 +80,22 @@ svg.chart-group {
     stroke-linejoin: round;
 }
 
-.label {
-    /* text-transform: uppercase; */
+text {
+    font: 11px sans-serif;
+    pointer-events: none;
 }
-.node-labels.hidden {
+
+.node-labels {
+    user-select: none;
+    stroke-width: 3px;
+    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+.labels {
+    text-anchor: middle;
+}
+
+.node-labels.hidden, .labels.hidden {
     display: none;
 }
 
@@ -102,7 +114,7 @@ svg.chart-group {
     cursor: -webkit-grab;
 }
 
- /* (Optional) Apply a "closed-hand" cursor during drag operation. */
+ /* Apply a "closed-hand" cursor during drag operation. */
 .grabbable:active {
     cursor: grabbing;
     cursor: -moz-grabbing;
@@ -115,22 +127,10 @@ circle {
     cursor: pointer;
 }
 
-text {
-    font: 11px sans-serif;
-}
-
 .land {
     fill: #E8E8E8;
     stroke: #fff;
     stroke-width: 2;
-}
-
-.node-labels {
-    user-select: none;
-    font-size: 8px;
-    stroke-width: 3px;
-    pointer-events: none;
-    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 }
 
 .title {
@@ -360,17 +360,6 @@ tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .contr
 }
 .bubble:hover {
     fill-opacity: 0.5;
-}
-  
-.labels {
-    font-family: sans-serif;
-    font-size: 10px;
-    pointer-events: none;
-    text-anchor: middle;
-}
-
-.labels.hidden {
-    display: none;
 }
 
 /* Smaller devices */
