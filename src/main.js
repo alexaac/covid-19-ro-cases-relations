@@ -123,18 +123,19 @@ const drawGraph = () => {
 
     // Append zoomable group
     zoomableGroup = svg.append("g")
-        .attr("class", "zoomable-group");
+        .attr("class", "zoomable-group")
+        .style("transform-origin", "50% 50% 0");
 
     // Zoom by scroll, pan
     d3.select("#zoom-in")
         .on("click", () => svg.transition().call(Layout.zoom.scaleBy, 2));
     d3.select("#zoom-out")
         .on("click", () => svg.transition().call(Layout.zoom.scaleBy, 0.5));
-    d3.select("#reset-zoom").on("click", () => svg.call(Layout.zoom.scaleTo, 0.5));
+    d3.select("#reset-zoom").on("click", () => Layout.resetZoom());
 
     // Apply zoom handler and zoom out
-    svg.call(Layout.zoom)
-        .call(Layout.zoom.scaleTo, 0.5);
+    svg.call(Layout.zoom);
+    Layout.resetZoom();
 
     // Toggle between map, graph and timeline chart
     d3.select("#show-map")

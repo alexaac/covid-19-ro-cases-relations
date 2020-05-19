@@ -154,15 +154,16 @@ export const updateRadius = (cases, nRadius) => {
 
 const zoomed = () => {
     let zoomableGroup = d3.selectAll(".zoomable-group");
+    let scale = d3.event.transform.k;
 
-    zoomableGroup.attr("transform", d3.event.transform);
-    if (d3.event.transform.k > 0.8) {
+    zoomableGroup.attr("transform", "translate(" + 0 + ") scale(" + scale + ")");
+    if (scale > 0.8) {
         zoomableGroup.selectAll(".node-labels > text")
-            .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+            .attr("transform", "scale(" + (1 / scale) + ")");
         zoomableGroup.selectAll(".labels > text")
-            .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+            .attr("transform", "scale(" + (1 / scale) + ")");
     };
-    return hideLabels(d3.event.transform.k);
+    return hideLabels(scale);
 }
 
 export const hideLabels = function(z) {
@@ -183,17 +184,13 @@ export const zoom = d3.zoom()
     .on("zoom", zoomed);
 
 export const resetZoom = () => {
-    let zoomableGroup = d3.selectAll(".zoomable-group");
+    let svg = d3.select("#chart").select("svg");
 
-    zoomableGroup.transition().duration(750).call(
-        zoom.transform,
-        d3.zoomIdentity,
-        d3.zoomTransform(zoomableGroup.node()).invert([Config.svg_width / 2, Config.svg_height / 2]),
-    );
+    svg.call(zoom.scaleTo, 0.5);
 };
 
 export const panTo = d => {
-    let svg = d3.selectAll("svg");
+    let svg = d3.select("#chart").select("svg");
 
     d3.event.stopPropagation();
     svg.transition().duration(750).call(
@@ -229,9 +226,11 @@ export const fixed = (nodes, positioning, immediate, idToNode, xScale, yScale) =
 
 export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
     let positioning = "map";
+
     d3.select("#positioning").attr("value", "map");
 
     simulation.stop();
+    resetZoom();
 
     d3.selectAll('.nodes-group').style("opacity", 1);
     d3.selectAll('.land').attr("opacity", 1);
@@ -248,6 +247,7 @@ export const showMapClusters = (graph, simulation, idToNode, xScale, yScale) => 
     d3.select("#positioning").attr("value", "map");
 
     simulation.stop();
+    resetZoom();
 
     d3.selectAll('.nodes-group').style("opacity", 1);
     d3.selectAll('.land').attr("opacity", 1);
@@ -265,6 +265,7 @@ export const showGraph = (simulation) => {
     d3.select("#positioning").attr("value", "diagram");
 
     simulation.alpha(1).restart();
+    resetZoom();
 
     d3.selectAll('.nodes-group').style("opacity", 1);
     d3.selectAll('.land').attr("opacity", 0.25);
@@ -278,6 +279,7 @@ export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
     d3.select("#positioning").attr("value", "arcs");
 
     simulation.stop();
+    resetZoom();
 
     d3.selectAll('.nodes-group').style("opacity", 1);
     d3.selectAll('.land').attr("opacity", 0);
