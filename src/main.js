@@ -120,7 +120,7 @@ const drawGraph = () => {
             .attr("height", Config.svg_height)
             .attr("viewBox", '0, 0 ' + Config.svg_width + ' ' + Config.svg_height)
             .on("click", () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
-    
+
     // Append zoomable group
     zoomableGroup = svg.append("g")
         .attr("class", "zoomable-group");
@@ -140,7 +140,16 @@ const drawGraph = () => {
     d3.select("#show-map")
         .on("click", () => Layout.showMap(graph, simulation, idToNode, xScale, yScale));
     d3.select("#show-map-clusters")
-        .on("click", () => Layout.showMapClusters(graph, simulation, idToNode, xScale, yScale, playCasesNow));
+        .on("click", () => {
+            Layout.showMapClusters(graph, simulation, idToNode, xScale, yScale);
+            Draw.MapCirclesPack();
+        });
+    d3.select("#show-clusters")
+        .on("click", () => {
+            Layout.showMapClusters(graph, simulation, idToNode, xScale, yScale);
+            d3.selectAll('.land').attr("opacity", 0.25);
+            Draw.GroupCirclesPack();
+        });
     d3.select("#show-graph")
         .on("click", () => Layout.showGraph(simulation));
     d3.select("#show-arcs")

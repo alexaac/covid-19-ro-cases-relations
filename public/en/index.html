@@ -31,7 +31,8 @@
                 </div>
                 <div class="control control-group">
                     <a id="show-map" class="map-icon" href="#" title="Map"></a>
-                    <a id="show-map-clusters" class="map-clusters-icon" href="#" title="Clusters"></a>
+                    <a id="show-map-clusters" class="map-clusters-icon" href="#" title="Map Clusters"></a>
+                    <a id="show-clusters" class="clusters-icon" href="#" title="Clusters"></a>
                     <a id="show-arcs" class="arcs-icon" href="#" title="Timeline"></a>
                     <a id="show-graph" class="graph-icon" href="#" title="Network"></a>
                 </div>
@@ -53,7 +54,12 @@
                 <input class="range" type="range" min="1" max="15000" id="nRadius">
             </div>
             <div id="spinner"></div>
-            <div id="chart" class="grabbable"></div>
+            <div id="chart" class="grabbable">
+                <div id="graph-group"></div>
+                <div id="map-group"></div>
+                <div id="clusters-group"></div>
+                <div id="timeline-group"></div>
+            </div>
             <div id="legend-div"></div>
             <input type="hidden" id="language" name="language" value="en">
             <input type="hidden" id="positioning" name="positioning" value="diagram">

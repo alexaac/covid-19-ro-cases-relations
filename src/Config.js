@@ -1,7 +1,9 @@
 // set the dimensions and margins of the graph
-export const margin = { top: 50, left: 50, bottom: 10, right: 50 },
-    svg_width = window.innerWidth - margin.left - margin.right,
-    svg_height = window.innerHeight - margin.top - margin.bottom;
+export const margin = { top: 100, left: 100, bottom: 50, right: 100 },
+    width = window.innerWidth - margin.left - margin.right,
+    height = window.innerHeight - margin.top - margin.bottom,
+    svg_width = width + margin.left + margin.right,
+    svg_height = height + margin.top + margin.bottom;
 
 export const projection = d3.geoAlbers()
     .center([24.7731, 45.7909])

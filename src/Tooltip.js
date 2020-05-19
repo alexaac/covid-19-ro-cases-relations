@@ -38,7 +38,7 @@ export const highlight = (d, cases) => {
         .style("opacity", .9);
 
     d3.select("#CO-" + caseId)
-        .attr("r", d => 3 * d.r)
+        .attr("r", d => 2 * d.r)
         .style("opacity", 1);
     d3.selectAll(".CO-labels-self-" + caseId)
         .style("opacity", "1");

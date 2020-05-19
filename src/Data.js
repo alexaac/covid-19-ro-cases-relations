@@ -5,7 +5,7 @@ export const formatNodes = (nodes, countiesCentroids) => {
     let idToTargetNodes = idToTargetNodesFnc(nodes);
     let rScale = d3.scaleLinear()
         .domain([0,d3.max(Object.values(idToTargetNodes))])
-        .range([3,15])
+        .range([5,25])
 
     nodes.forEach( d => {
         if (d.properties !== undefined) {
@@ -15,6 +15,8 @@ export const formatNodes = (nodes, countiesCentroids) => {
             d.name = +d.name;
             d.infected_persons = (idToTargetNodes[d.properties.case_no] + 1) || 1;
             d.r = rScale(d.infected_persons);
+        } else {
+            d.r = 3;
         };
     });
     nodes.sort((a,b) => a.date - b.date);

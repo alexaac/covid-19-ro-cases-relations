@@ -70,7 +70,7 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
 
     // Pack
     pack = d3.pack()
-        .size([0.5 * Config.svg_width, 0.5 * Config.svg_height])
+        .size([Config.svg_width/2, Config.svg_height/2])
         .padding(8);
     pack(root);
 
@@ -93,13 +93,13 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
     let language = d3.select("#language").node().value;
 
     // Draw the circle packs
-    bubbles = packGroup.selectAll('.bubble').data(root.leaves());
+    bubbles = packGroup.selectAll('.bubble').data(root.descendants());
     en_bubbles = bubbles.enter()
         .append('circle')
         .attr("class", 'bubble')
         .attr("r", d => d.r)
         .on("touchmove mouseover", d => Tooltip.highlightSearchedId(d.id))
-        .attr("fill", d => Layout.countyColor(d.parent.id) )
+        .attr("fill", d => d.parent && d.parent.id !== "root" ? Layout.countyColor(d.parent.id) : "none")
     en_bubbles.append('title').text(function(d) {
             return (language === "ro"
                 ? d.data.parent + " - sursa nr. " + d.id + "\n" + d.value + " cazuri"
@@ -111,6 +111,7 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
     en_bubble_labels.append('text')
         .text(d => d.value)
         .attr("dy", '0.35em');
+    Layout.hideLabels(1);
 
     // Move the circles to their place
     sec_simulation.nodes(geoCounties.map(d => d.force)).stop();
@@ -118,9 +119,18 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
     for (i = j = 0, ref = Math.ceil(Math.log(sec_simulation.alphaMin()) / Math.log(1 - sec_simulation.alphaDecay())); 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
         sec_simulation.tick();
     }
+};
 
-    en_bubbles.attr("transform", d => `translate(${d.relx + d.parent.data.d.force.x},${d.rely + d.parent.data.d.force.y})`);
-    en_bubble_labels.attr("transform", d => `translate(${d.relx + d.parent.data.d.force.x},${d.rely + d.parent.data.d.force.y})`);
+export const GroupCirclesPack = () => {
+    d3.select('.pack-group').attr("transform", "scale(2)");
+    d3.selectAll('.bubble').attr("transform", d => `translate(${d.x},${d.y})`);
+    d3.selectAll('.labels').attr("transform", d => `translate(${d.x},${d.y})`);
+};
+
+export const MapCirclesPack = () => {
+    d3.select('.pack-group').attr("transform", "scale(1)");
+    d3.selectAll('.bubble').attr("transform", d => d.parent && d.parent.data.d ? `translate(${d.relx + d.parent.data.d.force.x},${d.rely + d.parent.data.d.force.y})` : "translate(-10000,-10000)");
+    d3.selectAll('.labels').attr("transform", d => d.parent && d.parent.data.d ? `translate(${d.relx + d.parent.data.d.force.x},${d.rely + d.parent.data.d.force.y})` : "translate(-10000,-10000)");
 };
 
 export const CountiesMap = (geoCounties, geojsonFeatures) => {
@@ -129,7 +139,7 @@ export const CountiesMap = (geoCounties, geojsonFeatures) => {
     const thisMapPath = d3.geoPath()
         .projection(
             Config.projection
-                  .fitSize([Config.svg_width, Config.svg_height], geojsonFeatures));
+                  .fitSize([Config.svg_width , Config.svg_height], geojsonFeatures));
 
     zoomableGroup.append("g")
         .attr("class", "map-features")
@@ -158,9 +168,10 @@ export const TimeLine = (xScale, yScale) => {
     const xAxis = timeGraph.append("g")
         .attr("transform", "translate(0," + (Config.svg_height) + ")")
         .call(d3.axisBottom(xScale)
-            .ticks(20)
+            .ticks(30)
             .tickFormat(Config.multiFormat));
     xAxis.selectAll('text')
+        .attr("class", "time-graph-x")
         .attr("font-weight", "bold")
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
@@ -168,7 +179,9 @@ export const TimeLine = (xScale, yScale) => {
     const yAxis = timeGraph.append("g")
         .call(d3.axisLeft(yScale)
             .ticks(10));
-    yAxis.selectAll('text').attr("font-weight", "bold");
+    yAxis.selectAll('text')
+        .attr("class", "time-graph-y")
+        .attr("font-weight", "bold");
     const yLabel = timeGraph.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -50)
@@ -224,7 +237,6 @@ export const NodesAndLinks = (graph, cases, simulation, positioning) => {
         .classed("nodes", true)
         .attr("r", d => d.r)
         .on("touchmove mouseover", d => Tooltip.highlight(d, cases))
-        // .on("touchend mouseout", d => Tooltip.unHighlight())
         .on("click", d => Layout.panTo(d));
 
     nodes.append('g')

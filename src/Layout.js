@@ -1,4 +1,5 @@
 import * as Config from './Config';
+import * as Draw from './Draw';
 import * as Simulation from './Simulation';
 
 export const statusColor = (language) => {
@@ -146,7 +147,7 @@ export const updateRadius = (cases, nRadius) => {
     d3.selectAll(".nodes")
         .attr("r", d => d.r)
     d3.select("#CO-" + cases[nRadius])
-        .attr("r", d => 3 * d.r)
+        .attr("r", d => 2 * d.r)
         .dispatch("mouseover");
         // .dispatch("click");
 }
@@ -155,10 +156,12 @@ const zoomed = () => {
     let zoomableGroup = d3.selectAll(".zoomable-group");
 
     zoomableGroup.attr("transform", d3.event.transform);
-    zoomableGroup.selectAll(".node-labels > text")
-        .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
-    zoomableGroup.selectAll(".labels > text")
-        .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+    if (d3.event.transform.k > 0.8) {
+        zoomableGroup.selectAll(".node-labels > text")
+            .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+        zoomableGroup.selectAll(".labels > text")
+            .attr("transform", "scale(" + (1 / d3.event.transform.k) + ")");
+    };
     return hideLabels(d3.event.transform.k);
 }
 
