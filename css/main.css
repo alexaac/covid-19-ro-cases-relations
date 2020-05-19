@@ -1,9 +1,9 @@
 @charset "UTF-8";
 html {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 *, *:before, *:after {
-  box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 body {
@@ -37,16 +37,8 @@ h1 {
     margin: 0 20;
     margin-left: auto;
     margin-right: auto;
+    overflow-y: auto;
 }
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-svg {
-    width: 100%;
-    height: 100%;
-  }
 
 svg.chart-group {
     width: 100%;
@@ -92,6 +84,7 @@ text {
 }
 
 .labels {
+    font: 8px sans-serif;
     text-anchor: middle;
 }
 
@@ -229,6 +222,10 @@ svg.chart-group a {
 }
 
 .map-clusters-icon {
+    background-image: url(../icons/map_circles.svg);
+}
+
+.clusters-icon {
     background-image: url(../icons/circles.svg);
 }
 
@@ -257,7 +254,7 @@ svg.chart-group a {
 }
 
 .gender-icon {
-    background-image: url(../icons/sign-male.svg);
+    background-image: url(../icons/sign-gender.svg);
 }
 
 .age-icon {
@@ -367,9 +364,13 @@ tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .contr
     .slider {
         left: 0; top: 0; right: 70px;
     }
+
     .side-pannel {
         top: 0;
+        height: 500px;
+        overflow-y: auto;
     }
+
     .control a {
         width: 36px;
         line-height: 36px;
