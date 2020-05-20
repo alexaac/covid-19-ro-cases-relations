@@ -93,13 +93,17 @@ export const CirclesPacks = (geoCounties, graphNodes) => {
     let language = d3.select("#language").node().value;
 
     // Draw the circle packs
-    bubbles = packGroup.selectAll('.bubble').data(root.descendants());
-    en_bubbles = bubbles.enter()
-        .append('circle')
+    bubbles = packGroup.selectAll('.bubble')
+        .data(root.descendants())
+        .enter().append("g")
+        .each(function(d) { d.node = this; })
+        .on("mouseover", Tooltip.hovered(true))
+        .on("mouseout", Tooltip.hovered(false));
+    en_bubbles = bubbles.append('circle')
         .attr("class", 'bubble')
         .attr("r", d => d.r)
         .on("touchmove mouseover", d => Tooltip.highlightSearchedId(d.id))
-        .attr("fill", d => d.parent && d.parent.id !== "root" ? Layout.countyColor(d.parent.id) : "none")
+        .attr("fill", d => d.parent && d.parent.id !== "root" ? Layout.countyColor(d.parent.id) : "#E8E8E8")
     en_bubbles.append('title').text(function(d) {
             return (language === "ro"
                 ? d.data.parent + " - sursa nr. " + d.id + "\n" + d.value + " cazuri"

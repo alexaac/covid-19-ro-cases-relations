@@ -92,6 +92,11 @@ text {
     display: none;
 }
 
+.node--hover circle {
+	stroke: #000;
+	stroke-width: 1.2px;
+}
+
 #spinner {
     max-width: 600px;
     text-align: center;

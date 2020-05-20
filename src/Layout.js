@@ -265,6 +265,10 @@ export const showGraph = (simulation) => {
     d3.select("#positioning").attr("value", "diagram");
 
     simulation.alpha(1).restart();
+    setTimeout(function() {
+        simulation.stop();
+    }, 5000);
+
     resetZoom();
 
     d3.selectAll('.nodes-group').style("opacity", 1);
@@ -282,7 +286,7 @@ export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
     resetZoom();
 
     d3.selectAll('.nodes-group').style("opacity", 1);
-    d3.selectAll('.land').attr("opacity", 0);
+    d3.selectAll('.land').attr("opacity", 0.25);
     d3.selectAll('.time-graph').attr("opacity", 1);
     d3.selectAll('.pack-group').attr("opacity", 0);
     

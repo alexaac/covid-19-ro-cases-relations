@@ -149,13 +149,13 @@ export const hideTooltip = () => {
     tooltip_div.transition()
         .duration(200)
         .style("opacity", 0);
-}
+};
 
 export const highlightSearchedId = (caseId) => {
     d3.select("#CO-" + caseId)
         .dispatch('mouseover');
         // .dispatch('click');
-}
+};
 
 export const toggleInfo = (infoStatus) => {
     if (infoStatus === true) {
@@ -175,5 +175,10 @@ export const toggleInfo = (infoStatus) => {
     }
 
     return infoStatus;
-}
+};
 
+export const hovered = (hover) => {
+    return (d) => {
+        d3.selectAll(d.ancestors().map(function(d) { return d.node; })).classed("node--hover", hover);
+    };
+};

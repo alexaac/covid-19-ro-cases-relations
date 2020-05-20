@@ -148,7 +148,7 @@ const drawGraph = () => {
     d3.select("#show-clusters")
         .on("click", () => {
             Layout.showMapClusters(graph, simulation, idToNode, xScale, yScale);
-            d3.selectAll('.land').attr("opacity", 0.25);
+            d3.selectAll('.land').attr("opacity", 0.5);
             Draw.GroupCirclesPack();
         });
     d3.select("#show-graph")
