@@ -232,8 +232,8 @@ export const NodesAndLinks = (graph, cases, simulation, positioning) => {
         .attr("class", "node")
         .selectAll("g")
         .data(graph.nodes)
-        .join("g")
-            .call(Simulation.drag(simulation, positioning));
+        .join("g");
+            // .call(Simulation.drag(simulation, positioning));
 
     nodes.append("circle")
         .attr("id", d => d.properties && `CO-${d.properties.case_no}`)

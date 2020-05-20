@@ -21,7 +21,7 @@ export const packSimulation = () => {
         .strength(0.5));
 }
 
-// simulation drag
+// simulation drag - not used for now
 export const drag = (simulation, positioning) => {
     const dragstarted = d => {
         if (positioning !== 'diagram') { return };

@@ -238,8 +238,6 @@ export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
     d3.selectAll('.pack-group').attr("opacity", 0);
     
     fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
-
-    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
 };
 
 export const showMapClusters = (graph, simulation, idToNode, xScale, yScale) => {
@@ -256,7 +254,6 @@ export const showMapClusters = (graph, simulation, idToNode, xScale, yScale) => 
     
     fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
 
-    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
     d3.selectAll('.nodes-group').style("opacity", 0);
 };
 
@@ -275,7 +272,6 @@ export const showGraph = (simulation) => {
     d3.selectAll('.land').attr("opacity", 0.25);
     d3.selectAll('.time-graph').attr("opacity", 0);
     d3.selectAll('.pack-group').attr("opacity", 0);
-    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
 };
 
 export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
@@ -291,6 +287,4 @@ export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
     d3.selectAll('.pack-group').attr("opacity", 0);
     
     fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
-
-    d3.selectAll('.nodes').call(Simulation.drag(simulation, positioning));
 };
