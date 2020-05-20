@@ -235,7 +235,7 @@ export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
     d3.selectAll('.nodes-group').style("opacity", 1);
     d3.selectAll('.land').attr("opacity", 1);
     d3.selectAll('.time-graph').attr("opacity", 0);
-    d3.selectAll('.pack-group').attr("opacity", 0);
+    d3.selectAll('.pack-group').attr("transform", "translate(-10000,-10000)");
     
     fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
 };
@@ -271,7 +271,7 @@ export const showGraph = (simulation) => {
     d3.selectAll('.nodes-group').style("opacity", 1);
     d3.selectAll('.land').attr("opacity", 0.25);
     d3.selectAll('.time-graph').attr("opacity", 0);
-    d3.selectAll('.pack-group').attr("opacity", 0);
+    d3.selectAll('.pack-group').attr("transform", "translate(-10000,-10000)");
 };
 
 export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
@@ -284,7 +284,7 @@ export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
     d3.selectAll('.nodes-group').style("opacity", 1);
     d3.selectAll('.land').attr("opacity", 0.25);
     d3.selectAll('.time-graph').attr("opacity", 1);
-    d3.selectAll('.pack-group').attr("opacity", 0);
+    d3.selectAll('.pack-group').attr("transform", "translate(-10000,-10000)");
     
     fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
 };
