@@ -2,12 +2,12 @@ import * as Config from './Config';
 
 export const graphSimulation = (graph) => {
     return d3.forceSimulation(graph.nodes)
-        .force("link", d3.forceLink(graph.links).id( d => d.name))
-        .force("center", d3.forceCenter(Config.svg_width / 2, Config.svg_height / 2))
-        .force("charge", d3.forceManyBody())
-        // .force("collision", d3.forceCollide().radius(d => d.radius))
-        .force("x", d3.forceX())
-        .force("y", d3.forceY())
+        .force('link', d3.forceLink(graph.links).id( d => d.name))
+        .force('center', d3.forceCenter(Config.svg_width / 2, Config.svg_height / 2))
+        .force('charge', d3.forceManyBody())
+        // .force('collision', d3.forceCollide().radius(d => d.radius))
+        .force('x', d3.forceX())
+        .force('y', d3.forceY())
         .alphaDecay([0.02]);
 };
 
@@ -44,9 +44,9 @@ export const drag = (simulation, positioning) => {
     }
 
     return d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended);
+        .on('start', dragstarted)
+        .on('drag', dragged)
+        .on('end', dragended);
 };
 
 // simulation link
@@ -60,14 +60,14 @@ export const linkArc = (d) => {
 
 export const update = (idToNode, nodes, links, labels, positioning, xScale, yScale) => {
 
-    links.attr("d", d => {
+    links.attr('d', d => {
         if (positioning === 'arcs') {
-            if (typeof(d.source.name) === "string") {
+            if (typeof(d.source.name) === 'string') {
                 return linkArc(d)
             } else {
                 let start = xScale(idToNode[d.source.name].date) || 0;
                 let end = xScale(idToNode[d.target.name].date);
-                const arcPath = ['M', start, yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,",",
+                const arcPath = ['M', start, yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,',',
                             start < end ? 1: 0, end, yScale(idToNode[d.target.name].dayOrder)].join(' ');
                 return arcPath;
             }
@@ -75,6 +75,6 @@ export const update = (idToNode, nodes, links, labels, positioning, xScale, ySca
             return linkArc(d)
         }
     });
-    nodes.attr("transform", d => `translate(${d.x},${d.y})`);
-    labels.attr("transform", d => `translate(${d.x},${d.y})`);
+    nodes.attr('transform', d => `translate(${d.x},${d.y})`);
+    labels.attr('transform', d => `translate(${d.x},${d.y})`);
 };

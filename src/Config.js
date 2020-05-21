@@ -16,24 +16,24 @@ export const path = d3.geoPath()
     .projection(projection);
 
 const locale = d3.timeFormatLocale({
-    "dateTime": "%A, %e %B %Y г. %X",
-    "date": "%d.%m.%Y",
-    "time": "%H:%M:%S",
-    "periods": ["AM", "PM"],
-    "days": ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"],
-    "shortDays": ["Lu", "Ma", "Mi", "Jo", "Vi", "Sa", "Du"],
-    "months": ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"],
-    "shortMonths": ["Ian", "Feb", "Mart", "Apr", "Mai", "Iun", "Iul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+    'dateTime': '%A, %e %B %Y г. %X',
+    'date': '%d.%m.%Y',
+    'time': '%H:%M:%S',
+    'periods': ['AM', 'PM'],
+    'days': ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'],
+    'shortDays': ['Lu', 'Ma', 'Mi', 'Jo', 'Vi', 'Sa', 'Du'],
+    'months': ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
+    'shortMonths': ['Ian', 'Feb', 'Mart', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 });
 
-const formatMillisecond = locale.format(".%L"),
-    formatSecond = locale.format(":%S"),
-    formatMinute = locale.format("%I:%M"),
-    formatHour = locale.format("%I %p"),
-    formatDay = locale.format("%a %d"),
-    formatWeek = locale.format("%b %d"),
-    formatMonth = locale.format("%B"),
-    formatYear = locale.format("%Y");
+const formatMillisecond = locale.format('.%L'),
+    formatSecond = locale.format(':%S'),
+    formatMinute = locale.format('%I:%M'),
+    formatHour = locale.format('%I %p'),
+    formatDay = locale.format('%a %d'),
+    formatWeek = locale.format('%b %d'),
+    formatMonth = locale.format('%B'),
+    formatYear = locale.format('%Y');
 
 export const multiFormat = (date) => {
     return (d3.timeSecond(date) < date ? formatMillisecond

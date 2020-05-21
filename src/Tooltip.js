@@ -2,16 +2,16 @@ import * as Config from './Config';
 import * as Language from './Language';
 
 // use a tooltip to show node info
-export const tooltip_div = d3.select("body")
-   .append("tooltip_div")
-   .attr("class", "tooltip")
-   .style("opacity", 0)
-   .style("display", "none");
+export const tooltip_div = d3.select('body')
+   .append('tooltip_div')
+   .attr('class', 'tooltip')
+   .style('opacity', 0)
+   .style('display', 'none');
 
 export const highlight = (d, cases) => {
-    let positioning = d3.select("#positioning").node().value;
+    let positioning = d3.select('#positioning').node().value;
 
-    if (positioning === "clusters") {
+    if (positioning === 'clusters') {
         return;
     };
 
@@ -24,105 +24,106 @@ export const highlight = (d, cases) => {
         left = d3.event.pageX - 40;
     }
  
-    d3.selectAll(".nodes")
-        .attr("r", d => d.r)
-        .style("opacity", 0.3);
-    d3.selectAll(".links")
-        .style("stroke", "#999")
-        .style("opacity", 0.3);
-    d3.selectAll(".node-labels > text")
-        .style("opacity", 0.3);
+    d3.selectAll('.nodes')
+        .attr('r', d => d.r)
+        .style('opacity', 0.3);
+    d3.selectAll('.links')
+        .style('stroke', '#999')
+        .style('opacity', 0.3);
+    d3.selectAll('.node-labels > text')
+        .style('opacity', 0.3);
 
     tooltip_div.transition()
         .duration(200)
-        .style("opacity", .9);
+        .style('opacity', .9);
 
-    d3.select("#CO-" + caseId)
-        .attr("r", d => 2 * d.r)
-        .style("opacity", 1);
-    d3.selectAll(".CO-labels-self-" + caseId)
-        .style("opacity", "1");
-    d3.selectAll(".CO-links-" + caseId)
-        .style("stroke", "firebrick")
+    d3.select('#CO-' + caseId)
+        .attr('r', d => 2 * d.r)
+        .style('opacity', 1);
+    d3.selectAll('.CO-labels-self-' + caseId)
+        .style('opacity', '1');
+    d3.selectAll('.CO-links-' + caseId)
+        .style('stroke', 'firebrick')
         .transition()
             .duration(200)
-            .attr("stroke-dashoffset", 0)
-            .style("opacity", 1)
-            .on("end", function(d, i) {
-                if (i === 0)
-                d3.selectAll(".CO-nodes-" + caseId)
-                    .style("opacity", "1");
-                d3.selectAll(".CO-labels-" + caseId)
-                    .style("opacity", "1");
+            .attr('stroke-dashoffset', 0)
+            .style('opacity', 1)
+            .on('end', (d, i) => {
+                if (i === 0) {
+                    d3.selectAll('.CO-nodes-' + caseId)
+                        .style('opacity', '1');
+                    d3.selectAll('.CO-labels-' + caseId)
+                        .style('opacity', '1');
+                };
             });
 
     // adjust the text on the range slider
     let name = cases.indexOf(caseId);
-    d3.select("#nRadius-value").text(caseId);
-    d3.select("#nRadius").property("value", name);
+    d3.select('#nRadius-value').text(caseId);
+    d3.select('#nRadius').property('value', name);
 
     tooltip_div.html(tooltipHTML(d))
-        .style("left", left + 'px')
-        .style("top", top + 'px')
-        .style("display", null);
+        .style('left', left + 'px')
+        .style('top', top + 'px')
+        .style('display', null);
 };
 
 export const tooltipHTML = (d) => {
     if (d.properties !== undefined) {
-        let language = d3.select("#language").node().value;
+        let language = d3.select('#language').node().value;
 
         let labels = {
-            cazulLabel: { "ro": "Cazul", "en": "Case" },
-            maleLabel: { "ro": "Bărbat", "en": "Male" },
-            femaleLabel: { "ro": "Femeie", "en": "Female" },
-            unspecLabel: { "ro": "Gen nespecificat", "en": "Unspecified gender" },
-            statusLabel: { "ro": "Stare", "en": "Status" },
-            releasedLabel: { "ro": "vindecat", "en": "released" },
-            confirmedLabel: { "ro": "confirmat", "en": "confirmed" },
-            deceasedLabel: { "ro": "deces", "en": "deceased" },
-            confdateLabel: { "ro": "Data confirmării", "en": "Confirmation date" },
-            recoverydateLabel: { "ro": "Data recuperării", "en": "Recovery date" },
-            infectionCountryLabel: { "ro": "Țara de infectare", "en": "Country of infection" },
-            detailsLabel: { "ro": "Detalii", "en": "Details" },
-            aiciLabel: { "ro": "aici", "en": "here" },
+            cazulLabel: { 'ro': 'Cazul', 'en': 'Case' },
+            maleLabel: { 'ro': 'Bărbat', 'en': 'Male' },
+            femaleLabel: { 'ro': 'Femeie', 'en': 'Female' },
+            unspecLabel: { 'ro': 'Gen nespecificat', 'en': 'Unspecified gender' },
+            statusLabel: { 'ro': 'Stare', 'en': 'Status' },
+            releasedLabel: { 'ro': 'vindecat', 'en': 'released' },
+            confirmedLabel: { 'ro': 'confirmat', 'en': 'confirmed' },
+            deceasedLabel: { 'ro': 'deces', 'en': 'deceased' },
+            confdateLabel: { 'ro': 'Data confirmării', 'en': 'Confirmation date' },
+            recoverydateLabel: { 'ro': 'Data recuperării', 'en': 'Recovery date' },
+            infectionCountryLabel: { 'ro': 'Țara de infectare', 'en': 'Country of infection' },
+            detailsLabel: { 'ro': 'Detalii', 'en': 'Details' },
+            aiciLabel: { 'ro': 'aici', 'en': 'here' },
         };
 
-        let genderInfo = d.properties.gender === "Bărbat"
+        let genderInfo = d.properties.gender === 'Bărbat'
                 ? labels.maleLabel[language]
-                : (d.properties.gender === "Femeie"
+                : (d.properties.gender === 'Femeie'
                     ? labels.femaleLabel[language]
                     : labels.unspecLabel[language]),
             ageInfo = d.properties.age != null && d.properties.age != 0
-                ? (", " + d.properties.age)
-                : "",
-            countyInfo = d.properties.county != null && d.properties.county != ""
-                ? (", " + d.properties.county)
-                : "",
+                ? (', ' + d.properties.age)
+                : '',
+            countyInfo = d.properties.county != null && d.properties.county != ''
+                ? (', ' + d.properties.county)
+                : '',
             statusInfo = d.properties.status != null
-                ? (labels.statusLabel[language] + ": " + (d.properties.status === "Vindecat"
+                ? (labels.statusLabel[language] + ': ' + (d.properties.status === 'Vindecat'
                         ? labels.releasedLabel[language]
-                        : (d.properties.status === "Confirmat"
+                        : (d.properties.status === 'Confirmat'
                             ? labels.confirmedLabel[language]
-                            : labels.deceasedLabel[language])) + ".<br />")
-                : "",
+                            : labels.deceasedLabel[language])) + '.<br />')
+                : '',
             diagnosticDateInfo = d.properties.diagnostic_date !== null
-                ? (labels.confdateLabel[language] + ": " + d.properties.diagnostic_date + ".<br />")
-                : "",
+                ? (labels.confdateLabel[language] + ': ' + d.properties.diagnostic_date + '.<br />')
+                : '',
             healingDateInfo = d.properties.healing_date !== null
-                ? (labels.recoverydateLabel[language] + ": " + d.properties.healing_date + ".<br />")
-                : "",
+                ? (labels.recoverydateLabel[language] + ': ' + d.properties.healing_date + '.<br />')
+                : '',
             countyOfInfectionInfo = d.properties.country_of_infection !== null 
-                                    && d.properties.country_of_infection !== "România"
-                                    && d.properties.country_of_infection !== "Romania"
-                ? (labels.infectionCountryLabel[language] + ": " + d.properties.country_of_infection + ".<br />")
-                : "",
-            referenceInfo = d.properties.reference !== null && d.properties.reference !== ""
-                ? (labels.detailsLabel[language] + ": " + '<a href="' + d.properties.reference + '" target= "_blank">'+ labels.aiciLabel[language] +'</a>')
-                : "";
+                                    && d.properties.country_of_infection !== 'România'
+                                    && d.properties.country_of_infection !== 'Romania'
+                ? (labels.infectionCountryLabel[language] + ': ' + d.properties.country_of_infection + '.<br />')
+                : '',
+            referenceInfo = d.properties.reference !== null && d.properties.reference !== ''
+                ? (labels.detailsLabel[language] + ': ' + "<a href='' + d.properties.reference + '' target= '_blank'>"+ labels.aiciLabel[language] +"</a>")
+                : '';
 
-        return "<b>" + labels.cazulLabel[language] + " " + d.properties.case_no + "</b>" +
+        return '<b>' + labels.cazulLabel[language] + ' ' + d.properties.case_no + '</b>' +
             // genderInfo + ageInfo +
-            countyInfo + ".<br />" +
+            countyInfo + '.<br />' +
             statusInfo +
             diagnosticDateInfo +
             healingDateInfo +
@@ -135,24 +136,24 @@ export const tooltipHTML = (d) => {
 };
 
 export const unHighlight = () => {
-    d3.selectAll(".nodes")
-        .style("opacity", 1);
-    d3.selectAll(".link")
-        .style("opacity", 1);
-    d3.selectAll(".node-labels > text")
-        .style("opacity", "1");
+    d3.selectAll('.nodes')
+        .style('opacity', 1);
+    d3.selectAll('.link')
+        .style('opacity', 1);
+    d3.selectAll('.node-labels > text')
+        .style('opacity', '1');
 };
 
 export const hideTooltip = () => {
-    d3.selectAll(".nodes")
-        .attr("r", d => d.r)
+    d3.selectAll('.nodes')
+        .attr('r', d => d.r)
     tooltip_div.transition()
         .duration(200)
-        .style("opacity", 0);
+        .style('opacity', 0);
 };
 
 export const highlightSearchedId = (caseId) => {
-    d3.select("#CO-" + caseId)
+    d3.select('#CO-' + caseId)
         .dispatch('mouseover');
         // .dispatch('click');
 };
@@ -161,16 +162,16 @@ export const toggleInfo = (infoStatus) => {
     if (infoStatus === true) {
         tooltip_div.transition()
             .duration(200)
-            .style("opacity", .9);
+            .style('opacity', .9);
         tooltip_div.html(Language.infoHtml(language))
-            .style("left", Config.svg_width / 2 + 'px')
-            .style("top", Config.svg_height / 2 + 'px')
-            .style("display", null);
+            .style('left', Config.svg_width / 2 + 'px')
+            .style('top', Config.svg_height / 2 + 'px')
+            .style('display', null);
         infoStatus = false;
     } else {
         tooltip_div.transition()
             .duration(200)
-            .style("opacity", 0);
+            .style('opacity', 0);
         infoStatus = true;
     }
 
@@ -179,6 +180,6 @@ export const toggleInfo = (infoStatus) => {
 
 export const hovered = (hover) => {
     return (d) => {
-        d3.selectAll(d.ancestors().map(function(d) { return d.node; })).classed("node--hover", hover);
+        d3.selectAll(d.ancestors().map(d => d.node)).classed('node--hover', hover);
     };
 };

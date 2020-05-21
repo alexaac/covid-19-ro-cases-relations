@@ -1,5 +1,5 @@
 export const formatNodes = (nodes, countiesCentroids) => {
-    let parseTime = d3.timeParse("%d-%m-%Y");
+    let parseTime = d3.timeParse('%d-%m-%Y');
     let formattedData = [];
 
     let idToTargetNodes = idToTargetNodesFnc(nodes);
@@ -22,13 +22,11 @@ export const formatNodes = (nodes, countiesCentroids) => {
     nodes.sort((a,b) => a.date - b.date);
 
     var ed_data = d3.nest()
-        .key(function(d) {
-            return d.properties && d.properties.diagnostic_date;
-        })
+        .key(d => d.properties && d.properties.diagnostic_date)
         .entries(nodes);
-    ed_data.forEach(function(key){
-        let valuesArr = [...key["values"] ].sort((a,b) => a.name - b.name);
-        let valuesPerDay = valuesArr.map(function(d){
+    ed_data.forEach(key => {
+        let valuesArr = [...key['values'] ].sort((a,b) => a.name - b.name);
+        let valuesPerDay = valuesArr.map(d => {
                 d.dayOrder = valuesArr.indexOf(d) + 1;
                 return d;
             });
@@ -40,17 +38,13 @@ export const formatNodes = (nodes, countiesCentroids) => {
 
 export const idToNodeFnc = (graph) => {
     let dict = {};
-    graph.nodes.forEach(function(n) {
-        dict[n.name] = n;
-    });
+    graph.nodes.forEach(n => dict[n.name] = n);
     return dict;
 };
 
 export const idToTargetNodesFnc = (nodes) => {
     return d3.nest()
-        .key(function(d) {
-            return d.properties && d.properties.source_no;
-        })
-        .rollup(function(v) { return v.length; })
+        .key(d => d.properties && d.properties.source_no)
+        .rollup(v => v.length)
         .object(nodes); // returns a nested object
 };
