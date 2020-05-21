@@ -131,6 +131,10 @@ circle {
     stroke-width: 2;
 }
 
+.land:hover {
+    fill: #d1cfcf;
+}
+
 .title {
     font-size: 16px;
     text-decoration: underline;
