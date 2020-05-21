@@ -1,4 +1,4 @@
-@charset "UTF-8";
+@charset 'UTF-8';
 html {
     box-sizing: border-box;
 }
@@ -112,7 +112,7 @@ text {
     cursor: -webkit-grab;
 }
 
- /* Apply a "closed-hand" cursor during drag operation. */
+ /* Apply a 'closed-hand' cursor during drag operation. */
 .grabbable:active {
     cursor: grabbing;
     cursor: -moz-grabbing;
@@ -337,7 +337,7 @@ tooltip_div.tooltip {
     padding: 10px;
     font-size: 0.7em;
     line-height: 12pt;
-    font-family:  "EB Garamond", serif;
+    font-family:  'EB Garamond', serif;
     max-width: 160px;
     z-index: 1000;
 }
