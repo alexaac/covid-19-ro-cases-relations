@@ -118,7 +118,7 @@ export const tooltipHTML = (d) => {
                 ? (labels.infectionCountryLabel[language] + ': ' + d.properties.country_of_infection + '.<br />')
                 : '',
             referenceInfo = d.properties.reference !== null && d.properties.reference !== ''
-                ? (labels.detailsLabel[language] + ': ' + "<a href='' + d.properties.reference + '' target= '_blank'>"+ labels.aiciLabel[language] +"</a>")
+                ? (labels.detailsLabel[language] + ': ' + '<a href="' + d.properties.reference + '" target= "_blank">'+ labels.aiciLabel[language] +'</a>')
                 : '';
 
         return '<b>' + labels.cazulLabel[language] + ' ' + d.properties.case_no + '</b>' +
