@@ -157,6 +157,8 @@ export const CountiesMap = (geoCounties, geojsonFeatures) => {
 export const TimeLine = (xScale, yScale) => {
     let zoomableGroup = d3.select('svg').select('.zoomable-group');
 
+    let language = d3.select('#language').node().value;
+
     const timeGraph = zoomableGroup.append('g')
         .attr('class', 'time-graph')
         .attr('opacity', 0);
@@ -166,7 +168,7 @@ export const TimeLine = (xScale, yScale) => {
         .attr('x', Config.svg_width / 2)
         .attr('font-size', '16px')
         .attr('text-anchor', 'middle')
-        .text('Ziua');
+        .text(language === 'ro' ? 'Ziua' : 'Day');
     const xAxis = timeGraph.append('g')
         .attr('transform', `translate(0,${Config.svg_height})`)
         .call(d3.axisBottom(xScale)
@@ -190,7 +192,7 @@ export const TimeLine = (xScale, yScale) => {
         .attr('x', -Config.svg_height / 2)
         .attr('font-size', '20px')
         .attr('text-anchor', 'middle')
-        .text('Cazuri pe zi')
+        .text(language === 'ro' ? 'Cazuri ordonate pe zi' : 'Ordered cases per day');
 }
 
 export const NodesAndLinks = (graph, cases, simulation, positioning) => {
