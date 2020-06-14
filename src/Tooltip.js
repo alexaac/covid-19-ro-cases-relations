@@ -158,7 +158,7 @@ export const highlightSearchedId = (caseId) => {
         // .dispatch('click');
 };
 
-export const toggleInfo = (infoStatus) => {
+export const toggleInfo = (infoStatus, language) => {
     if (infoStatus === true) {
         tooltip_div.transition()
             .duration(200)

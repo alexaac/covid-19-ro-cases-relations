@@ -205,7 +205,7 @@ const setActions = () => {
         });
 
     // General page info
-    d3.select('#show-info').on('click', () => infoStatus = Tooltip.toggleInfo(infoStatus));
+    d3.select('#show-info').on('click', () => infoStatus = Tooltip.toggleInfo(infoStatus, language));
 
     // Start/stop the animation - highlight the cases ordered by day and case number
     d3.select('#play-cases')
