@@ -153,9 +153,10 @@ export const updateRadius = (cases, nRadius) => {
 
 const zoomed = () => {
     let zoomableGroup = d3.selectAll('.zoomable-group');
-    let scale = d3.event.transform.k;
 
-    zoomableGroup.attr('transform', 'translate(' + 0 + ') scale(' + scale + ')');
+    zoomableGroup.attr("transform", d3.event.transform);
+
+    let scale = d3.event.transform.k;
     if (scale > 0.8) {
         zoomableGroup.selectAll('.node-labels > text')
             .attr('transform', 'scale(' + (1 / scale) + ')');
@@ -185,7 +186,7 @@ export const zoom = d3.zoom()
 export const resetZoom = () => {
     let svg = d3.select('#chart').select('svg');
 
-    svg.call(zoom.scaleTo, 0.5);
+    svg.call(zoom.transform, d3.zoomIdentity.scale(0.5));
 };
 
 export const panTo = d => {
@@ -194,9 +195,10 @@ export const panTo = d => {
     d3.event.stopPropagation();
     svg.transition().duration(750).call(
         zoom.transform,
-        d3.zoomIdentity.translate(Config.svg_width / 2, Config.svg_height / 2)
+        d3.zoomIdentity
             .scale(2)
-            .translate(-d.x, -d.y),
+            .translate(-d.x, -d.y)
+            .translate(Config.svg_width / 2, Config.svg_height / 2),
         d3.mouse(svg.node())
     );
 };
