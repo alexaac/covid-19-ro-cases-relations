@@ -6,6 +6,9 @@ import * as Draw from './Draw';
 import * as Language from './Language';
 import * as Layout from './Layout';
 
+import MapChart from './models/MapChart';
+import PackChart from './models/PackChart';
+
 let graph = {nodes: [], links: []};
 let svg, simulation, xScale, yScale, zoomableGroup, idToNode;
 let sources, casesData, geoData, layer, geoCounties, geojsonFeatures;
@@ -20,6 +23,8 @@ let positioning = d3.select('#positioning').node().value;
 // Switch the language to english/romanian
 let language = d3.select('#language').node().value;
 let countiesSource = language === 'ro' ? 'data/judete_wgs84.json' : '../data/judete_wgs84.json';
+
+let mapChart, packChart;
 
 (() => {
 
@@ -111,6 +116,12 @@ const drawGraph = () => {
     zoomableGroup = svg.append('g')
         .attr('class', 'zoomable-group')
         .style('transform-origin', '50% 50% 0');
+
+    // Set object for map
+    mapChart = new MapChart(".zoomable-group", geoCounties, geojsonFeatures);
+
+    // Set object for clusters
+    packChart = new PackChart(".zoomable-group", geoCounties, graph.nodes);
 
     // Map nodes name with nodes details
     idToNode = Data.idToNodeFnc(graph);
@@ -255,13 +266,15 @@ const setActions = () => {
     Draw.TimeLine(xScale, yScale);
 
     // Draw counties map
-    Draw.CountiesMap(geoCounties, geojsonFeatures);
+    // Draw.CountiesMap(geoCounties, geojsonFeatures);
+    mapChart.setupData();
 
     // Draw nodes and links
     Draw.NodesAndLinks(graph, cases, simulation, positioning);
 
     // Define the secondary simulation, for county groups
-    Draw.CirclesPacks(geoCounties, graph.nodes, cases);
+    // Draw.CirclesPacks(geoCounties, graph.nodes, cases);
+    packChart.setupData();
 
     // Color the legend for counties
     Layout.colorStatus();
