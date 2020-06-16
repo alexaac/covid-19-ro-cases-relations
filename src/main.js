@@ -6,8 +6,10 @@ import * as Draw from './Draw';
 import * as Language from './Language';
 import * as Layout from './Layout';
 
+import NodesChart from './models/NodesChart';
 import MapChart from './models/MapChart';
 import PackChart from './models/PackChart';
+import LineChart from './models/LineChart';
 
 let graph = {nodes: [], links: []};
 let svg, simulation, xScale, yScale, zoomableGroup, idToNode;
@@ -24,7 +26,7 @@ let positioning = d3.select('#positioning').node().value;
 let language = d3.select('#language').node().value;
 let countiesSource = language === 'ro' ? 'data/judete_wgs84.json' : '../data/judete_wgs84.json';
 
-let mapChart, packChart;
+let nodesChart, mapChart, packChart, lineChart;
 
 (() => {
 
@@ -95,7 +97,7 @@ const drawGraph = () => {
     // Setup the simulation
     // https://gist.github.com/mbostock/1153292
     const ticked = () => {
-        Simulation.update(idToNode, d3.selectAll('.nodes'), d3.selectAll('.links'), d3.selectAll('.node-labels'), positioning, xScale, yScale);
+        Simulation.update(idToNode, d3.selectAll('.nodes'), d3.selectAll('.links'), d3.selectAll('.node-labels'), positioning, lineChart);
     };
 
     simulation = Simulation.graphSimulation(graph);
@@ -117,11 +119,18 @@ const drawGraph = () => {
         .attr('class', 'zoomable-group')
         .style('transform-origin', '50% 50% 0');
 
+    // https://github.com/adamjanes
+    // // Set object for nodes and links
+    // nodesChart = new NodesChart(".zoomable-group", graph, cases);
+
     // Set object for map
     mapChart = new MapChart(".zoomable-group", geoCounties, geojsonFeatures);
 
     // Set object for clusters
     packChart = new PackChart(".zoomable-group", geoCounties, graph.nodes);
+
+    // Set object for nodes by time
+    lineChart = new LineChart(".zoomable-group", graph.nodes);
 
     // Map nodes name with nodes details
     idToNode = Data.idToNodeFnc(graph);
@@ -156,22 +165,22 @@ const setActions = () => {
 
     // Toggle between map, graph and timeline chart
     d3.select('#show-map')
-        .on('click', () => Layout.showMap(graph, simulation, idToNode, xScale, yScale));
+        .on('click', () => Layout.showMap(graph, simulation, idToNode, lineChart));
     d3.select('#show-map-clusters')
         .on('click', () => {
-            Layout.showMapClusters(graph, simulation, idToNode, xScale, yScale);
+            Layout.showMapClusters(graph, simulation, idToNode, lineChart);
             Draw.MapCirclesPack();
         });
     d3.select('#show-clusters')
         .on('click', () => {
-            Layout.showMapClusters(graph, simulation, idToNode, xScale, yScale);
+            Layout.showMapClusters(graph, simulation, idToNode, lineChart);
             d3.selectAll('.land').attr('opacity', 0.5);
             Draw.GroupCirclesPack();
         });
     d3.select('#show-graph')
         .on('click', () => Layout.showGraph(simulation));
     d3.select('#show-arcs')
-        .on('click', () => Layout.showArcs(graph, simulation, idToNode, xScale, yScale));
+        .on('click', () => Layout.showArcs(graph, simulation, idToNode, lineChart));
 
     // Change colors from status to counties and vice versa
     d3.select('#color-counties')
@@ -263,7 +272,7 @@ const setActions = () => {
 
 
     // Draw cases by time
-    Draw.TimeLine(xScale, yScale);
+    lineChart.setupData();
 
     // Draw counties map
     mapChart.setupData();

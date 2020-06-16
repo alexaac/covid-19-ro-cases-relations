@@ -203,7 +203,7 @@ export const panTo = d => {
     );
 };
 
-export const fixed = (nodes, positioning, immediate, idToNode, xScale, yScale) => {
+export const fixed = (nodes, positioning, immediate, idToNode, lineChart) => {
     if (positioning === 'map' || positioning === 'clusters') {
         nodes.forEach(function (d) {
             const pos = Config.projection([d.longitude, d.latitude]);
@@ -212,8 +212,8 @@ export const fixed = (nodes, positioning, immediate, idToNode, xScale, yScale) =
         });
     } else {
         nodes.forEach(function (d) {
-            d.x = xScale(d.date) || -100;
-            d.y = yScale(d.dayOrder);
+            d.x = lineChart.xScale(d.date) || -100;
+            d.y = lineChart.yScale(d.dayOrder);
         });
     }
 
@@ -221,11 +221,11 @@ export const fixed = (nodes, positioning, immediate, idToNode, xScale, yScale) =
         .duration(immediate ? 0 : 800)
         .ease(d3.easeElastic.period(0.5));
 
-    Simulation.update(idToNode, d3.selectAll('.nodes').transition(t), d3.selectAll('.links').transition(t), d3.selectAll('.node-labels').transition(t), positioning, xScale, yScale)
+    Simulation.update(idToNode, d3.selectAll('.nodes').transition(t), d3.selectAll('.links').transition(t), d3.selectAll('.node-labels').transition(t), positioning, lineChart)
 
 };
 
-export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
+export const showMap = (graph, simulation, idToNode, lineChart) => {
     let positioning = 'map';
 
     d3.select('#positioning').attr('value', 'map');
@@ -238,10 +238,10 @@ export const showMap = (graph, simulation, idToNode, xScale, yScale) => {
     d3.selectAll('.time-graph').attr('opacity', 0);
     d3.selectAll('.pack-group').attr('transform', 'translate(-10000,-10000)');
     
-    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
+    fixed(graph.nodes, positioning, 0, idToNode, lineChart);
 };
 
-export const showMapClusters = (graph, simulation, idToNode, xScale, yScale) => {
+export const showMapClusters = (graph, simulation, idToNode, lineChart) => {
     let positioning = 'clusters';
     d3.select('#positioning').attr('value', 'map');
 
@@ -253,7 +253,7 @@ export const showMapClusters = (graph, simulation, idToNode, xScale, yScale) => 
     d3.selectAll('.time-graph').attr('opacity', 0);
     d3.selectAll('.pack-group').attr('opacity', 1);
     
-    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
+    fixed(graph.nodes, positioning, 0, idToNode, lineChart);
 
     d3.selectAll('.nodes-group').style('opacity', 0);
 };
@@ -274,7 +274,7 @@ export const showGraph = (simulation) => {
     d3.selectAll('.pack-group').attr('transform', 'translate(-10000,-10000)');
 };
 
-export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
+export const showArcs = (graph, simulation, idToNode, lineChart) => {
     let positioning = 'arcs';
     d3.select('#positioning').attr('value', 'arcs');
 
@@ -286,5 +286,5 @@ export const showArcs = (graph, simulation, idToNode, xScale, yScale) => {
     d3.selectAll('.time-graph').attr('opacity', 1);
     d3.selectAll('.pack-group').attr('transform', 'translate(-10000,-10000)');
     
-    fixed(graph.nodes, positioning, 0, idToNode, xScale, yScale);
+    fixed(graph.nodes, positioning, 0, idToNode, lineChart);
 };

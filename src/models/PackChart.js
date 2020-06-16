@@ -101,14 +101,13 @@ export default class PackChart {
 
         viz.dataFiltered = root;
         
-        viz.updateVis();
+        viz.updateViz();
     };
 
-    updateVis () {
+    updateViz () {
         var viz = this;
 
         if (viz.dataFiltered !== undefined) {
-            console.log(viz.dataFiltered);
             let bubbles, en_bubbles, bubble_labels, en_bubble_labels;
             let language = d3.select('#language').node().value;
 

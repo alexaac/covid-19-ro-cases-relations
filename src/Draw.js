@@ -15,47 +15,6 @@ export const MapCirclesPack = () => {
     d3.selectAll('.labels').attr('transform', d => d.parent && d.parent.data.d ? `translate(${d.relx + d.parent.data.d.force.x},${d.rely + d.parent.data.d.force.y})` : 'translate(-10000,-10000)');
 };
 
-export const TimeLine = (xScale, yScale) => {
-    let zoomableGroup = d3.select('svg').select('.zoomable-group');
-
-    let language = d3.select('#language').node().value;
-
-    const timeGraph = zoomableGroup.append('g')
-        .attr('class', 'time-graph')
-        .attr('opacity', 0);
-
-    const xLabel = timeGraph.append('text')
-        .attr('y', Config.svg_height + 70)
-        .attr('x', Config.svg_width / 2)
-        .attr('font-size', '16px')
-        .attr('text-anchor', 'middle')
-        .text(language === 'ro' ? 'Ziua' : 'Day');
-    const xAxis = timeGraph.append('g')
-        .attr('transform', `translate(0,${Config.svg_height})`)
-        .call(d3.axisBottom(xScale)
-            .ticks(30)
-            .tickFormat(Config.multiFormat));
-    xAxis.selectAll('text')
-        .attr('class', 'time-graph-x')
-        .attr('font-weight', 'bold')
-        .style('text-anchor', 'end')
-        .attr('dx', '-.8em')
-        .attr('transform', 'rotate(-65)');
-    const yAxis = timeGraph.append('g')
-        .call(d3.axisLeft(yScale)
-            .ticks(10));
-    yAxis.selectAll('text')
-        .attr('class', 'time-graph-y')
-        .attr('font-weight', 'bold');
-    const yLabel = timeGraph.append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', -50)
-        .attr('x', -Config.svg_height / 2)
-        .attr('font-size', '20px')
-        .attr('text-anchor', 'middle')
-        .text(language === 'ro' ? 'Cazuri ordonate pe zi' : 'Ordered cases per day');
-}
-
 export const NodesAndLinks = (graph, cases, simulation, positioning) => {
     let links, nodes;
 

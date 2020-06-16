@@ -58,17 +58,17 @@ export const linkArc = (d) => {
     `;
 };
 
-export const update = (idToNode, nodes, links, labels, positioning, xScale, yScale) => {
+export const update = (idToNode, nodes, links, labels, positioning, lineChart) => {
 
     links.attr('d', d => {
         if (positioning === 'arcs') {
             if (typeof(d.source.name) === 'string') {
                 return linkArc(d)
             } else {
-                let start = xScale(idToNode[d.source.name].date) || 0;
-                let end = xScale(idToNode[d.target.name].date);
-                const arcPath = ['M', start, yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,',',
-                            start < end ? 1: 0, end, yScale(idToNode[d.target.name].dayOrder)].join(' ');
+                let start = lineChart.xScale(idToNode[d.source.name].date) || 0;
+                let end = lineChart.xScale(idToNode[d.target.name].date);
+                const arcPath = ['M', start, lineChart.yScale(idToNode[d.source.name].dayOrder), 'A', (start - end)/2, ',', (start-end)/2, 0,0,',',
+                            start < end ? 1: 0, end, lineChart.yScale(idToNode[d.target.name].dayOrder)].join(' ');
                 return arcPath;
             }
         } else {

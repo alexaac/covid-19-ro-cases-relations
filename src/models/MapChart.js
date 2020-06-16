@@ -28,15 +28,13 @@ export default class MapChart {
 
         viz.dataFiltered = viz.geoCounties;
         
-        viz.updateVis();
+        viz.updateViz();
     };
 
-    updateVis () {
+    updateViz () {
         var viz = this;
 
         if (viz.dataFiltered !== undefined) {
-            console.log(viz.dataFiltered);
-                    
             const thisMapPath = d3.geoPath()
                 .projection(
                     Config.projection
