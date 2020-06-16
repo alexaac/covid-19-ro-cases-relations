@@ -266,14 +266,12 @@ const setActions = () => {
     Draw.TimeLine(xScale, yScale);
 
     // Draw counties map
-    // Draw.CountiesMap(geoCounties, geojsonFeatures);
     mapChart.setupData();
 
     // Draw nodes and links
     Draw.NodesAndLinks(graph, cases, simulation, positioning);
 
     // Define the secondary simulation, for county groups
-    // Draw.CirclesPacks(geoCounties, graph.nodes, cases);
     packChart.setupData();
 
     // Color the legend for counties
