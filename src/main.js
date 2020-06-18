@@ -81,7 +81,7 @@ const setupGraph = () => {
             lon: d.properties.lon,
         });
         d.id = county;
-        d.centroid = Config.projection.fitSize([Config.svg_width, Config.svg_height], geojsonFeatures)([d.properties.lon, d.properties.lat]);
+        d.centroid = Config.projection.fitSize([Config.width, Config.height], geojsonFeatures)([d.properties.lon, d.properties.lat]);
         // Set force for group by county
         d.force = {};
         d.force.x = d.centroid[0];
@@ -111,12 +111,13 @@ const drawGraph = () => {
             .attr('preserveAspectRatio', 'xMidYMid')
             .attr('width', Config.svg_width)
             .attr('height', Config.svg_height)
-            .attr('viewBox', '0, 0 ' + Config.svg_width + ' ' + Config.svg_height)
+            .attr('viewBox', '0, 0 ' + Config.width + ' ' + Config.height)
             .on('click', () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
 
     // Append zoomable group
     zoomableGroup = svg.append('g')
         .attr('class', 'zoomable-group')
+        .attr('transform', `translate(${Config.margin.left}, ${Config.margin.top})`)
         .style('transform-origin', '50% 50% 0');
 
     // https://github.com/adamjanes
@@ -147,7 +148,7 @@ const setActions = () => {
     // Set scales for nodes by time
     xScale = d3.scaleTime()
         .domain(d3.extent(graph.nodes, d => d.date))
-        .range([0, Config.svg_width]);
+        .range([0, Config.width]);
     yScale = d3.scaleLinear()
         .domain(d3.extent(graph.nodes, d => d.dayOrder))
         .range([Config.svg_height, 0]);

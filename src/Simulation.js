@@ -3,7 +3,7 @@ import * as Config from './Config';
 export const graphSimulation = (graph) => {
     return d3.forceSimulation(graph.nodes)
         .force('link', d3.forceLink(graph.links).id( d => d.name))
-        .force('center', d3.forceCenter(Config.svg_width / 2, Config.svg_height / 2))
+        .force('center', d3.forceCenter(Config.width / 2, Config.height / 2))
         .force('charge', d3.forceManyBody())
         // .force('collision', d3.forceCollide().radius(d => d.radius))
         .force('x', d3.forceX())

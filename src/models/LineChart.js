@@ -14,8 +14,8 @@ export default class LineChart {
 
         let language = d3.select('#language').node().value;
 
-        viz.height = Config.svg_height;
-        viz.width = Config.svg_width;
+        viz.height = Config.height;
+        viz.width = Config.width;
     
         viz.g = d3.select(viz.parentElement).append("g")
             .attr('class', 'time-graph')

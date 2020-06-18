@@ -198,7 +198,7 @@ export const panTo = d => {
         d3.zoomIdentity
             .scale(2)
             .translate(-d.x, -d.y)
-            .translate(Config.svg_width / 2, Config.svg_height / 2),
+            .translate(Config.width / 2, Config.height / 2),
         d3.mouse(svg.node())
     );
 };

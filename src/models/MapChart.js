@@ -13,8 +13,8 @@ export default class MapChart {
     initViz () {
         var viz = this;
 
-        viz.height = Config.svg_height;
-        viz.width = Config.svg_width;
+        viz.height = Config.height;
+        viz.width = Config.width;
     
         viz.g = d3.select(viz.parentElement).append("g")
             .attr('class', 'map-features')

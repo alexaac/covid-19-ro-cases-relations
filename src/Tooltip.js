@@ -164,8 +164,8 @@ export const toggleInfo = (infoStatus, language) => {
             .duration(200)
             .style('opacity', .9);
         tooltip_div.html(Language.infoHtml(language))
-            .style('left', Config.svg_width / 2 + 'px')
-            .style('top', Config.svg_height / 2 + 'px')
+            .style('left', Config.width / 2 + 'px')
+            .style('top', Config.height / 2 + 'px')
             .style('display', null);
         infoStatus = false;
     } else {

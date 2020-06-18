@@ -10,7 +10,7 @@ export const projection = d3.geoAlbers()
     .rotate([-14, 3.3, -10])
     .parallels([37, 54])
     .scale(5000)
-    .translate([svg_width / 2, svg_height / 2]);
+    .translate([width / 2, height / 2]);
 
 export const path = d3.geoPath()
     .projection(projection);
