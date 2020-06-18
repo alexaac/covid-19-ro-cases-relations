@@ -219,7 +219,7 @@ const setActions = () => {
             };
         });
     d3.select('#search-input')
-        .on('input', () => {
+        .on('input', function() {
             if (cases.includes(+this.value)) {
                 Tooltip.highlightSearchedId(+this.value);
             }
