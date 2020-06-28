@@ -230,14 +230,6 @@ svg.chart-group a {
     background-image: url(../icons/map.svg);
 }
 
-.map-clusters-icon {
-    background-image: url(../icons/map_circles.svg);
-}
-
-.clusters-icon {
-    background-image: url(../icons/circles.svg);
-}
-
 .graph-icon {
     background-image: url(../icons/graphs.svg);
 }
