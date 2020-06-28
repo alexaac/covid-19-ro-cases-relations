@@ -8,7 +8,6 @@ import * as Layout from './Layout';
 
 import NodesChart from './models/NodesChart';
 import MapChart from './models/MapChart';
-import PackChart from './models/PackChart';
 import LineChart from './models/LineChart';
 
 let graph = {nodes: [], links: []};
@@ -26,7 +25,7 @@ let positioning = d3.select('#positioning').node().value;
 let language = d3.select('#language').node().value;
 let countiesSource = language === 'ro' ? 'data/judete_wgs84.json' : '../data/judete_wgs84.json';
 
-let nodesChart, mapChart, packChart, lineChart;
+let nodesChart, mapChart, lineChart;
 
 (() => {
 
@@ -82,12 +81,6 @@ const setupGraph = () => {
         });
         d.id = county;
         d.centroid = Config.projection.fitSize([Config.width, Config.height], geojsonFeatures)([d.properties.lon, d.properties.lat]);
-        // Set force for group by county
-        d.force = {};
-        d.force.x = d.centroid[0];
-        d.force.y = d.centroid[1];
-        d.force.foc_x = d.centroid[0];
-        d.force.foc_y = d.centroid[1];
     });
 
     graph.nodes = Data.formatNodes(graph.nodes, countiesCentroids);
@@ -127,9 +120,6 @@ const drawGraph = () => {
     // Set object for map
     mapChart = new MapChart(".zoomable-group", geoCounties, geojsonFeatures);
 
-    // Set object for clusters
-    packChart = new PackChart(".zoomable-group", geoCounties, graph.nodes);
-
     // Set object for nodes by time
     lineChart = new LineChart(".zoomable-group", graph.nodes);
 
@@ -167,17 +157,6 @@ const setActions = () => {
     // Toggle between map, graph and timeline chart
     d3.select('#show-map')
         .on('click', () => Layout.showMap(graph, simulation, idToNode, lineChart));
-    d3.select('#show-map-clusters')
-        .on('click', () => {
-            Layout.showMapClusters(graph, simulation, idToNode, lineChart);
-            Draw.MapCirclesPack();
-        });
-    d3.select('#show-clusters')
-        .on('click', () => {
-            Layout.showMapClusters(graph, simulation, idToNode, lineChart);
-            d3.selectAll('.land').attr('opacity', 0.5);
-            Draw.GroupCirclesPack();
-        });
     d3.select('#show-graph')
         .on('click', () => Layout.showGraph(simulation));
     d3.select('#show-arcs')
@@ -280,9 +259,6 @@ const setActions = () => {
 
     // Draw nodes and links
     Draw.NodesAndLinks(graph, cases, simulation, positioning);
-
-    // Define the secondary simulation, for county groups
-    packChart.setupData();
 
     // Color the legend for counties
     Layout.colorStatus();

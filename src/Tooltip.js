@@ -9,11 +9,6 @@ export const tooltip_div = d3.select('body')
    .style('display', 'none');
 
 export const highlight = (d, cases) => {
-    let positioning = d3.select('#positioning').node().value;
-
-    if (positioning === 'clusters') {
-        return;
-    };
 
     let left = d3.event.pageX -20;
     let top = d3.event.pageY + 20;
@@ -178,8 +173,3 @@ export const toggleInfo = (infoStatus, language) => {
     return infoStatus;
 };
 
-export const hovered = (hover) => {
-    return (d) => {
-        d3.selectAll(d.ancestors().map(d => d.node)).classed('node--hover', hover);
-    };
-};

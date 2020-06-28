@@ -204,7 +204,7 @@ export const panTo = d => {
 };
 
 export const fixed = (nodes, positioning, immediate, idToNode, lineChart) => {
-    if (positioning === 'map' || positioning === 'clusters') {
+    if (positioning === 'map') {
         nodes.forEach(function (d) {
             const pos = Config.projection([d.longitude, d.latitude]);
             d.x = pos[0] || d.x;
@@ -239,23 +239,6 @@ export const showMap = (graph, simulation, idToNode, lineChart) => {
     d3.selectAll('.pack-group').attr('transform', 'translate(-10000,-10000)');
     
     fixed(graph.nodes, positioning, 0, idToNode, lineChart);
-};
-
-export const showMapClusters = (graph, simulation, idToNode, lineChart) => {
-    let positioning = 'clusters';
-    d3.select('#positioning').attr('value', 'map');
-
-    simulation.stop();
-    resetZoom();
-
-    d3.selectAll('.nodes-group').style('opacity', 1);
-    d3.selectAll('.land').attr('opacity', 1);
-    d3.selectAll('.time-graph').attr('opacity', 0);
-    d3.selectAll('.pack-group').attr('opacity', 1);
-    
-    fixed(graph.nodes, positioning, 0, idToNode, lineChart);
-
-    d3.selectAll('.nodes-group').style('opacity', 0);
 };
 
 export const showGraph = (simulation) => {

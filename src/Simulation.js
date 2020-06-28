@@ -11,16 +11,6 @@ export const graphSimulation = (graph) => {
         .alphaDecay([0.02]);
 };
 
-export const packSimulation = () => {
-    return d3.forceSimulation()
-    .force('collision', d3.forceCollide()
-        .radius(d => d.radius )
-        .strength(0.01))
-    .force('attract', d3.forceAttract()
-        .target(d => [d.foc_x, d.foc_y])
-        .strength(0.5));
-}
-
 // simulation drag - not used for now
 export const drag = (simulation, positioning) => {
     const dragstarted = d => {
