@@ -116,7 +116,8 @@ export const tooltipHTML = (d) => {
                 ? (labels.detailsLabel[language] + ': ' + '<a href="' + d.properties.reference + '" target= "_blank">'+ labels.aiciLabel[language] +'</a>')
                 : '';
 
-        return '<b>' + labels.cazulLabel[language] + ' ' + d.properties.case_no + '</b>' +
+        // return '<b>' + labels.cazulLabel[language] + ' ' + d.properties.case_no + '</b>' +
+        return '<b>' + labels.cazulLabel[language] + ' ' + 'x' + '</b>' +
             // genderInfo + ageInfo +
             countyInfo + '.<br />' +
             statusInfo +

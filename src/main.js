@@ -80,7 +80,6 @@ const setupGraph = () => {
             lon: d.properties.lon,
         });
         d.id = county;
-        d.centroid = Config.projection.fitSize([Config.width, Config.height], geojsonFeatures)([d.properties.lon, d.properties.lat]);
     });
 
     graph.nodes = Data.formatNodes(graph.nodes, countiesCentroids);
