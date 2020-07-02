@@ -34,6 +34,8 @@ let opts = {lines: 9, length: 4, width: 5, radius: 12, scale: 1, corners: 1, col
     target = document.getElementById('spinner'),
     spinner;
 
+spinner = new Spinner(opts).spin(target);
+
 // Load data
 const promises = [
     d3.json(countiesSource),
@@ -44,10 +46,9 @@ Promise.all(promises).then( data => {
     geoData = data[0];
     casesData = data[1];
 
-    spinner = new Spinner(opts).spin(target);
     setupGraph();
     drawGraph();
-    setTimeout(setActions(), 100);
+    setActions();
 }).catch(
     error => console.log(error)
 );
