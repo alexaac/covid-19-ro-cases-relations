@@ -68,6 +68,7 @@ export const tooltipHTML = (d) => {
         let language = d3.select('#language').node().value;
 
         let labels = {
+            valueLabel: { 'ro': 'cazuri legate', 'en': 'clustered cases' },
             cazulLabel: { 'ro': 'Cazul', 'en': 'Case' },
             maleLabel: { 'ro': 'Bărbat', 'en': 'Male' },
             femaleLabel: { 'ro': 'Femeie', 'en': 'Female' },
@@ -83,7 +84,8 @@ export const tooltipHTML = (d) => {
             aiciLabel: { 'ro': 'aici', 'en': 'here' },
         };
 
-        let genderInfo = d.properties.gender === 'Bărbat'
+        let cazuriInfo = d.infected_persons + ' ' + labels.valueLabel[language],
+            genderInfo = d.properties.gender === 'Bărbat'
                 ? labels.maleLabel[language]
                 : (d.properties.gender === 'Femeie'
                     ? labels.femaleLabel[language]
@@ -120,6 +122,7 @@ export const tooltipHTML = (d) => {
         return '<b>' + labels.cazulLabel[language] + ' ' + 'x' + '</b>' +
             // genderInfo + ageInfo +
             countyInfo + '.<br />' +
+            cazuriInfo + '.<br />' +
             statusInfo +
             diagnosticDateInfo +
             healingDateInfo +
