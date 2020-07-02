@@ -84,7 +84,7 @@ export const tooltipHTML = (d) => {
             aiciLabel: { 'ro': 'aici', 'en': 'here' },
         };
 
-        let cazuriInfo = d.infected_persons + ' ' + labels.valueLabel[language],
+        let cazuriInfo = d.infected_persons ? (d.infected_persons + ' ' + labels.valueLabel[language] + '.<br />') : '',
             genderInfo = d.properties.gender === 'Bărbat'
                 ? labels.maleLabel[language]
                 : (d.properties.gender === 'Femeie'
@@ -122,7 +122,7 @@ export const tooltipHTML = (d) => {
         return '<b>' + labels.cazulLabel[language] + ' ' + 'x' + '</b>' +
             // genderInfo + ageInfo +
             countyInfo + '.<br />' +
-            cazuriInfo + '.<br />' +
+            cazuriInfo + // Note: a case id can have 303 related cases from two counties, and 301 from the same county in the Pack graphic
             statusInfo +
             diagnosticDateInfo +
             healingDateInfo +
