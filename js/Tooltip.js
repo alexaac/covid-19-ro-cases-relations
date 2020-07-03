@@ -1,5 +1,5 @@
-import * as Config from './Config';
-import * as Language from './Language';
+import * as Config from './Config.js';
+import * as Language from './Language.js';
 
 // use a tooltip to show node info
 export const tooltip_div = d3.select('body')

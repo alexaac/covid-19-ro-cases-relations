@@ -1,31 +1,22 @@
-import * as Config from './Config';
-import * as Data from './Data';
-import * as Tooltip from './Tooltip';
-import * as Simulation from './Simulation';
-import * as Draw from './Draw';
-import * as Language from './Language';
-import * as Layout from './Layout';
+import * as Config from './Config.js';
+import * as Data from './Data.js';
+import * as Tooltip from './Tooltip.js';
+import * as Draw from './Draw.js';
+import * as Language from './Language.js';
+import * as Layout from './Layout.js';
 
-import NodesChart from './models/NodesChart';
-import MapChart from './models/MapChart';
-import LineChart from './models/LineChart';
+import NodesChart from './models/NodesChart.js';
 
 let graph = {nodes: [], links: []};
-let svg, simulation, xScale, yScale, zoomableGroup, idToNode;
-let sources, casesData, geoData, layer, geoCounties, geojsonFeatures;
-let cases;
-let countiesCentroids = d3.map();
+let svg, sources, casesData, cases;
 
 let legendStatus = false, infoStatus = true, searchStatus = true;
 let playCasesNow, thisCaseId, thisCaseOrder;
 
-let positioning = d3.select('#positioning').node().value;
-
 // Switch the language to english/romanian
 let language = d3.select('#language').node().value;
-let countiesSource = language === 'ro' ? 'data/judete_wgs84.json' : '../data/judete_wgs84.json';
 
-let nodesChart, mapChart, lineChart;
+let nodesChart;
 
 (() => {
 
@@ -38,13 +29,11 @@ spinner = new Spinner(opts).spin(target);
 
 // Load data
 const promises = [
-    d3.json(countiesSource),
     d3.json('https://covid19.geo-spatial.org/api/statistics/getCaseRelations')
 ];
 
 Promise.all(promises).then( data => {
-    geoData = data[0];
-    casesData = data[1];
+    casesData = data[0];
 
     setupGraph();
     drawGraph();
@@ -66,36 +55,39 @@ const setupGraph = () => {
     graph.nodes = graph.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
     graph.links = graph.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
 
-    layer = 'judete_wgs84';
-    geoCounties = topojson.feature(geoData, geoData.objects[layer]).features;
-    geojsonFeatures = topojson.feature(geoData, {
-        type: 'GeometryCollection',
-        geometries: geoData.objects[layer].geometries
-    });
-
-    geoCounties.forEach( d => {
-        let county = d.properties.county;
-        // Get lat, lon for nodes within county
-        countiesCentroids.set(county, {
-            lat: d.properties.lat,
-            lon: d.properties.lon,
-        });
-        d.id = county;
-    });
-
-    graph.nodes = Data.formatNodes(graph.nodes, countiesCentroids);
+    graph.nodes = Data.formatNodes(graph.nodes);
 }
 
 const drawGraph = () => {
-    // Setup the simulation
-    // https://gist.github.com/mbostock/1153292
-    const ticked = () => {
-        Simulation.update(idToNode, d3.selectAll('.nodes'), d3.selectAll('.links'), d3.selectAll('.node-labels'), positioning, lineChart);
+    
+    const linkArc = (d) => {
+        const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+        return `
+            M${d.source.x},${d.source.y}
+            A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+        `;
     };
 
-    simulation = Simulation.graphSimulation(graph);
+    const ticked = () => {
+        d3.selectAll('.links').attr('d', d => linkArc(d));
+        d3.selectAll('.nodes').attr('transform', d => `translate(${d.x},${d.y})`);
+        d3.selectAll('.node-labels').attr('transform', d => `translate(${d.x},${d.y})`);
+    };
+
+    let simulation = d3.forceSimulation(graph.nodes)
+        .force('link', d3.forceLink(graph.links).id( d => d.name))
+        .force('center', d3.forceCenter(Config.width / 2, Config.height / 2))
+        .force('charge', d3.forceManyBody())
+        .force('x', d3.forceX())
+        .force('y', d3.forceY())
+        .alphaDecay([0.02]);
+    
     simulation.on('tick', ticked);
     simulation.force('link').links(graph.links);
+    
+    setTimeout(() => {
+        simulation.stop();
+    }, 5000);
 
     // Append the svg object to the chart div
     svg = d3.select('#chart')
@@ -108,7 +100,7 @@ const drawGraph = () => {
             .on('click', () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
 
     // Append zoomable group
-    zoomableGroup = svg.append('g')
+    svg.append('g')
         .attr('class', 'zoomable-group')
         .attr('transform', `translate(${Config.margin.left}, ${Config.margin.top})`)
         .style('transform-origin', '50% 50% 0');
@@ -116,15 +108,6 @@ const drawGraph = () => {
     // https://github.com/adamjanes
     // // Set object for nodes and links
     // nodesChart = new NodesChart(".zoomable-group", graph, cases);
-
-    // Set object for map
-    mapChart = new MapChart(".zoomable-group", geoCounties, geojsonFeatures);
-
-    // Set object for nodes by time
-    lineChart = new LineChart(".zoomable-group", graph.nodes);
-
-    // Map nodes name with nodes details
-    idToNode = Data.idToNodeFnc(graph);
 };
 
 const setActions = () => {
@@ -134,14 +117,6 @@ const setActions = () => {
     Layout.createLegend(Layout.countyColor, 900, 1100, 'county-legend', Language.county(language));
     Layout.createLegend(Layout.genderColor(language), 200, 200, 'gender-legend', Language.gender(language));
     Layout.createLegend(Layout.ageColor, 400, 400, 'age-legend', Language.age(language));
-
-    // Set scales for nodes by time
-    xScale = d3.scaleTime()
-        .domain(d3.extent(graph.nodes, d => d.date))
-        .range([0, Config.width]);
-    yScale = d3.scaleLinear()
-        .domain(d3.extent(graph.nodes, d => d.dayOrder))
-        .range([Config.svg_height, 0]);
 
     // Zoom by scroll, pan
     d3.select('#zoom-in')
@@ -153,14 +128,6 @@ const setActions = () => {
     // Apply zoom handler and zoom out
     svg.call(Layout.zoom);
     Layout.resetZoom();
-
-    // Toggle between map, graph and timeline chart
-    d3.select('#show-map')
-        .on('click', () => Layout.showMap(graph, simulation, idToNode, lineChart));
-    d3.select('#show-graph')
-        .on('click', () => Layout.showGraph(simulation));
-    d3.select('#show-arcs')
-        .on('click', () => Layout.showArcs(graph, simulation, idToNode, lineChart));
 
     // Change colors from status to counties and vice versa
     d3.select('#color-counties')
@@ -250,15 +217,9 @@ const setActions = () => {
     d3.select('#nRadius').property('max', cases.length-1);
     Layout.updateRadius(cases, cases.length-1);
 
-
-    // Draw cases by time
-    lineChart.setupData();
-
-    // Draw counties map
-    mapChart.setupData();
-
     // Draw nodes and links
-    Draw.NodesAndLinks(graph, cases, simulation, positioning);
+    // nodesChart.setupData();
+    Draw.NodesAndLinks(graph, cases);
 
     // Color the legend for counties
     Layout.colorStatus();
@@ -266,16 +227,12 @@ const setActions = () => {
     // Hide case labels first
     Layout.hideLabels(1);
 
-
     // Zoom to latest case, when loading spinner stops
-    setTimeout(() => {
-        simulation.stop();
-        spinner.stop();
-        d3.select('tooltip_div').classed('tooltip-abs', true);
-        d3.select('#CO-' + d3.max(cases))
-            .attr('r', d => 2 * d.r)
-            .dispatch('mouseover');
-    }, 5000);
+    spinner.stop();
+    d3.select('tooltip_div').classed('tooltip-abs', true);
+    d3.select('#CO-' + d3.max(cases))
+        .attr('r', d => 2 * d.r)
+        .dispatch('mouseover');
 
 };
 

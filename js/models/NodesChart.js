@@ -1,7 +1,7 @@
-import * as Config from '../Config';
-import * as Data from '../Data';
-import * as Layout from '../Layout';
-import * as Tooltip from '../Tooltip';
+import * as Config from '../Config.js';
+import * as Data from '../Data.js';
+import * as Layout from '../Layout.js';
+import * as Tooltip from '../Tooltip.js';
 
 // nodesChart Class
 export default class nodesChart {
@@ -64,22 +64,24 @@ export default class nodesChart {
                         .attr('fill', '#999')
                         .attr('d', 'M0,-5L10,0L0,5');
             
-            viz.links = viz.g.append('g')
-                    .attr('class', 'link')
-                    .selectAll('path')
-                    .data(viz.dataFiltered.links)
-                    .join('path')
-                        .attr('class', d => `CO-links-${d.source.name}`)
-                        .classed('links', true)
-                        .attr('marker-end', d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
+            viz.links = viz.g.selectAll('.link')
+                .data(viz.dataFiltered.links)
+                .enter()
+                .append('g')
+                .attr('class', 'link');
+
+            viz.links.append('path')
+                .attr('class', d => `CO-links-${d.source.name}`)
+                .classed('links', true)
+                .attr('marker-end', d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
+
             viz.links.exit().remove();
 
-            viz.node = viz.g.append('g')
-                .attr('class', 'node')
-                .selectAll('g')
+            viz.node = viz.g.selectAll('.node')
                 .data(viz.dataFiltered.nodes)
-                .join('g');
-                    // .call(Simulation.drag(viz.simulation, "diagram"));
+                .enter()
+                .append('g')
+                .attr('class', 'node');
 
             viz.nodes = viz.node.append('circle')
                 .attr('id', d => d.properties && `CO-${d.properties.case_no}`)
@@ -100,6 +102,34 @@ export default class nodesChart {
 
             viz.nodes.exit().remove();
 
+            const linkArc = (d) => {
+                const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+                return `
+                    M${d.source.x},${d.source.y}
+                    A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+                `;
+            };
+        
+            const ticked = () => {
+                d3.selectAll('.links').attr('d', d => linkArc(d));
+                d3.selectAll('.nodes').attr('transform', d => `translate(${d.x},${d.y})`);
+                d3.selectAll('.node-labels').attr('transform', d => `translate(${d.x},${d.y})`);
+            };
+        
+            let simulation = d3.forceSimulation(viz.dataFiltered.nodes)
+                .force('link', d3.forceLink(viz.dataFiltered.links).id( d => d.name))
+                .force('center', d3.forceCenter(Config.width / 2, Config.height / 2))
+                .force('charge', d3.forceManyBody())
+                .force('x', d3.forceX())
+                .force('y', d3.forceY())
+                .alphaDecay([0.02]);
+            
+            simulation.on('tick', ticked);
+            simulation.force('link').links(viz.dataFiltered.links);
+            
+            setTimeout(() => {
+                simulation.stop();
+            }, 5000);            
         };
     };
 }

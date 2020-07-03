@@ -1,7 +1,8 @@
-import * as Layout from './Layout';
-import * as Tooltip from './Tooltip';
+import * as Config from './Config.js';
+import * as Layout from './Layout.js';
+import * as Tooltip from './Tooltip.js';
 
-export const NodesAndLinks = (graph, cases, simulation, positioning) => {
+export const NodesAndLinks = (graph, cases) => {
     let links, nodes;
 
     let zoomableGroup = d3.select('svg').select('.zoomable-group');
@@ -24,22 +25,24 @@ export const NodesAndLinks = (graph, cases, simulation, positioning) => {
                 .attr('fill', '#999')
                 .attr('d', 'M0,-5L10,0L0,5');
     
-    links = nodesGroup.append('g')
-            .attr('class', 'link')
-            .selectAll('path')
-            .data(graph.links)
-            .join('path')
-                .attr('class', d => `CO-links-${d.source.name}`)
-                .classed('links', true)
-                .attr('marker-end', d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
+    links = nodesGroup.selectAll('.link')
+        .data(graph.links)
+        .enter()
+        .append('g')
+        .attr('class', 'link');
+
+    links.append('path')
+        .attr('class', d => `CO-links-${d.source.name}`)
+        .classed('links', true)
+        .attr('marker-end', d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
+
     links.exit().remove();
 
-    nodes = nodesGroup.append('g')
-        .attr('class', 'node')
-        .selectAll('g')
+    nodes = nodesGroup.selectAll('.node')
         .data(graph.nodes)
-        .join('g');
-            // .call(Simulation.drag(simulation, positioning));
+        .enter()
+        .append('g')
+        .attr('class', 'node');
 
     nodes.append('circle')
         .attr('id', d => d.properties && `CO-${d.properties.case_no}`)
@@ -57,6 +60,6 @@ export const NodesAndLinks = (graph, cases, simulation, positioning) => {
             .attr('y', '0.31em')
             .text(d => d.name)
             .clone(true).lower();
-
+            
     nodes.exit().remove();
 } 

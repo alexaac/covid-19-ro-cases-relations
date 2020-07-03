@@ -1,5 +1,5 @@
-import * as Config from './Config';
-import * as Simulation from './Simulation';
+import * as Config from './Config.js';
+import * as Simulation from './Simulation.js';
 
 export const statusColor = (language) => {
     return language === 'ro'
@@ -186,7 +186,7 @@ export const zoom = d3.zoom()
 export const resetZoom = () => {
     let svg = d3.select('#chart').select('svg');
 
-    svg.call(zoom.transform, d3.zoomIdentity.scale(0.5));
+    svg.call(zoom.transform, d3.zoomIdentity.scale(0.2));
 };
 
 export const panTo = d => {

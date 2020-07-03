@@ -1,17 +1,15 @@
-export const formatNodes = (nodes, countiesCentroids) => {
+export const formatNodes = (nodes) => {
     let parseTime = d3.timeParse('%d-%m-%Y');
     let formattedData = [];
 
     let idToTargetNodes = idToTargetNodesFnc(nodes);
 
-    let rScale = d3.scaleLinear()
+    let rScale = d3.scaleSqrt()
         .domain([0,d3.max(Object.values(idToTargetNodes))])
         .range([5,25])
 
     nodes.forEach( d => {
         if (d.properties !== undefined) {
-            d.latitude = countiesCentroids.get(d.properties.county) && countiesCentroids.get(d.properties.county).lat;
-            d.longitude = countiesCentroids.get(d.properties.county) && countiesCentroids.get(d.properties.county).lon;
             d.date = parseTime(d.properties.diagnostic_date).getTime();
             d.name = +d.name;
             d.infected_persons = (idToTargetNodes[d.properties.case_no]) || 0;

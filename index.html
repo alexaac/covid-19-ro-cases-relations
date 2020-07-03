@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+
     <head>
 
         <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta charset="UTF-8">
         <meta content="utf-8" http-equiv="encoding">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>COVID-19 in România - Relationship between cases</title>
-        <link rel="stylesheet" href="../bundle.css">
-        <link rel="stylesheet" href="../css/main.css">
+        <title>COVID-19 în România - Relațiile dintre cazuri</title>
+        <link rel="stylesheet" href="css/main.css">
 
     </head>
 
@@ -19,32 +19,27 @@
                     <a id="pause-cases" class="pause-icon hide" href="#" title="Pause"></a>
                 </div>
                 <div class="control control-group">
-                    <a id="search-case" class="search-icon" href="#" title="Search by Case Id"></a>
+                    <a id="search-case" class="search-icon" href="#" title="Caută după id-ul cazului"></a>
                     <input id="search-input" class="hide"></input>
                 </div>
                 <div class="control control-group">
-                    <a id="toggle-legend" class="legend-icon" href="#" title="Legend"></a>
-                    <a id="color-counties" class="counties-icon" href="#" title="Counties"></a>
-                    <a id="color-gender" class="gender-icon" href="#" title="Gender"></a>
-                    <a id="color-age" class="age-icon" href="#" title="Age"></a>
-                    <a id="color-status" class="status-icon" href="#" title="Status"></a>
-                </div>
-                <div class="control control-group">
-                    <a id="show-map" class="map-icon" href="#" title="Map"></a>
-                    <a id="show-arcs" class="arcs-icon" href="#" title="Timeline"></a>
-                    <a id="show-graph" class="graph-icon" href="#" title="Network"></a>
+                    <a id="toggle-legend" class="legend-icon" href="#" title="Legenda"></a>
+                    <a id="color-counties" class="counties-icon" href="#" title="Județe"></a>
+                    <a id="color-gender" class="gender-icon" href="#" title="Gen"></a>
+                    <a id="color-age" class="age-icon" href="#" title="Vârsta"></a>
+                    <a id="color-status" class="status-icon" href="#" title="Stare"></a>
                 </div>
                 <div class="control control-group">
                     <a id="zoom-in" class="zoom-in-icon" href="#" title="Zoom In"></a>
                     <a id="zoom-out" class="zoom-out-icon" href="#" title="Zoom Out"></a>
-                    <a id="reset-zoom" class="zoom-reset-icon" href="#" title="Zoom to Map"></a>
+                    <a id="reset-zoom" class="zoom-reset-icon" href="#" title="Zoom la Hartă"></a>
                 </div>
                 <div class="control control-group">
                     <a id="show-info" class="info-icon" href="#" title="Info"></a>
                 </div>
                 <div class="control control-group">
-                    <a id="switch-ro" class="ro-icon" href="https://alexaac.github.io/covid-19-ro-cases-relations/" title="Romanian"></a>
-                    <a id="switch-en" class="en-icon" href="https://alexaac.github.io/covid-19-ro-cases-relations/en" title="English"></a>
+                    <a id="switch-ro" class="ro-icon" href="https://alexaac.github.io/covid-19-ro-cases-relations/" title="Română"></a>
+                    <a id="switch-en" class="en-icon" href="https://alexaac.github.io/covid-19-ro-cases-relations/en" title="Engleză"></a>
                 </div>
             </div>
             <div class="slider">
@@ -54,12 +49,9 @@
             <div id="spinner"></div>
             <div id="chart" class="grabbable">
                 <div id="graph-group"></div>
-                <div id="map-group"></div>
-                <div id="timeline-group"></div>
             </div>
             <div id="legend-div"></div>
-            <input type="hidden" id="language" name="language" value="en">
-            <input type="hidden" id="positioning" name="positioning" value="diagram">
+            <input type="hidden" id="language" name="language" value="ro">
         </div>
 
         <script src="//d3js.org/d3.v5.min.js"></script>
@@ -67,9 +59,8 @@
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js'></script>
-        <script src="https://unpkg.com/d3-force-attract@latest"></script>
         
-        <script src="../bundle.js"></script>
+        <script type="module" src="js/main.js"></script>
 
     </body>
 

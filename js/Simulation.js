@@ -1,4 +1,4 @@
-import * as Config from './Config';
+import * as Config from './Config.js';
 
 export const graphSimulation = (graph) => {
     return d3.forceSimulation(graph.nodes)
