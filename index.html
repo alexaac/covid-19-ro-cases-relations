@@ -3,10 +3,10 @@
     <head>
 
         <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta charset="UTF-8">
         <meta content="utf-8" http-equiv="encoding">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>COVID-19 în România - Relațiile dintre cazuri</title>
-        <link rel="stylesheet" href="bundle.css">
         <link rel="stylesheet" href="css/main.css">
 
     </head>
@@ -30,11 +30,6 @@
                     <a id="color-status" class="status-icon" href="#" title="Stare"></a>
                 </div>
                 <div class="control control-group">
-                    <a id="show-map" class="map-icon" href="#" title="Hartă"></a>
-                    <a id="show-arcs" class="arcs-icon" href="#" title="Timp"></a>
-                    <a id="show-graph" class="graph-icon" href="#" title="Rețea"></a>
-                </div>
-                <div class="control control-group">
                     <a id="zoom-in" class="zoom-in-icon" href="#" title="Zoom In"></a>
                     <a id="zoom-out" class="zoom-out-icon" href="#" title="Zoom Out"></a>
                     <a id="reset-zoom" class="zoom-reset-icon" href="#" title="Zoom la Hartă"></a>
@@ -54,12 +49,9 @@
             <div id="spinner"></div>
             <div id="chart" class="grabbable">
                 <div id="graph-group"></div>
-                <div id="map-group"></div>
-                <div id="timeline-group"></div>
             </div>
             <div id="legend-div"></div>
             <input type="hidden" id="language" name="language" value="ro">
-            <input type="hidden" id="positioning" name="positioning" value="diagram">
         </div>
 
         <script src="//d3js.org/d3.v5.min.js"></script>
@@ -67,9 +59,8 @@
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js'></script>
-        <script src="https://unpkg.com/d3-force-attract@latest"></script>
         
-        <script src="bundle.js"></script>
+        <script type="module" src="js/main.js"></script>
 
     </body>
 
