@@ -296,7 +296,7 @@ svg.chart-group a {
 
 .slider {
     position: absolute;
-    left: 10px; top: 0; right: 62px;
+    left: 45px; top: 0; right: 62px;
     margin-top: 10px;
     z-index: 100;
     text-align: center;
@@ -389,10 +389,6 @@ tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .contr
 
     .land {
         stroke-width: 1;
-    }
-
-    .wrapper {
-        margin-top: 80px;
     }
 }
 
