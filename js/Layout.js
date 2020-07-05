@@ -185,7 +185,7 @@ export const zoom = d3.zoom()
 export const resetZoom = () => {
     let svg = d3.select('#chart').select('svg');
 
-    svg.call(zoom.transform, d3.zoomIdentity.scale(0.2));
+    svg.call(zoom.transform, d3.zoomIdentity.scale(0.3));
 };
 
 export const panTo = d => {
