@@ -1,4 +1,3 @@
-import * as Config from './Config.js';
 import * as Layout from './Layout.js';
 import * as Tooltip from './Tooltip.js';
 

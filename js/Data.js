@@ -35,12 +35,6 @@ export const formatNodes = (nodes) => {
     return formattedData;
 };
 
-export const idToNodeFnc = (graph) => {
-    let dict = {};
-    graph.nodes.forEach(n => dict[n.name] = n);
-    return dict;
-};
-
 export const idToTargetNodesFnc = (nodes) => {
     return d3.nest()
         .key(d => d.properties && d.properties.source_no)

@@ -1,5 +1,4 @@
 import * as Config from './Config.js';
-import * as Simulation from './Simulation.js';
 
 export const statusColor = (language) => {
     return language === 'ro'
@@ -201,73 +200,4 @@ export const panTo = d => {
             .translate(Config.width / 2, Config.height / 2),
         d3.mouse(svg.node())
     );
-};
-
-export const fixed = (nodes, positioning, immediate, idToNode, lineChart) => {
-    if (positioning === 'map') {
-        nodes.forEach(function (d) {
-            const pos = Config.projection([d.longitude, d.latitude]);
-            d.x = pos[0] || d.x;
-            d.y = pos[1] || d.y;
-        });
-    } else {
-        nodes.forEach(function (d) {
-            d.x = lineChart.xScale(d.date) || -100;
-            d.y = lineChart.yScale(d.dayOrder);
-        });
-    }
-
-    const t = d3.transition()
-        .duration(immediate ? 0 : 800)
-        .ease(d3.easeElastic.period(0.5));
-
-    Simulation.update(idToNode, d3.selectAll('.nodes').transition(t), d3.selectAll('.links').transition(t), d3.selectAll('.node-labels').transition(t), positioning, lineChart)
-
-};
-
-export const showMap = (graph, simulation, idToNode, lineChart) => {
-    let positioning = 'map';
-
-    d3.select('#positioning').attr('value', 'map');
-
-    simulation.stop();
-    resetZoom();
-
-    d3.selectAll('.nodes-group').style('opacity', 1);
-    d3.selectAll('.land').attr('opacity', 1);
-    d3.selectAll('.time-graph').attr('opacity', 0);
-    d3.selectAll('.pack-group').attr('transform', 'translate(-10000,-10000)');
-    
-    fixed(graph.nodes, positioning, 0, idToNode, lineChart);
-};
-
-export const showGraph = (simulation) => {
-    d3.select('#positioning').attr('value', 'diagram');
-
-    simulation.alpha(1).restart();
-    setTimeout(() => {
-        simulation.stop();
-    }, 5000);
-
-    resetZoom();
-
-    d3.selectAll('.nodes-group').style('opacity', 1);
-    d3.selectAll('.land').attr('opacity', 0.25);
-    d3.selectAll('.time-graph').attr('opacity', 0);
-    d3.selectAll('.pack-group').attr('transform', 'translate(-10000,-10000)');
-};
-
-export const showArcs = (graph, simulation, idToNode, lineChart) => {
-    let positioning = 'arcs';
-    d3.select('#positioning').attr('value', 'arcs');
-
-    simulation.stop();
-    resetZoom();
-
-    d3.selectAll('.nodes-group').style('opacity', 1);
-    d3.selectAll('.land').attr('opacity', 0.25);
-    d3.selectAll('.time-graph').attr('opacity', 1);
-    d3.selectAll('.pack-group').attr('transform', 'translate(-10000,-10000)');
-    
-    fixed(graph.nodes, positioning, 0, idToNode, lineChart);
 };

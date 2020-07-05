@@ -5,8 +5,6 @@ import * as Draw from './Draw.js';
 import * as Language from './Language.js';
 import * as Layout from './Layout.js';
 
-import NodesChart from './models/NodesChart.js';
-
 let graph = {nodes: [], links: []};
 let svg, sources, casesData, cases;
 
@@ -15,8 +13,6 @@ let playCasesNow, thisCaseId, thisCaseOrder;
 
 // Switch the language to english/romanian
 let language = d3.select('#language').node().value;
-
-let nodesChart;
 
 (() => {
 
@@ -105,9 +101,6 @@ const drawGraph = () => {
         .attr('transform', `translate(${Config.margin.left}, ${Config.margin.top})`)
         .style('transform-origin', '50% 50% 0');
 
-    // https://github.com/adamjanes
-    // // Set object for nodes and links
-    // nodesChart = new NodesChart(".zoomable-group", graph, cases);
 };
 
 const setActions = () => {
@@ -218,7 +211,6 @@ const setActions = () => {
     Layout.updateRadius(cases, cases.length-1);
 
     // Draw nodes and links
-    // nodesChart.setupData();
     Draw.NodesAndLinks(graph, cases);
 
     // Color the legend for counties
