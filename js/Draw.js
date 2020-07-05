@@ -48,8 +48,8 @@ export const NodesAndLinks = (graph, cases) => {
         .attr('class', d => d.properties && `CO-nodes-${d.properties.source_no}`)
         .classed('nodes', true)
         .attr('r', d => d.r)
-        .on('touchmove mouseover', d => Tooltip.highlight(d, cases))
-        .on('click', d => Layout.panTo(d));
+        .on('touchstart mouseover', d => Tooltip.highlight(d, cases))
+        .on('dblclick', d => Layout.panTo(d));
 
     nodes.append('g')
         .classed('node-labels', true)

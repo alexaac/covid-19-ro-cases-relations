@@ -1,7 +1,7 @@
 export const infoHtml = (language) => {
     return language === 'ro'
-    ? '<strong>Relația cazurilor confirmate. Fiecare punct reprezintă un om.</strong><br/><br/>Date de pe covid19.geo-spatial.org<br/>Situaţia până la data în care s-au raportat oficial aceste informaţii.<br/>Dați click în afara cercului pentru a deselecta.'
-    : '<strong>Relationship between confirmed cases. Each point represents a person.</strong><br/><br/>Data from covid19.geo-spatial.org<br/>The status until the date this information has been officially reported.<br/>Click outside the circle to clear the selection.';
+    ? '<strong>Relația cazurilor confirmate. Fiecare punct reprezintă un om.</strong><br/><br/>Date de pe covid19.geo-spatial.org<br/>Doar cazurile pentru care se cunoaște sursa de infectare.'
+    : '<strong>Relationship between confirmed cases. Each point represents a person.</strong><br/><br/>Data from covid19.geo-spatial.org<br/>Only cases with known infection source.';
 }
 
 export const status = (language) => {

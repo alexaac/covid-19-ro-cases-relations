@@ -92,8 +92,7 @@ const drawGraph = () => {
             .attr('preserveAspectRatio', 'xMidYMid')
             .attr('width', Config.svg_width)
             .attr('height', Config.svg_height)
-            .attr('viewBox', '0, 0 ' + Config.width + ' ' + Config.height)
-            .on('click', () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
+            .attr('viewBox', '0, 0 ' + Config.width + ' ' + Config.height);
 
     // Append zoomable group
     svg.append('g')
@@ -199,6 +198,9 @@ const setActions = () => {
     const pauseCases = () => {
         clearInterval(playCasesNow);
     };
+
+    d3.select('#clear-tooltip')
+        .on('click', () => { Tooltip.unHighlight(); Tooltip.hideTooltip(); });
 
     // Case slider to highlight nodes by id
     // https://bl.ocks.org/d3noob/c4b31a539304c29767a56c2373eeed79/9d18fc47e580d8c940ffffea1179e77e62647e36
