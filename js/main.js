@@ -72,7 +72,7 @@ const drawGraph = () => {
 
     let simulation = d3.forceSimulation(graph.nodes)
         .force('link', d3.forceLink(graph.links).id( d => d.name))
-        .force('center', d3.forceCenter(Config.width / 2, Config.height / 2))
+        // .force('center', d3.forceCenter(Config.width / 2, Config.height / 2))
         .force('charge', d3.forceManyBody())
         .force('x', d3.forceX())
         .force('y', d3.forceY())
@@ -92,13 +92,13 @@ const drawGraph = () => {
             .attr('preserveAspectRatio', 'xMinYMid')
             .attr('width', Config.svg_width)
             .attr('height', Config.svg_height)
-            .attr('viewBox', '0, 0 ' + Config.width + ' ' + Config.height);
+            .attr('viewBox', [-Config.width / 2, -Config.height / 2, Config.width, Config.height]);
 
     // Append zoomable group
     svg.append('g')
         .attr('class', 'zoomable-group')
         .attr('transform', `translate(${Config.margin.left}, ${Config.margin.top})`)
-        .style('transform-origin', '50% 50% 0');
+        // .style('transform-origin', '50% 50% 0');
 
 };
 
