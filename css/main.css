@@ -42,10 +42,8 @@ h1 {
 
 svg.chart-group {
     width: 100%;
-    height: 100%;
-    display: inline-block;
-    min-width: 340px;
-    min-height: 500px;
+    max-width: 1600px;
+    font: 12px sans-serif;
 }
 
 .link {
@@ -149,13 +147,22 @@ svg.chart-group a {
 	color: #0078A8;
 }
 
-.side-pannel {
-    position: absolute;
-    right: 0;
-    top: 0;
+.side-pannel-left, .side-pannel-right {
     z-index: 100;
     font-size: 12px;
     pointer-events: none;
+}
+
+.side-pannel-left {
+    position: absolute;
+    left: 10px;
+    top: 0;
+}
+
+.side-pannel-right {
+    position: absolute;
+    right: 10px;
+    top: 0;
 }
 
 .control {
@@ -176,8 +183,8 @@ svg.chart-group a {
 	background-repeat: no-repeat;
 	display: block;
 	height: 36px;
-	width: 50px;
-    line-height: 50px;
+	width: 36px;
+    line-height: 36px;
     background-size: contain;
     cursor: pointer;
 }
@@ -205,6 +212,10 @@ svg.chart-group a {
 }
 
 /* http://alessioatzeni.com/metrize-icons/ */
+
+.clear-icon {
+    background-image: url(../icons/brush.svg);
+}
 
 .play-icon {
     background-image: url(../icons/play.svg);
@@ -285,7 +296,7 @@ svg.chart-group a {
 
 .slider {
     position: absolute;
-    left: 10px; top: 0; right: 62px;
+    left: 45px; top: 0; right: 62px;
     margin-top: 10px;
     z-index: 100;
     text-align: center;
@@ -361,29 +372,36 @@ tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .contr
 }
 
 /* Smaller devices */
-@media (max-width: 340px) {
-    .slider {
-        left: 0; top: 0; right: 70px;
-    }
-
-    .side-pannel {
+@media (max-width: 360px) {
+    .side-pannel-left {
         top: 0;
-        height: 500px;
-        overflow-y: auto;
+        left: 5px;
     }
 
-    .control a {
-        width: 36px;
-        line-height: 36px;
+    .side-pannel-right {
+        top: 0;
+        right: 0;
     }
 
     .control #search-input {
         width: 36px;
     }
+
+    .land {
+        stroke-width: 1;
+    }
 }
 
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 550px) {
+    .slider {
+        left: 50px; top: 0; right: 75px;
+    }
+
+    .tooltip-abs {
+        right: 85px; top: 55px;
+    }
+
     .wrapper {
         width: 97%;
     }
@@ -391,8 +409,17 @@ tooltip_div, .county-legend, .status-legend, .gender-legend, .age-legend, .contr
 
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 850px) {
+    .slider {
+        left: 60px; top: 0; right: 80px;
+    }
+
     .wrapper {
         width: 97%;
         float: none;
+    }
+
+    .control a {
+        width: 50px;
+        line-height: 50px;
     }
 }
