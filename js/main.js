@@ -76,8 +76,12 @@ const drawGraph = () => {
         .force('charge', d3.forceManyBody())
         .force('x', d3.forceX())
         .force('y', d3.forceY())
-        .alphaDecay([0.02]);
-    
+        .alphaDecay([0.02])
+        .stop();
+
+    simulation.tick(120);
+    simulation.restart();
+
     simulation.on('tick', ticked);
     simulation.force('link').links(graph.links);
     
