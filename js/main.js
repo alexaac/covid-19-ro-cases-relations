@@ -41,7 +41,6 @@ Promise.all(promises).then( data => {
 const setupGraph = () => {
 
     sources = casesData.data.nodes.filter( d => d.properties.country_of_infection !== null && d.properties.country_of_infection !== 'România' && d.properties.country_of_infection !== 'Romania');
-    let counties = casesData.data.nodes.filter( d => d.properties.county);
 
     graph.nodes = casesData.data.nodes;
     graph.links = casesData.data.links;
@@ -50,10 +49,7 @@ const setupGraph = () => {
 
     // https://observablehq.com/d/cedc594061a988c6
     graph.nodes = graph.nodes.concat(Array.from(new Set(sources.map(d => d.properties.country_of_infection)), name => ({name})));
-    graph.nodes = graph.nodes.concat(Array.from(new Set(counties.map(d => d.properties.county)), name => ({name})));
-
     graph.links = graph.links.concat(sources.map(d => ({target: d.name, source: d.properties.country_of_infection})));
-    graph.links = graph.links.concat(counties.map(d => ({target: d.name, source: d.properties.county})));
 
     graph.nodes = Data.formatNodes(graph.nodes);
 }
