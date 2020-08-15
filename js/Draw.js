@@ -30,10 +30,19 @@ export const NodesAndLinks = (graph, cases) => {
         .append('g')
         .attr('class', 'link');
 
+    const linkArc = (d) => {
+        const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+        return `
+            M${d.source.x},${d.source.y}
+            A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+        `;
+    };
+
     links.append('path')
         .attr('class', d => `CO-links-${d.source.name}`)
         .classed('links', true)
-        .attr('marker-end', d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`);
+        .attr('marker-end', d => `url(${new URL(`#arrow-${d.type}`, location.toString())})`)
+        .attr('d', d => linkArc(d));
 
     links.exit().remove();
 
@@ -48,6 +57,8 @@ export const NodesAndLinks = (graph, cases) => {
         .attr('class', d => d.properties && `CO-nodes-${d.properties.source_no}`)
         .classed('nodes', true)
         .attr('r', d => d.r)
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
         .on('touchstart mouseover', d => Tooltip.highlight(d, cases))
         .on('dblclick', d => Layout.panTo(d));
 
@@ -59,6 +70,8 @@ export const NodesAndLinks = (graph, cases) => {
             .attr('y', '0.31em')
             .text(d => d.name)
             .clone(true).lower();
-            
+
+    d3.selectAll('.node-labels').attr('transform', d => `translate(${d.x},${d.y})`);
+
     nodes.exit().remove();
 } 

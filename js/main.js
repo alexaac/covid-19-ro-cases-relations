@@ -56,20 +56,6 @@ const setupGraph = () => {
 
 const drawGraph = () => {
     
-    const linkArc = (d) => {
-        const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
-        return `
-            M${d.source.x},${d.source.y}
-            A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
-        `;
-    };
-
-    const ticked = () => {
-        d3.selectAll('.links').attr('d', d => linkArc(d));
-        d3.selectAll('.nodes').attr('transform', d => `translate(${d.x},${d.y})`);
-        d3.selectAll('.node-labels').attr('transform', d => `translate(${d.x},${d.y})`);
-    };
-
     let simulation = d3.forceSimulation(graph.nodes)
         .force('link', d3.forceLink(graph.links).id( d => d.name))
         // .force('center', d3.forceCenter(Config.width / 2, Config.height / 2))
@@ -80,14 +66,14 @@ const drawGraph = () => {
         .stop();
 
     simulation.tick(120);
-    simulation.restart();
+    // simulation.restart();
 
-    simulation.on('tick', ticked);
-    simulation.force('link').links(graph.links);
+    // simulation.on('tick', ticked);
+    // simulation.force('link').links(graph.links);
     
-    setTimeout(() => {
-        simulation.stop();
-    }, 5000);
+    // setTimeout(() => {
+    //     simulation.stop();
+    // }, 5000);
 
     // Append the svg object to the chart div
     svg = d3.select('#chart')
