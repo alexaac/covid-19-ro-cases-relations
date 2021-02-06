@@ -162,11 +162,11 @@ export const toggleInfo = (infoStatus, language) => {
     if (infoStatus === true) {
         tooltip_div.transition()
             .duration(200)
+            .style('max-width', '100%')
             .style('opacity', .9);
         tooltip_div.html(Language.infoHtml(language))
             .style('left', Config.width / 2 + 'px')
             .style('top', Config.height / 2 + 'px')
-            .style('max-width', '100%')
             .style('display', null);
         infoStatus = false;
     } else {
