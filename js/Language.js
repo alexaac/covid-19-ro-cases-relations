@@ -10,10 +10,9 @@ judeţul, genul sau vârsta.<br/>
 locurile şi circumstanţele care pot conduce la focare.<br/>
 <strong>Explorează.</strong> Treci pe deasupra fiecărei persoane pentru a vedea cu câţi oameni a intrat în contact, mai multe detalii, şi link-ul web către articolul original
 din media. Selectează altă temă pentru a colora toţi oamenii în funcţie de judeţ, gen, localizare sau stare. Zoom înăuntru pentru a afişa etichele, şi pan
-pentru a naviga. Schimbă limba (română sau engleză) după preferinţe.<br/>
-    Date de pe covid19.geo-spatial.org<br/>
-    Doar cazurile pentru care se cunoaște sursa de infectare.<br/>
-    Ultima actualizare a datelor: 30 iulie 2020.`
+pentru a naviga. Schimbă limba (română sau engleză) după preferinţe.<br/><br/>
+    <strong>Date</strong> de pe covid19.geo-spatial.org. Doar cazurile pentru care se cunoaște sursa de infectare.<br/>
+    <strong>Ultima actualizare a datelor:</strong> 30 iulie 2020.`
     : `<strong>Relationship between confirmed cases.<br/>
     See how many people got infected by each person.</strong> In the visualization below, each circle represents
 a person, its size is proportional to how many people has infected (= were found in the area where the virus was spread by an infected person) and the color
@@ -23,10 +22,9 @@ as a curved line.<br/>
     <strong>See where outbreaks could occur.</strong> The clusters of people, created based on the connections, could reveal possible hot spots and could help us discover the
 locations and the circumstances that can lead to outbreaks.<br/>
     <strong>Explore.</strong> Hover over each person to see how many people got in contact with,  more details, and the link to the original media article. Select another theme
-to color all people by county, gender, location or status. Zoom in to reveal labels, and pan to navigate. Switch the language (Romanian or English) as desired.<br/>
-    <br/>Data from covid19.geo-spatial.org<br/>
-    Only cases with known infection source.<br/>
-    The last data update: 30th of July 2020.`;
+to color all people by county, gender, location or status. Zoom in to reveal labels, and pan to navigate. Switch the language (Romanian or English) as desired.<br/><br/>
+    <strong>Data</strong> from covid19.geo-spatial.org. Only cases with known infection source.<br/>
+    <strong>The last data update:</strong> 30th of July 2020.`;
 };
 
 export const status = (language) => {
