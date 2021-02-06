@@ -30,6 +30,7 @@ export const highlight = (d, cases) => {
 
     tooltip_div.transition()
         .duration(200)
+        .style('max-width', '160px')
         .style('opacity', .9);
 
     d3.select('#CO-' + caseId)
