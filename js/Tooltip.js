@@ -165,6 +165,7 @@ export const toggleInfo = (infoStatus, language) => {
         tooltip_div.html(Language.infoHtml(language))
             .style('left', Config.width / 2 + 'px')
             .style('top', Config.height / 2 + 'px')
+            .style('width', '100%')
             .style('display', null);
         infoStatus = false;
     } else {
