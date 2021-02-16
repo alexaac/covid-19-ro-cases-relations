@@ -1,0 +1,58 @@
+.control {
+  margin-right: 10px;
+  margin-top: 10px;
+  cursor: auto;
+  float: left;
+  clear: both;
+  position: relative;
+  z-index: 800;
+  pointer-events: visiblePainted;
+  pointer-events: auto;
+
+  #search-input {
+    width: 50px;
+
+    @media (max-width: 360px) {
+        width: 36px;
+    }
+  }
+
+  a {
+    text-decoration: none;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    display: block;
+    height: 36px;
+    width: 36px;
+    line-height: 36px;
+    background-size: contain;
+    cursor: pointer;
+
+    @media (min-width: 850px) {
+      width: 50px;
+      line-height: 50px;
+    }
+  }
+
+  &.control-group {
+    a {
+      background-color: #fff;
+      border-bottom: 1px solid #ccc;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      color: black;
+    
+      &:hover {
+        background-color: #f4f4f4;
+      }
+    
+      &:first-child, &:last-child {
+        border-top-left-radius: 2px;
+        border-top-right-radius: 2px;
+      }
+    }
+  }
+}
+
+

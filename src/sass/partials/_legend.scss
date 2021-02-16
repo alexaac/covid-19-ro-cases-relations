@@ -1,0 +1,29 @@
+
+.county-legend,
+.status-legend,
+.gender-legend,
+.age-legend {
+  font-size: 10px;
+  position: absolute;
+  left: 10px;
+  top: 55px;
+  z-index: 100;
+  padding: 5px;
+  overflow-y: auto;
+}
+
+.gender-legend {
+  height: 30%;
+}
+
+.status-legend {
+  height: 40%;
+}
+
+.age-legend {
+  height: 50%;
+}
+
+.county-legend {
+  height: 90%;
+}

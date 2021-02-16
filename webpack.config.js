@@ -8,11 +8,13 @@ const presetConfig = require("./build-utils/loadPresets");
 // JavaScript rule
 const javascript = {
   test: /\.(js)$/,
-  exclude: /node_modules/,
+  exclude: /(node_modules)/,
   use: [
     {
       loader: "babel-loader",
-      options: {}, // this is one way of passing options
+      options: {
+        presets: []
+      },
     },
   ],
 };
@@ -49,7 +51,7 @@ const config = ({ mode, presets } = { mode: "production", presets: [] }) => {
       mode,
       entry: {
         // main JS file
-        app: "./src/main.js",
+        app: "./src/js/index.js",
       },
       // use sourcemaps, 'source-map' specifically
       devtool: "source-map",
@@ -62,6 +64,9 @@ const config = ({ mode, presets } = { mode: "production", presets: [] }) => {
         filename: "[name].js",
       },
       plugins: [htmlPlugin, new webpack.ProgressPlugin()],
+      resolve: {
+        extensions: ['.js', '.jsx', '.scss']
+      }
     },
     modeConfig(mode),
     presetConfig({ mode, presets })

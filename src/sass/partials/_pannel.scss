@@ -1,0 +1,26 @@
+.side-pannel {
+  z-index: 100;
+  font-size: 12px;
+  pointer-events: none;
+
+  position: absolute;
+  top: 0;
+
+  &.side-pannel--left {
+    left: 10px;
+    
+    @media (max-width: 360px) {
+      left: 5px;
+    }
+  }
+  
+  &.side-pannel--right {
+    right: 10px;
+    
+    @media (max-width: 360px) {
+      right: 0;
+    }
+  }
+}
+
+

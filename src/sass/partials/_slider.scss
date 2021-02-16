@@ -1,0 +1,27 @@
+
+.slider {
+  position: absolute;
+  left: 45px;
+  top: 0;
+  right: 62px;
+  margin-top: 10px;
+  z-index: 100;
+  text-align: center;
+  padding: 5px;
+
+  @media (min-width: 550px) {
+    left: 50px;
+    top: 0;
+    right: 75px;
+  }
+
+  @media (min-width: 850px) {
+    left: 60px;
+    top: 0;
+    right: 80px;
+  }
+
+  &__range {
+    width: 100%;
+  }
+}

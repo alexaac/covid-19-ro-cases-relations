@@ -1,0 +1,80 @@
+@charset 'UTF-8';
+
+@import 'partials/variables';
+@import 'partials/pannel';
+@import 'partials/control';
+@import 'partials/icons';
+@import 'partials/legend';
+@import 'partials/tooltip';
+@import 'partials/spinner';
+@import 'partials/link';
+@import 'partials/slider';
+@import 'partials/chart';
+@import 'partials/navigation';
+@import 'partials/map';
+
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  font: 12px Arial;
+  margin: 0px;
+  padding: 0px;
+}
+
+h1 {
+  text-align: center;
+  font: 16px sans-serif;
+}
+
+.wrapper {
+  margin: 0 20;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-y: auto;
+
+  /* Small devices (tablets, 768px and up) */
+  @media (min-width: 550px) {
+    width: 97%;
+  }
+
+  /* Large devices (large desktops, 1200px and up) */
+  @media (min-width: 850px) {
+    width: 97%;
+    float: none;
+  }
+}
+
+.title {
+  font-size: 16px;
+  text-decoration: underline;
+  text-anchor: middle;
+}
+
+button {
+  padding: 10;
+}
+
+.hide {
+  position: absolute;
+  left: -9999px;
+}
+
+tooltip_div,
+.county-legend,
+.status-legend,
+.gender-legend,
+.age-legend,
+.control {
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background: none no-repeat scroll center center #fff;
+  border: 1px solid #bbb;
+  opacity: 0.9;
+}

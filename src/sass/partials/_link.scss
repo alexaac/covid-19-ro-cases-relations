@@ -1,0 +1,19 @@
+.link {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1px;
+  cursor: pointer;
+}
+
+#licensing {
+  fill: green;
+}
+
+.link.licensing {
+  stroke: green;
+}
+
+.link.resolved {
+  stroke-dasharray: 0, 2 1;
+}
+

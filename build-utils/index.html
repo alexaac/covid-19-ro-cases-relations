@@ -24,14 +24,14 @@
         <meta property="twitter:site" content="@maptheclouds" />
     </head>
 
-    <body>
+    <body background="red">
         <div class="wrapper">
-            <div class="side-pannel-left">
+            <div class="side-pannel side-pannel--left">
                 <div class="control control-group">
                     <a id="clear-tooltip" class="clear-icon" href="#" title="Șterge selecția"></a>
                 </div>
             </div>
-            <div class="side-pannel-right">
+            <div class="side-pannel side-pannel--right">
                 <div class="control control-group">
                     <a id="play-cases" class="play-icon" href="#" title="Play"></a>
                     <a id="pause-cases" class="pause-icon hide" href="#" title="Pause"></a>
@@ -62,7 +62,7 @@
             </div>
             <div class="slider">
                 <!-- Caz <span id="nRadius-value">…</span> -->
-                <input class="range" type="range" min="1" max="15000" id="nRadius">
+                <input class="slider__range" type="range" min="1" max="15000" id="nRadius">
             </div>
             <div id="spinner"></div>
             <div id="chart" class="grabbable">

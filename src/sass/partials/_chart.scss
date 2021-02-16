@@ -1,0 +1,64 @@
+svg.chart-group {
+  width: 100%;
+  max-width: 1600px;
+  font: 14px sans-serif;
+}
+
+.node {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+.node-labels {
+  user-select: none;
+  stroke-width: 3px;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+.labels {
+  font: 8px sans-serif;
+  text-anchor: middle;
+}
+
+.node-labels.hidden,
+.labels.hidden {
+  display: none;
+}
+
+.node--hover circle {
+  stroke: #000;
+  stroke-width: 1.2px;
+}
+
+circle {
+  stroke: #333;
+  stroke-width: 1px;
+  cursor: pointer;
+}
+
+svg.chart-group a {
+  color: #0078a8;
+}
+
+.bubble {
+  fill-opacity: 0.3;
+  stroke: black;
+  stroke-width: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+.bubble:hover {
+  fill-opacity: 0.5;
+}
+
+.up-title {
+  text-align: center;
+  position: absolute;
+  top: 0%;
+  width: 100%;
+}
+

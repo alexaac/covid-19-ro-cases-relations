@@ -1,0 +1,81 @@
+
+
+/* http://alessioatzeni.com/metrize-icons/ */
+
+.clear-icon {
+  background-image: url(../icons/brush.svg);
+}
+
+.play-icon {
+  background-image: url(../icons/play.svg);
+}
+
+.pause-icon {
+  background-image: url(../icons/pause.svg);
+}
+
+.counties-icon {
+  background-image: url(../icons/pin.svg);
+}
+
+.status-icon {
+  background-image: url(../icons/like-add.svg);
+}
+
+.legend-icon {
+  background-image: url(../icons/layers.svg);
+}
+
+.map-icon {
+  background-image: url(../icons/map.svg);
+}
+
+.graph-icon {
+  background-image: url(../icons/graphs.svg);
+}
+
+.arcs-icon {
+  background-image: url(../icons/bezier.svg);
+}
+
+.zoom-in-icon {
+  background-image: url(../icons/plus.svg);
+}
+
+.zoom-out-icon {
+  background-image: url(../icons/minus.svg);
+}
+
+.zoom-reset-icon {
+  background-image: url(../icons/arrow-oblique-expand-directions.svg);
+}
+
+.info-icon {
+  background-image: url(../icons/info.svg);
+}
+
+.gender-icon {
+  background-image: url(../icons/sign-gender.svg);
+}
+
+.age-icon {
+  background-image: url(../icons/alarm-clock.svg);
+}
+
+.search-icon {
+  background-image: url(../icons/search.svg);
+}
+
+.ro-icon:after,
+.en-icon:after {
+  font: normal 20px/20px helvetica;
+  display: inline-block;
+}
+
+.ro-icon:after {
+  content: "🇷🇴";
+}
+
+.en-icon:after {
+  content: "🇬🇧";
+}

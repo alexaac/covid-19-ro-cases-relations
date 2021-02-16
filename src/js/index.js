@@ -1,4 +1,4 @@
-import css from "../public/css/main.css";
+import styles from '../sass/main.scss';
 import * as d3 from "d3";
 import * as Spinner from "spin";
 import * as Config from "./Config.js";

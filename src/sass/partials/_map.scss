@@ -1,0 +1,14 @@
+
+.land {
+  fill: #e8e8e8;
+  stroke: #fff;
+  stroke-width: 2;
+
+  &:hover {
+    fill: #d1cfcf;
+  }
+
+  @media (max-width: 360px) {
+    stroke-width: 1;
+  }
+}

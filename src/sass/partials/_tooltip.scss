@@ -1,0 +1,22 @@
+
+tooltip_div.tooltip {
+  /* text-align: center; */
+  position: absolute;
+  color: #222;
+  padding: 10px;
+  font-size: 0.8em;
+  line-height: 12pt;
+  font-family: "EB Garamond", serif;
+  max-width: 160px;
+  z-index: 1000;
+}
+
+.tooltip-abs {
+  right: 70px;
+  top: 55px;
+
+  @media (min-width: 550px) {
+    right: 85px;
+    top: 55px;
+  }
+}
