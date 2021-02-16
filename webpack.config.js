@@ -5,7 +5,28 @@ const path = require("path");
 const modeConfig = (env) => require(`./build-utils/webpack.${env}`)(env);
 const presetConfig = require("./build-utils/loadPresets");
 
-// SVG loader
+// JavaScript rule
+const javascript = {
+  test: /\.(js)$/,
+  exclude: /node_modules/,
+  use: [
+    {
+      loader: "babel-loader",
+      options: {}, // this is one way of passing options
+    },
+  ],
+};
+
+// Image rule
+const image = {
+  test: /\.(png|jpg|gif|eot|ttf|woff|woff2)$/,
+  use: {
+    loader: "url-loader",
+    options: { limit: 10000 },
+  },
+};
+
+// SVG rule
 const svg = {
   test: /\.svg$/,
   use: [
@@ -34,11 +55,11 @@ const config = ({ mode, presets } = { mode: "production", presets: [] }) => {
       devtool: "source-map",
       // different loaders are responsible for different file types
       module: {
-        rules: [svg],
+        rules: [javascript, image, svg],
       },
       output: {
         path: path.resolve(__dirname, "public", "dist"),
-        filename: "[name].bundle.js",
+        filename: "[name].js",
       },
       plugins: [htmlPlugin, new webpack.ProgressPlugin()],
     },

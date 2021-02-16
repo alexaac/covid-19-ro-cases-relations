@@ -7,9 +7,6 @@ const uglifyPlugin = new UglifyJSPlugin({
 });
 
 module.exports = () => ({
-  output: {
-    filename: "bundle.js",
-  },
   module: {
     rules: [
       {
