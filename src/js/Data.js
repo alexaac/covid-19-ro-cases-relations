@@ -1,4 +1,19 @@
-import * as d3 from "d3";
+import { timeParse } from "d3-time-format";
+import { max, range } from "d3-array";
+import { scaleSqrt } from "d3-scale";
+import { nest } from "d3-collection";
+
+// Create a d3 Object with a subset of functions
+const d3 = Object.assign(
+  {},
+  {
+    timeParse,
+    max,
+    range,
+    scaleSqrt,
+    nest,
+  }
+);
 
 export const formatNodes = (nodes) => {
   let parseTime = d3.timeParse("%d-%m-%Y");

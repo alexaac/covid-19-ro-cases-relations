@@ -13,7 +13,7 @@ const javascript = {
     {
       loader: "babel-loader",
       options: {
-        presets: []
+        presets: [],
       },
     },
   ],
@@ -60,13 +60,14 @@ const config = ({ mode, presets } = { mode: "production", presets: [] }) => {
         rules: [javascript, image, svg],
       },
       output: {
-        path: path.resolve(__dirname, "public", "dist"),
+        path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
+        publicPath: "",
       },
       plugins: [htmlPlugin, new webpack.ProgressPlugin()],
       resolve: {
-        extensions: ['.js', '.jsx', '.scss']
-      }
+        extensions: [".js", "*"],
+      },
     },
     modeConfig(mode),
     presetConfig({ mode, presets })

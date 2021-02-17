@@ -1,7 +1,16 @@
-import * as d3 from "d3";
-
-import * as Config from "./Config.js";
+import { select, selectAll, event as currentEvent } from "d3-selection";
+import { transition } from "d3-transition";
 import * as Language from "./Language.js";
+
+// create a Object with only the subset of functions/submodules/plugins that we need
+const d3 = Object.assign(
+  {},
+  {
+    select,
+    selectAll,
+    transition,
+  }
+);
 
 // use a tooltip to show node info
 export const tooltip_div = d3
@@ -12,13 +21,13 @@ export const tooltip_div = d3
   .style("display", "none");
 
 export const highlight = (d, cases) => {
-  let left = d3.event.pageX - 20;
-  let top = d3.event.pageY + 20;
+  let left = currentEvent.pageX - 20;
+  let top = currentEvent.pageY + 20;
 
   let caseId = d.name;
 
   if (window.innerWidth - left < 150) {
-    left = d3.event.pageX - 40;
+    left = currentEvent.pageX - 40;
   }
 
   d3.selectAll(".nodes")

@@ -1,6 +1,15 @@
-import * as d3 from "d3";
+import { select, selectAll } from "d3-selection";
 import * as Layout from "./Layout.js";
 import * as Tooltip from "./Tooltip.js";
+
+// Create a d3 Object with a subset of functions
+const d3 = Object.assign(
+  {},
+  {
+    select,
+    selectAll,
+  }
+);
 
 export const NodesAndLinks = (graph, cases) => {
   let links, nodes;

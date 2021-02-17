@@ -1,17 +1,16 @@
 @charset 'UTF-8';
 
-@import 'partials/variables';
-@import 'partials/pannel';
-@import 'partials/control';
-@import 'partials/icons';
-@import 'partials/legend';
-@import 'partials/tooltip';
-@import 'partials/spinner';
-@import 'partials/link';
-@import 'partials/slider';
-@import 'partials/chart';
-@import 'partials/navigation';
-@import 'partials/map';
+@import "partials/variables";
+@import "partials/pannel";
+@import "partials/control";
+@import "partials/icons";
+@import "partials/legend";
+@import "partials/tooltip";
+@import "partials/spinner";
+@import "partials/link";
+@import "partials/slider";
+@import "partials/chart";
+@import "partials/navigation";
 
 html {
   box-sizing: border-box;

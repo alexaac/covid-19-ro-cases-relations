@@ -1,5 +1,9 @@
-import styles from '../sass/main.scss';
-import * as d3 from "d3";
+import styles from "../sass/main.scss";
+import * as path from "path";
+import { select, selectAll } from "d3-selection";
+import { max } from "d3-array";
+import * as fetch from "d3-fetch";
+import * as force from "d3-force";
 import * as Spinner from "spin";
 import * as Config from "./Config.js";
 import * as Data from "./Data.js";
@@ -7,6 +11,20 @@ import * as Tooltip from "./Tooltip.js";
 import * as Draw from "./Draw.js";
 import * as Language from "./Language.js";
 import * as Layout from "./Layout.js";
+
+// Create a d3 Object with a subset of functions
+const d3 = Object.assign(
+  {},
+  {
+    select,
+    selectAll,
+    max,
+  },
+  fetch,
+  force
+);
+
+const absPath = path.resolve(__dirname, "src/data");
 
 let graph = { nodes: [], links: [] };
 let svg, sources, casesData, cases;
@@ -56,6 +74,7 @@ d3.select("#show-info").dispatch("click");
   // Load data
   const promises = [
     d3.json("https://covid19.geo-spatial.org/api/statistics/getCaseRelations"),
+    // d3.json(`${absPath}/getCaseRelations20210217.json`),
   ];
 
   Promise.all(promises)
@@ -185,15 +204,15 @@ d3.select("#show-info").dispatch("click");
 
     // Zoom by scroll, pan
     d3.select("#zoom-in").on("click", () =>
-      svg.transition().call(Layout.zoom.scaleBy, 2)
+      svg.transition().call(Layout.zoomGraph.scaleBy, 2)
     );
     d3.select("#zoom-out").on("click", () =>
-      svg.transition().call(Layout.zoom.scaleBy, 0.5)
+      svg.transition().call(Layout.zoomGraph.scaleBy, 0.5)
     );
     d3.select("#reset-zoom").on("click", () => Layout.resetZoom());
 
     // Apply zoom handler and zoom out
-    svg.call(Layout.zoom);
+    svg.call(Layout.zoomGraph);
     Layout.resetZoom();
 
     // Change colors from status to counties and vice versa
@@ -244,7 +263,7 @@ d3.select("#show-info").dispatch("click");
     });
 
     const playCases = () => {
-      svg.call(Layout.zoom.scaleTo, 0.5);
+      svg.call(Layout.zoomGraph.scaleTo, 0.5);
       thisCaseOrder = d3.select("#nRadius").node().value;
       if (+thisCaseOrder === +cases.length - 1) thisCaseOrder = 0;
 

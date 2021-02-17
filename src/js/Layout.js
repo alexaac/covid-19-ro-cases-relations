@@ -1,9 +1,30 @@
-import * as d3Base from "d3";
 import { legendColor } from "d3-svg-legend";
+import { schemeSpectral } from "d3-scale-chromatic";
+import { zoom, zoomIdentity } from "d3-zoom";
+import { select, selectAll, event as currentEvent, mouse } from "d3-selection";
+import { symbol, symbolCircle } from "d3-shape";
+import { format } from "d3-format";
+import { scaleOrdinal, scaleQuantile } from "d3-scale";
 import * as Config from "./Config.js";
 
-// attach all d3 plugins to the d3 library
-const d3 = Object.assign(d3Base, { legendColor });
+// Create a d3 Object with a subset of functions
+const d3 = Object.assign(
+  {},
+  {
+    legendColor,
+    schemeSpectral,
+    zoom,
+    select,
+    selectAll,
+    mouse,
+    format,
+    zoomIdentity,
+    scaleOrdinal,
+    scaleQuantile,
+    symbol,
+    symbolCircle,
+  }
+);
 
 export const statusColor = (language) => {
   return language === "ro"
@@ -276,9 +297,9 @@ export const updateRadius = (cases, nRadius) => {
 const zoomed = () => {
   let zoomableGroup = d3.selectAll(".zoomable-group");
 
-  zoomableGroup.attr("transform", d3.event.transform);
+  zoomableGroup.attr("transform", currentEvent.transform);
 
-  let scale = d3.event.transform.k;
+  let scale = currentEvent.transform.k;
   if (scale > 0.8) {
     zoomableGroup
       .selectAll(".node-labels > text")
@@ -301,23 +322,23 @@ export const hideLabels = (z) => {
   d3.selectAll(".labels").classed("hidden", (d) => d.r < 10 / z);
 };
 
-export const zoom = d3.zoom().scaleExtent([0.2, 10]).on("zoom", zoomed);
+export const zoomGraph = d3.zoom().scaleExtent([0.2, 10]).on("zoom", zoomed);
 
 export const resetZoom = () => {
   let svg = d3.select("#chart").select("svg");
 
-  svg.call(zoom.transform, d3.zoomIdentity.scale(0.3));
+  svg.call(zoomGraph.transform, d3.zoomIdentity.scale(0.3));
 };
 
 export const panTo = (d) => {
   let svg = d3.select("#chart").select("svg");
 
-  d3.event.stopPropagation();
+  currentEvent.stopPropagation();
   svg
     .transition()
     .duration(750)
     .call(
-      zoom.transform,
+      zoomGraph.transform,
       d3.zoomIdentity
         .scale(2)
         .translate(-d.x, -d.y)
