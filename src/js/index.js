@@ -12,6 +12,10 @@ import * as Draw from './Draw.js';
 import * as Language from './Language.js';
 import * as Layout from './Layout.js';
 
+import demo from '../img/demo.gif';
+import og from '../img/og_1200_630.png';
+import ogen from '../img/og_1200_630_en.png';
+
 // Create a d3 Object with a subset of functions
 const d3 = Object.assign(
   {},
