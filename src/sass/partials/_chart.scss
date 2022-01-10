@@ -9,6 +9,13 @@ svg.chart-group {
   stroke-linejoin: round;
 }
 
+.link {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1px;
+  cursor: pointer;
+}
+
 text {
   font: 12px sans-serif;
   pointer-events: none;
@@ -41,6 +48,16 @@ circle {
   cursor: pointer;
 }
 
+image {
+  cursor: pointer;
+
+  &:hover {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #999;
+  }
+}
+
 svg.chart-group a {
   color: #0078a8;
 }
@@ -61,4 +78,3 @@ svg.chart-group a {
   top: 0%;
   width: 100%;
 }
-
